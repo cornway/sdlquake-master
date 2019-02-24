@@ -334,9 +334,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls> </MiscControls>
-              <Define>STM32F769xx,USE_HAL_DRIVER,USE_STM32F769I_DISCO,DATA_IN_ExtSDRAM,USE_LCD_HDMI,USE_USB_HS</Define>
+              <Define>STM32F769xx,USE_HAL_DRIVER,USE_STM32F769I_DISCO,DATA_IN_ExtSDRAM,USE_LCD_HDMI,USE_USB_HS,SDLQUAKE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;..\STM32F7xx_Driver\Inc;..\Utilities\JPEG;..\FatFs\src;..\STM32F7xx_Driver\BSP\Components\Common;..\STM32F7xx_Driver\BSP\STM32F769I-Discovery;..\STM32F7xx_Driver\CMSIS\Device\ST\STM32F7xx\Include;..\sdlquake-master</IncludePath>
+              <IncludePath>..\Common\STM32F7xx_Driver\Inc;..\Common\STM32F7xx_Driver\BSP\Components\Common;..\Common\STM32F7xx_Driver\BSP\STM32F769I-Discovery;..\Common\STM32F7xx_Driver\CMSIS\Device\ST\STM32F7xx\Include;..\Common\FatFs\src;..\Common\Utilities\JPEG;..\Inc;..\sdlquake-master;..\common\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -379,13 +379,6 @@
       <Groups>
         <Group>
           <GroupName>Doc</GroupName>
-          <Files>
-            <File>
-              <FileName>readme.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>../readme.txt</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>Drivers/STM32F7xx_HAL_Driver</GroupName>
@@ -393,157 +386,157 @@
             <File>
               <FileName>stm32f7xx_hal_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_flash.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_flash.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_flash_ex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_flash_ex.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_flash_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_i2c.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_i2c.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_i2c_ex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_i2c_ex.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_i2c_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_rcc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_rcc.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_rcc.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_gpio.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_pwr_ex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_pwr_ex.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_pwr_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_rcc_ex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_rcc_ex.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_rcc_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_cortex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_cortex.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_cortex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_dma.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_dma.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_pwr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_pwr.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_pwr.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_dma2d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_dma2d.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_dma2d.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_ltdc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_ltdc.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_ltdc.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_dma_ex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_dma_ex.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_dma_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_sd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_sd.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_sd.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_sdram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_sdram.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_sdram.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_jpeg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_jpeg.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_jpeg.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_ll_sdmmc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_ll_sdmmc.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_ll_sdmmc.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_ltdc_ex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_ltdc_ex.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_ltdc_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_ll_fmc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_ll_fmc.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_ll_fmc.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_dsi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_dsi.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_dsi.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_dfsdm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_dfsdm.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_dfsdm.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_sai.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_sai.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_sai.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_sai_ex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_sai_ex.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_sai_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_i2s.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_i2s.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_i2s.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_ll_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_ll_spi.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_ll_spi.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_spi.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_spi.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_qspi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_qspi.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_qspi.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_hal_hcd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_hal_hcd.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_hal_hcd.c</FilePath>
             </File>
             <File>
               <FileName>stm32f7xx_ll_usb.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\Src\stm32f7xx_ll_usb.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\Src\stm32f7xx_ll_usb.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -563,22 +556,12 @@
             <File>
               <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\FatFs\src\option\syscall.c</FilePath>
+              <FilePath>..\Common\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
               <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\FatFs\src\option\unicode.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Middlewares/FatFs/Drivers</GroupName>
-          <Files>
-            <File>
-              <FileName>sd_diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/sd_diskio.c</FilePath>
+              <FilePath>..\Common\FatFs\src\option\unicode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -611,49 +594,9 @@
               <FilePath>../Src/stm32f7xx_it.c</FilePath>
             </File>
             <File>
-              <FileName>audio_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\audio_main.c</FilePath>
-            </File>
-            <File>
-              <FileName>input_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\input_main.c</FilePath>
-            </File>
-            <File>
-              <FileName>lcd_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\lcd_main.c</FilePath>
-            </File>
-            <File>
               <FileName>i_sdlsound.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\i_sdlsound.c</FilePath>
-            </File>
-            <File>
-              <FileName>music_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\music_main.c</FilePath>
-            </File>
-            <File>
-              <FileName>qspi_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\qspi_flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>fixed_div.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\Src\fixed_div.s</FilePath>
-            </File>
-            <File>
-              <FileName>usb_hid_gamepad.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\usb_hid_gamepad.c</FilePath>
-            </File>
-            <File>
-              <FileName>mach_stub.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\mach_stub.c</FilePath>
             </File>
             <File>
               <FileName>STUB.c</FileName>
@@ -668,22 +611,22 @@
             <File>
               <FileName>adv7533.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\Components\adv7533\adv7533.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\Components\adv7533\adv7533.c</FilePath>
             </File>
             <File>
               <FileName>otm8009a.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\Components\otm8009a\otm8009a.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\Components\otm8009a\otm8009a.c</FilePath>
             </File>
             <File>
               <FileName>ft6x06.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\Components\ft6x06\ft6x06.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\Components\ft6x06\ft6x06.c</FilePath>
             </File>
             <File>
               <FileName>wm8994.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\Components\wm8994\wm8994.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\Components\wm8994\wm8994.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -693,37 +636,37 @@
             <File>
               <FileName>stm32f769i_discovery.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery.c</FilePath>
             </File>
             <File>
               <FileName>stm32f769i_discovery_lcd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_lcd.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_lcd.c</FilePath>
             </File>
             <File>
               <FileName>stm32f769i_discovery_sd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_sd.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_sd.c</FilePath>
             </File>
             <File>
               <FileName>stm32f769i_discovery_sdram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_sdram.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_sdram.c</FilePath>
             </File>
             <File>
               <FileName>stm32f769i_discovery_ts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_ts.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_ts.c</FilePath>
             </File>
             <File>
               <FileName>stm32f769i_discovery_audio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_audio.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_audio.c</FilePath>
             </File>
             <File>
               <FileName>stm32f769i_discovery_qspi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_qspi.c</FilePath>
+              <FilePath>..\Common\STM32F7xx_Driver\BSP\STM32F769I-Discovery\stm32f769i_discovery_qspi.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -733,22 +676,19 @@
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\FatFs\src\diskio.c</FilePath>
+              <FilePath>..\Common\FatFs\src\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\FatFs\src\ff.c</FilePath>
+              <FilePath>..\Common\FatFs\src\ff.c</FilePath>
             </File>
             <File>
               <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\FatFs\src\ff_gen_drv.c</FilePath>
+              <FilePath>..\Common\FatFs\src\ff_gen_drv.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>Utilities</GroupName>
         </Group>
         <Group>
           <GroupName>usbh</GroupName>
@@ -756,47 +696,47 @@
             <File>
               <FileName>usbh_conf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\usbh_conf.c</FilePath>
+              <FilePath>..\Common\usbh_conf.c</FilePath>
             </File>
             <File>
               <FileName>usbh_core.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\usbh_core.c</FilePath>
+              <FilePath>..\Common\usbh_core.c</FilePath>
             </File>
             <File>
               <FileName>usbh_ctlreq.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\usbh_ctlreq.c</FilePath>
+              <FilePath>..\Common\usbh_ctlreq.c</FilePath>
             </File>
             <File>
               <FileName>usbh_hid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\usbh_hid.c</FilePath>
+              <FilePath>..\Common\usbh_hid.c</FilePath>
             </File>
             <File>
               <FileName>usbh_hid_keybd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\usbh_hid_keybd.c</FilePath>
+              <FilePath>..\Common\usbh_hid_keybd.c</FilePath>
             </File>
             <File>
               <FileName>usbh_hid_mouse.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\usbh_hid_mouse.c</FilePath>
+              <FilePath>..\Common\usbh_hid_mouse.c</FilePath>
             </File>
             <File>
               <FileName>usbh_hid_parser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\usbh_hid_parser.c</FilePath>
+              <FilePath>..\Common\usbh_hid_parser.c</FilePath>
             </File>
             <File>
               <FileName>usbh_ioreq.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\usbh_ioreq.c</FilePath>
+              <FilePath>..\Common\usbh_ioreq.c</FilePath>
             </File>
             <File>
               <FileName>usbh_pipes.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\usbh_pipes.c</FilePath>
+              <FilePath>..\Common\usbh_pipes.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1117,6 +1057,46 @@
               <FileName>zone.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\sdlquake-master\zone.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>common</GroupName>
+          <Files>
+            <File>
+              <FileName>audio_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\audio_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>input_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\input_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\lcd_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>mach_stub.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\mach_stub.c</FilePath>
+            </File>
+            <File>
+              <FileName>music_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\music_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\sd_diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_hid_gamepad.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\usb_hid_gamepad.c</FilePath>
             </File>
           </Files>
         </Group>
