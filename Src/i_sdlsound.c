@@ -26,7 +26,8 @@
 #include <samplerate.h>
 #endif
 
-#include "deh_str.h"
+#if 0
+
 #include "i_sound.h"
 #include "i_system.h"
 #include "i_swap.h"
@@ -1142,3 +1143,4 @@ sound_module_t sound_sdl_module =
     I_SDL_PrecacheSounds,
 };
 
+#endif

@@ -14,14 +14,21 @@ static void error_handle (void)
 #define N(x) (sizeof(x) / sizeof(x[0]))
 
 static const char mus_dir_path[] =
-"/doom/music";
+"/id1/music";
 
 #define MUS_BUF_GUARD_MS (AUDIO_MS_TO_SIZE(AUDIO_SAMPLE_RATE, AUDIO_OUT_BUFFER_SIZE) / 2)
 #define MUS_CHK_GUARD(mus) ((systime - (mus)->last_upd_tsf) > MUS_BUF_GUARD_MS)
 
 #define MUS_BUF_LEN_MS 1000
 
-#define MUS_RAM_BUF_SIZE AUDIO_OUT_BUFFER_SIZE * 10
+/*IMPORTANT NOTE : music won't play with small cache buffer (less than 'AUDIO_OUT_BUFFER_SIZE * 5'), -
+  frequent access to the sd card (or any other storage)
+  in blocking mode (currently used mode) - will hungs up system forever!
+*/
+/*NOTE 2 : cache size of 'AUDIO_OUT_BUFFER_SIZE * 5' seems to be ok,
+  but such size will cause less fps.
+*/
+#define MUS_RAM_BUF_SIZE AUDIO_OUT_BUFFER_SIZE * 5
 
 static snd_sample_t mus_ram_buf[2][MUS_RAM_BUF_SIZE];
 

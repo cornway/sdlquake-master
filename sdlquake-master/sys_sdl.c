@@ -1,24 +1,12 @@
 /* -*- Mode: C; tab-width: 4 -*- */ 
 
-#include <unistd.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdarg.h>
+#include "main.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
 #ifndef __WIN32__
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <sys/mman.h>
+
 #endif
 
 #include "quakedef.h"
@@ -43,21 +31,13 @@ void Sys_DebugNumber(int y, int val)
 
 void Sys_Printf (char *fmt, ...)
 {
-	va_list		argptr;
-	char		text[1024];
-	
-	va_start (argptr,fmt);
-	vsprintf (text,fmt,argptr);
-	va_end (argptr);
-	fprintf(stderr, "%s", text);
-	
-	//Con_Print (text);
+
 }
 
 void Sys_Quit (void)
 {
 	Host_Shutdown();
-	exit(0);
+	for (;;) {}
 }
 
 void Sys_Init(void)
@@ -95,28 +75,12 @@ void Sys_HighFPPrecision (void)
 
 void Sys_Error (char *error, ...)
 { 
-    va_list     argptr;
-    char        string[1024];
-
-    va_start (argptr,error);
-    vsprintf (string,error,argptr);
-    va_end (argptr);
-	fprintf(stderr, "Error: %s\n", string);
-
-	Host_Shutdown ();
-	exit (1);
-
+    Sys_Quit();
 } 
 
 void Sys_Warn (char *warning, ...)
 { 
-    va_list     argptr;
-    char        string[1024];
-    
-    va_start (argptr,warning);
-    vsprintf (string,warning,argptr);
-    va_end (argptr);
-	fprintf(stderr, "Warning: %s", string);
+
 } 
 
 /*
@@ -126,19 +90,22 @@ FILE IO
 
 ===============================================================================
 */
+#include "ff.h"
+#include "main.h"
 
-#define	MAX_HANDLES		10
-FILE	*sys_handles[MAX_HANDLES];
+#define MAX_HANDLES		2
+FIL sys_handles[MAX_HANDLES];
+uint8_t handle_ready[MAX_HANDLES] = {0};
 
-int		findhandle (void)
+int findhandle (void)
 {
-	int		i;
-	
-	for (i=1 ; i<MAX_HANDLES ; i++)
-		if (!sys_handles[i])
-			return i;
-	Sys_Error ("out of handles");
-	return -1;
+    int i;
+
+    for (i=1 ; i<MAX_HANDLES ; i++)
+        if (!handle_ready[i])
+            return i;
+    Sys_Error ("out of handles");
+    return -1;
 }
 
 /*
@@ -146,123 +113,106 @@ int		findhandle (void)
 Qfilelength
 ================
 */
-static int Qfilelength (FILE *f)
+static int Qfilelength (FIL *f)
 {
-	int		pos;
-	int		end;
-
-	pos = ftell (f);
-	fseek (f, 0, SEEK_END);
-	end = ftell (f);
-	fseek (f, pos, SEEK_SET);
-
-	return end;
+    return f_size(f);
 }
 
 int Sys_FileOpenRead (char *path, int *hndl)
 {
-	FILE	*f;
-	int		i;
-	
-	i = findhandle ();
+    FRESULT res;
+    FIL *f;
+    int i;
 
-	f = fopen(path, "rb");
-	if (!f)
-	{
-		*hndl = -1;
-		return -1;
-	}
-	sys_handles[i] = f;
-	*hndl = i;
-	
-	return Qfilelength(f);
+    i = findhandle ();
+
+    res = f_open(&sys_handles[i], path, FA_OPEN_EXISTING | FA_READ);
+    if (res != FR_OK) {
+        *hndl = -1;
+        return -1;
+    }
+    handle_ready[i] = 1;
+    *hndl = i;
+
+    return Qfilelength(f);
 }
 
 int Sys_FileOpenWrite (char *path)
 {
-	FILE	*f;
-	int		i;
-	
-	i = findhandle ();
+    FRESULT res;
+    int i;
 
-	f = fopen(path, "wb");
-	if (!f)
-		Sys_Error ("Error opening %s: %s", path,strerror(errno));
-	sys_handles[i] = f;
-	
-	return i;
+    i = findhandle ();
+
+    res = f_open(&sys_handles[i], path, FA_OPEN_EXISTING | FA_WRITE);
+    if (res != FR_OK) {
+        return -1;
+    }
+    handle_ready[i] = 1;
+
+    return i;
 }
 
 void Sys_FileClose (int handle)
 {
-	if ( handle >= 0 ) {
-		fclose (sys_handles[handle]);
-		sys_handles[handle] = NULL;
-	}
+    if ( handle >= 0 ) {
+        f_close (&sys_handles[handle]);
+        handle_ready[handle] = 0;
+    }
 }
 
 void Sys_FileSeek (int handle, int position)
 {
-	if ( handle >= 0 ) {
-		fseek (sys_handles[handle], position, SEEK_SET);
-	}
+    if ( handle >= 0 ) {
+        f_lseek(&sys_handles[handle], position);
+    }
 }
 
 int Sys_FileRead (int handle, void *dst, int count)
 {
-	char *data;
-	int size, done;
+    char *data;
+    UINT size, done;
 
-	size = 0;
-	if ( handle >= 0 ) {
-		data = dst;
-		while ( count > 0 ) {
-			done = fread (data, 1, count, sys_handles[handle]);
-			if ( done == 0 ) {
-				break;
-			}
-			data += done;
-			count -= done;
-			size += done;
-		}
-	}
-	return size;
-		
+    size = 0;
+    if ( handle >= 0 ) {
+        data = dst;
+        while ( count > 0 ) {
+            f_read (&sys_handles[handle], data, count, &done);
+            if ( done == 0 ) {
+                break;
+            }
+            data += done;
+            count -= done;
+            size += done;
+        }
+    }
+    return size;
 }
 
 int Sys_FileWrite (int handle, void *src, int count)
 {
-	char *data;
-	int size, done;
+        char *data;
+    UINT size, done;
 
-	size = 0;
-	if ( handle >= 0 ) {
-		data = src;
-		while ( count > 0 ) {
-			done = fread (data, 1, count, sys_handles[handle]);
-			if ( done == 0 ) {
-				break;
-			}
-			data += done;
-			count -= done;
-			size += done;
-		}
-	}
-	return size;
+    size = 0;
+    if ( handle >= 0 ) {
+        data = src;
+        while ( count > 0 ) {
+            f_write (&sys_handles[handle], data, count, &done);
+            if ( done == 0 ) {
+                break;
+            }
+            data += done;
+            count -= done;
+            size += done;
+        }
+    }
+    return size;
 }
 
 int	Sys_FileTime (char *path)
 {
-	FILE	*f;
-	
-	f = fopen(path, "rb");
-	if (f)
-	{
-		fclose(f);
-		return 1;
-	}
-	
-	return -1;
+    return 0;
 }
 
 void Sys_mkdir (char *path)
@@ -270,24 +220,18 @@ void Sys_mkdir (char *path)
 #ifdef __WIN32__
     mkdir (path);
 #else
-    mkdir (path, 0777);
+    static DIR dp;
+    f_opendir(&dp, path);
 #endif
 }
 
 void Sys_DebugLog(char *file, char *fmt, ...)
 {
-    va_list argptr; 
-    static char data[1024];
-    FILE *fp;
-    
-    va_start(argptr, fmt);
-    vsprintf(data, fmt, argptr);
-    va_end(argptr);
-    fp = fopen(file, "a");
-    fwrite(data, strlen(data), 1, fp);
-    fclose(fp);
+
 }
 
+
+extern volatile uint32_t systime;
 double Sys_FloatTime (void)
 {
 #ifdef __WIN32__
@@ -301,19 +245,7 @@ double Sys_FloatTime (void)
 
 #else
 
-    struct timeval tp;
-    struct timezone tzp; 
-    static int      secbase; 
-    
-    gettimeofday(&tp, &tzp);  
-
-    if (!secbase)
-    {
-        secbase = tp.tv_sec;
-        return tp.tv_usec/1000000.0;
-    }
-
-    return (tp.tv_sec - secbase) + tp.tv_usec/1000000.0;
+    return systime;
 
 #endif
 }
@@ -324,6 +256,10 @@ double Sys_FloatTime (void)
 
 static volatile int oktogo;
 
+extern volatile uint8_t *__heap_buf_raw;
+extern volatile size_t __heap_buf_raw_size;
+
+
 void alarm_handler(int x)
 {
 	oktogo=1;
@@ -332,19 +268,8 @@ void alarm_handler(int x)
 byte *Sys_ZoneBase (int *size)
 {
 
-	char *QUAKEOPT = getenv("QUAKEOPT");
-
-	*size = 0xc00000;
-	if (QUAKEOPT)
-	{
-		while (*QUAKEOPT)
-			if (tolower(*QUAKEOPT++) == 'm')
-			{
-				*size = atof(QUAKEOPT) * 1024*1024;
-				break;
-			}
-	}
-	return malloc (*size);
+    *size = __heap_buf_raw_size;
+    return (byte *)__heap_buf_raw;
 
 }
 
@@ -354,48 +279,48 @@ void Sys_LineRefresh(void)
 
 void Sys_Sleep(void)
 {
-	SDL_Delay(1);
+	HAL_Delay(1);
 }
 
 void floating_point_exception_handler(int whatever)
 {
-//	Sys_Warn("floating point exception\n");
-	signal(SIGFPE, floating_point_exception_handler);
+    Sys_Error("floating point exception\n");
 }
 
 void moncontrol(int x)
 {
 }
 
-int main (int c, char **v)
+
+extern volatile uint8_t *__heap_buf_raw;
+extern volatile size_t __heap_buf_raw_size;
+
+int SDL_main (int argc, const char *argv[])
 {
 
-	double		time, oldtime, newtime;
-	quakeparms_t parms;
-	extern int vcrFile;
-	extern int recording;
-	static int frame;
+    double  time, oldtime, newtime;
+    quakeparms_t parms;
+    extern int vcrFile;
+    extern int recording;
+    static int frame;
 
-	moncontrol(0);
+    moncontrol(0);
 
-//	signal(SIGFPE, floating_point_exception_handler);
-	signal(SIGFPE, SIG_IGN);
-
-	parms.memsize = 32*1024*1024;
-	parms.membase = malloc (parms.memsize);
-	parms.basedir = basedir;
+    parms.memsize = __heap_buf_raw_size;
+    parms.membase = (void *)__heap_buf_raw;
+    parms.basedir = basedir;
     // Disable cache, else it looks in the cache for config.cfg.
-	parms.cachedir = NULL;
+    parms.cachedir = NULL;
 
-	COM_InitArgv(c, v);
-	parms.argc = com_argc;
-	parms.argv = com_argv;
+    COM_InitArgv(argc, (char **)argv);
+    parms.argc = com_argc;
+    parms.argv = com_argv;
 
-	Sys_Init();
+    Sys_Init();
 
     Host_Init(&parms);
 
-	Cvar_RegisterVariable (&sys_nostdout);
+    Cvar_RegisterVariable (&sys_nostdout);
 
     oldtime = Sys_FloatTime () - 0.1;
     while (1)
@@ -408,7 +333,7 @@ int main (int c, char **v)
         {   // play vcrfiles at max speed
             if (time < sys_ticrate.value && (vcrFile == -1 || recording) )
             {
-                SDL_Delay (1);
+                HAL_Delay (1);
                 continue;       // not time to run a server only tic yet
             }
             time = sys_ticrate.value;
@@ -439,7 +364,7 @@ Sys_MakeCodeWriteable
 */
 void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 {
-
+#if 0
 	int r;
 	unsigned long addr;
 	int psize = getpagesize();
@@ -452,6 +377,6 @@ void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 
 	if (r < 0)
     		Sys_Error("Protection change failed\n");
-
+#endif
 }
 

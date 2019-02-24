@@ -2,9 +2,6 @@
 #include "main.h"
 #include "stm32f769i_discovery_ts.h"
 #include <stdlib.h>
-#include "doomkeys.h"
-#include "d_event.h"
-#include "i_timer.h"
 
 #define TS_DEF_CD_COUNT 0
 touch_state_t touch_state;

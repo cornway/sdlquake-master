@@ -1371,8 +1371,9 @@ Finds the file in the search path.
 Sets com_filesize and one of handle or file
 ===========
 */
-int COM_FindFile (char *filename, int *handle, FILE **file)
+int COM_FindFile (char *filename, int *handle, FIL *file)
 {
+    FRESULT res = FR_OK;
 	searchpath_t    *search;
 	char            netpath[MAX_OSPATH];
 	char            cachepath[MAX_OSPATH];
@@ -1413,9 +1414,9 @@ int COM_FindFile (char *filename, int *handle, FILE **file)
 					}
 					else
 					{       // open a new file on the pakfile
-						*file = fopen (pak->filename, "rb");
-						if (*file)
-							fseek (*file, pak->files[i].filepos, SEEK_SET);
+						res = f_open (file, pak->filename, FA_OPEN_EXISTING | FA_READ);
+						if (file)
+							f_lseek (file, pak->files[i].filepos);
 					}
 					com_filesize = pak->files[i].filelen;
 					return com_filesize;
@@ -1430,7 +1431,7 @@ int COM_FindFile (char *filename, int *handle, FILE **file)
 					continue;
 			}
 			
-			sprintf (netpath, "%s/%s",search->filename, filename);
+			//sprintf (netpath, "%s/%s",search->filename, filename);
 			
 			findtime = Sys_FileTime (netpath);
 			if (findtime == -1)
@@ -1447,7 +1448,7 @@ int COM_FindFile (char *filename, int *handle, FILE **file)
 				else
 					sprintf (cachepath,"%s%s", com_cachedir, netpath+2);
 #else
-				sprintf (cachepath,"%s/%s", com_cachedir, netpath);
+				//sprintf (cachepath,"%s/%s", com_cachedir, netpath);
 #endif
 
 				cachetime = Sys_FileTime (cachepath);
@@ -1464,7 +1465,7 @@ int COM_FindFile (char *filename, int *handle, FILE **file)
 			else
 			{
 				Sys_FileClose (i);
-				*file = fopen (netpath, "rb");
+				res = f_open (file, netpath, FA_OPEN_ALWAYS | FA_READ);
 			}
 			return com_filesize;
 		}
@@ -1475,8 +1476,7 @@ int COM_FindFile (char *filename, int *handle, FILE **file)
 	
 	if (handle)
 		*handle = -1;
-	else
-		*file = NULL;
+
 	com_filesize = -1;
 	return -1;
 }
@@ -1504,7 +1504,7 @@ If the requested file is inside a packfile, a new FILE * will be opened
 into the file.
 ===========
 */
-int COM_FOpenFile (char *filename, FILE **file)
+int COM_FOpenFile (char *filename, FIL *file)
 {
 	return COM_FindFile (filename, NULL, file);
 }

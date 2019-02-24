@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "quakedef.h"
+#include "ff.h"
 
 void CL_FinishTimeDemo (void);
 
@@ -47,9 +48,8 @@ void CL_StopPlayback (void)
 	if (!cls.demoplayback)
 		return;
 
-	fclose (cls.demofile);
+	f_close (&cls.demofile);
 	cls.demoplayback = false;
-	cls.demofile = NULL;
 	cls.state = ca_disconnected;
 
 	if (cls.timedemo)
@@ -65,6 +65,7 @@ Dumps the current net message, prefixed by the length and view angles
 */
 void CL_WriteDemoMessage (void)
 {
+#if 0
 	int		len;
 	int		i;
 	float	f;
@@ -78,6 +79,7 @@ void CL_WriteDemoMessage (void)
 	}
 	fwrite (net_message.data, net_message.cursize, 1, cls.demofile);
 	fflush (cls.demofile);
+#endif
 }
 
 /*
@@ -89,6 +91,7 @@ Handles recording and playback of demos, on top of NET_ code
 */
 int CL_GetMessage (void)
 {
+#if 0
 	int		r, i;
 	float	f;
 	
@@ -153,6 +156,8 @@ int CL_GetMessage (void)
 		CL_WriteDemoMessage ();
 	
 	return r;
+#endif
+        return 0;
 }
 
 
@@ -165,6 +170,7 @@ stop recording a demo
 */
 void CL_Stop_f (void)
 {
+#if 0
 	if (cmd_source != src_command)
 		return;
 
@@ -184,6 +190,7 @@ void CL_Stop_f (void)
 	cls.demofile = NULL;
 	cls.demorecording = false;
 	Con_Printf ("Completed demo\n");
+#endif
 }
 
 /*
@@ -195,6 +202,7 @@ record <demoname> <map> [cd track]
 */
 void CL_Record_f (void)
 {
+#if 0
 	int		c;
 	char	name[MAX_OSPATH];
 	int		track;
@@ -255,6 +263,7 @@ void CL_Record_f (void)
 	fprintf (cls.demofile, "%i\n", cls.forcetrack);
 	
 	cls.demorecording = true;
+#endif
 }
 
 
@@ -267,6 +276,7 @@ play [demoname]
 */
 void CL_PlayDemo_f (void)
 {
+    UINT btr;
 	char	name[256];
 	int c;
 	qboolean neg = false;
@@ -293,22 +303,19 @@ void CL_PlayDemo_f (void)
 
 	Con_Printf ("Playing demo from %s.\n", name);
 	COM_FOpenFile (name, &cls.demofile);
-	if (!cls.demofile)
-	{
-		Con_Printf ("ERROR: couldn't open.\n");
-		cls.demonum = -1;		// stop demo loop
-		return;
-	}
 
 	cls.demoplayback = true;
 	cls.state = ca_connected;
 	cls.forcetrack = 0;
 
-	while ((c = getc(cls.demofile)) != '\n')
+    f_read(&cls.demofile, &c, 1, &btr);
+	while (c != '\n') {
 		if (c == '-')
 			neg = true;
 		else
 			cls.forcetrack = cls.forcetrack * 10 + (c - '0');
+        f_read(&cls.demofile, &c, 1, &btr);
+    }
 
 	if (neg)
 		cls.forcetrack = -cls.forcetrack;

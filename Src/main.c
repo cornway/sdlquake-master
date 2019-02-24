@@ -35,6 +35,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "quakedef.h"
 #include "lcd_main.h"
 #include "audio_main.h"
 #include "usbh_hid.h"
@@ -51,6 +52,9 @@ void fatal_error (const char* message)
 }
 extern void qspi_flash_init (void);
 extern void gamepad_init (void);
+/** The prototype for the application's main() function */
+extern int SDL_main(int argc, const char *argv[]);
+
 
 FATFS SDFatFs;  /* File system object for SD card logical drive */
 char SDPath[4]; /* SD card logical drive path */
@@ -71,6 +75,13 @@ static void CPU_CACHE_Enable(void);
 volatile uint8_t *__heap_buf_raw = (void *)(SDRAM_VOL_START + SCREEN_FB_MEM_SIZE_MAX);
 volatile size_t __heap_buf_raw_size = (SDRAM_VOL_SIZE - SCREEN_FB_MEM_SIZE_MAX);
 volatile pix_t *screen_fb_mem_start = (void *)SDRAM_VOL_START;
+
+const char *argv[] =
+{
+    __FILE__,
+};
+
+const int argc = arrlen(argv);
 
 int main(void)
 {
@@ -93,6 +104,10 @@ int main(void)
     if(f_mount(&SDFatFs, (TCHAR const*)SDPath, 0) != FR_OK) {
         return -1;
     }
+
+    SDL_main(argc, argv);
+
+    return 0;
 }
 
 static void SystemClock_Config(void)

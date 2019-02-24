@@ -5,9 +5,9 @@
   Mark Baker <homer1@together.net>
 */
 
-#include <SDL.h>
-
 #include "quakedef.h"
+
+#if 0
 
 static qboolean cdValid = false;
 static qboolean initialized = false;
@@ -221,3 +221,4 @@ static void CD_f()
 	}
 }
 
+#endif

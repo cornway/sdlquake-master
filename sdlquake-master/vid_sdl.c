@@ -1,8 +1,9 @@
 // vid_sdl.h -- sdl video driver 
 
-#include "SDL.h"
 #include "quakedef.h"
 #include "d_local.h"
+#include "gfx.h"
+#include "sdl_video.h"
 
 viddef_t    vid;                // global video state
 unsigned short  d_8to16table[256];
@@ -29,6 +30,7 @@ void (*vid_menukeyfn)(int key) = NULL;
 
 void    VID_SetPalette (unsigned char *palette)
 {
+#if 0
     int i;
     SDL_Color colors[256];
 
@@ -39,6 +41,7 @@ void    VID_SetPalette (unsigned char *palette)
         colors[i].b = *palette++;
     }
     SDL_SetColors(screen, colors, 0, 256);
+#endif
 }
 
 void    VID_ShiftPalette (unsigned char *palette)
@@ -48,6 +51,7 @@ void    VID_ShiftPalette (unsigned char *palette)
 
 void    VID_Init (unsigned char *palette)
 {
+#if 0
     int pnum, chunk;
     byte *cache;
     int cachesize;
@@ -133,6 +137,7 @@ void    VID_Init (unsigned char *palette)
 
     // initialize the mouse
     SDL_ShowCursor(0);
+#endif
 }
 
 void    VID_Shutdown (void)
@@ -142,6 +147,7 @@ void    VID_Shutdown (void)
 
 void    VID_Update (vrect_t *rects)
 {
+#if 0
     SDL_Rect *sdlrects;
     int n, i;
     vrect_t *rect;
@@ -166,6 +172,7 @@ void    VID_Update (vrect_t *rects)
         ++i;
     }
     SDL_UpdateRects(screen, n, sdlrects);
+#endif
 }
 
 /*
@@ -175,12 +182,12 @@ D_BeginDirectRect
 */
 void D_BeginDirectRect (int x, int y, byte *pbitmap, int width, int height)
 {
-    Uint8 *offset;
+    uint8_t *offset;
 
 
     if (!screen) return;
     if ( x < 0 ) x = screen->w+x-1;
-    offset = (Uint8 *)screen->pixels + y*screen->pitch + x;
+    offset = (uint8_t *)screen->pixels + y*screen->pitch + x;
     while ( height-- )
     {
         memcpy(offset, pbitmap, width);
@@ -211,6 +218,7 @@ Sys_SendKeyEvents
 
 void Sys_SendKeyEvents(void)
 {
+#if 0
     SDL_Event event;
     int sym, state;
      int modstate;
@@ -334,6 +342,7 @@ void Sys_SendKeyEvents(void)
                 break;
         }
     }
+#endif
 }
 
 void IN_Init (void)

@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "r_local.h"
+#include "ff.h"
 
 #define MAX_PARTICLES			2048	// default max # of particles at one
 										//  time
@@ -195,7 +196,8 @@ void R_ClearParticles (void)
 
 void R_ReadPointFile_f (void)
 {
-	FILE	*f;
+	FIL	f;
+    char *s, s_buf[128];
 	vec3_t	org;
 	int		r;
 	int		c;
@@ -204,18 +206,16 @@ void R_ReadPointFile_f (void)
 	
 	sprintf (name,"maps/%s.pts", sv.name);
 
-	COM_FOpenFile (name, &f);
-	if (!f)
-	{
-		Con_Printf ("couldn't open %s\n", name);
-		return;
-	}
-	
+	if (COM_FOpenFile (name, &f) < 0) {
+        Sys_Error("");
+    }
+
 	Con_Printf ("Reading %s...\n", name);
 	c = 0;
 	for ( ;; )
 	{
-		r = fscanf (f,"%f %f %f\n", &org[0], &org[1], &org[2]);
+	    s = f_gets(s_buf, sizeof(s_buf), &f);
+		r = sscanf (s,"%f %f %f\n", &org[0], &org[1], &org[2]);
 		if (r != 3)
 			break;
 		c++;
@@ -237,7 +237,7 @@ void R_ReadPointFile_f (void)
 		VectorCopy (org, p->org);
 	}
 
-	fclose (f);
+	f_close (&f);
 	Con_Printf ("%i points read\n", c);
 }
 

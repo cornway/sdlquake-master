@@ -3,7 +3,6 @@
 
 #include "main.h"
 #include "touch.h"
-#include "doomkeys.h"
 
 #define GAMEPAD_USE_FLYLOOK 1
 

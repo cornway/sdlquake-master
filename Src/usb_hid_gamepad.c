@@ -5,6 +5,14 @@
 #include "usbh_hid.h"
 #include "input_main.h"
 
+static USBH_HandleTypeDef hUSBHost;
+static uint32_t gamepad_data[2];
+
+uint64_t gamepad_data_ev;
+int8_t gamepad_data_ready = 0;
+static uint8_t needs_handle_cnt;
+
+
 #define UP_DOWN_MASK    0x0000ff00
 #define UP_DOWN_GPOS    8
 #define LR_MASK         0x000000ff
@@ -52,6 +60,10 @@ enum {
     K_MAX = 14,
 };
 
+static int8_t keypads[K_MAX];
+
+#if 0
+
 static const struct usb_gamepad_to_kbd_map gamepad_to_kbd_map[] =
 {
     [K_UP]      = {KEY_UPARROW,       PAD_LOOK_CONTROL | PAD_LOOK_UP, 0, 0, 0},
@@ -81,13 +93,6 @@ get_gamepad_to_kbd_map (uint8_t *keys_cnt)
     return gamepad_to_kbd_map;
 }
 
-static USBH_HandleTypeDef hUSBHost;
-static uint32_t gamepad_data[2];
-uint64_t gamepad_data_ev;
-int8_t gamepad_data_ready = 0;
-static int8_t keypads[K_MAX];
-static uint8_t needs_handle_cnt;
-
 static inline int
 set_pad_state (int pad_idx, int state)
 {
@@ -102,26 +107,7 @@ set_pad_state (int pad_idx, int state)
     return 0;
 }
 
-static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id);
-USBH_StatusTypeDef USBH_HID_GamepadInit(USBH_HandleTypeDef *phost);
 
-
-
-void gamepad_init (void)
-{
-    USBH_Init(&hUSBHost, USBH_UserProcess, 0);
-    USBH_RegisterClass(&hUSBHost, USBH_HID_CLASS);
-    USBH_Start(&hUSBHost);
-    for (int i = 0; i < K_MAX; i++) {
-        keypads[i] = -1;
-    }
-    needs_handle_cnt = 0;
-}
-
-void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
-{
-
-}
 
 int gamepad_read (int8_t *pads)
 {
@@ -176,6 +162,29 @@ int gamepad_read (int8_t *pads)
     return needs_handle_cnt;
 }
 
+
+#endif
+
+static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id);
+USBH_StatusTypeDef USBH_HID_GamepadInit(USBH_HandleTypeDef *phost);
+
+
+
+void gamepad_init (void)
+{
+    USBH_Init(&hUSBHost, USBH_UserProcess, 0);
+    USBH_RegisterClass(&hUSBHost, USBH_HID_CLASS);
+    USBH_Start(&hUSBHost);
+    for (int i = 0; i < K_MAX; i++) {
+        keypads[i] = -1;
+    }
+    needs_handle_cnt = 0;
+}
+
+void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
+{
+
+}
 
 void gamepad_process (void)
 {

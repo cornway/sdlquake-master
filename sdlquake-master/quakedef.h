@@ -78,7 +78,9 @@ void	VID_UnlockBuffer (void);
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 #define CACHE_SIZE	32		// used to align key data structures
 
+#ifndef UNUSED
 #define UNUSED(x)	(x = x)	// for pesky compiler / lint warnings
+#endif
 
 #define	MINIMUM_MEMORY			0x550000
 #define	MINIMUM_MEMORY_LEVELPAK	(MINIMUM_MEMORY + 0x100000)
@@ -335,3 +337,7 @@ extern	cvar_t	chase_active;
 void Chase_Init (void);
 void Chase_Reset (void);
 void Chase_Update (void);
+
+#ifndef arrlen
+#define arrlen(a) (sizeof(a) / sizeof(a[0]))
+#endif
