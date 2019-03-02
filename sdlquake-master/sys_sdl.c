@@ -11,7 +11,7 @@
 
 #include "quakedef.h"
 
-qboolean			isDedicated;
+qboolean        isDedicated;
 
 int noconinput = 0;
 
@@ -94,61 +94,75 @@ FILE IO
 #include "main.h"
 
 #define MAX_HANDLES		2
-FIL sys_handles[MAX_HANDLES];
-uint8_t handle_ready[MAX_HANDLES] = {0};
 
-int findhandle (void)
+typedef struct {
+    FIL file;
+    int is_owned;
+} fhandle_t;
+
+fhandle_t sys_handles[MAX_HANDLES];
+
+static FIL *allochandle (int *num)
 {
     int i;
 
-    for (i=1 ; i<MAX_HANDLES ; i++)
-        if (!handle_ready[i])
-            return i;
-    Sys_Error ("out of handles");
-    return -1;
+    for (i=0 ; i<MAX_HANDLES ; i++) {
+        if (sys_handles[i].is_owned == 0) {
+            sys_handles[i].is_owned = 1;
+            *num = i;
+            return &sys_handles[i].file;
+        }
+    }
+    return NULL;
 }
 
-/*
-================
-Qfilelength
-================
-*/
-static int Qfilelength (FIL *f)
+static inline FIL *gethandle (int num)
 {
-    return f_size(f);
+    return &sys_handles[num].file;
+}
+
+static void releasehandle (int handle)
+{
+    sys_handles[handle].is_owned = 0;
 }
 
 int Sys_FileOpenRead (char *path, int *hndl)
 {
     FRESULT res;
     FIL *f;
-    int i;
 
-    i = findhandle ();
-
-    res = f_open(&sys_handles[i], path, FA_OPEN_EXISTING | FA_READ);
-    if (res != FR_OK) {
+    f = allochandle(hndl);
+    if (f == NULL) {
         *hndl = -1;
         return -1;
     }
-    handle_ready[i] = 1;
-    *hndl = i;
 
-    return Qfilelength(f);
+    res = f_open(f, path, FA_OPEN_EXISTING | FA_READ);
+    if (res != FR_OK) {
+        releasehandle(*hndl);
+        *hndl = -1;
+        return -1;
+    }
+
+    return f_size(f);
 }
 
 int Sys_FileOpenWrite (char *path)
 {
     FRESULT res;
+    FIL *f;
     int i;
 
-    i = findhandle ();
-
-    res = f_open(&sys_handles[i], path, FA_OPEN_EXISTING | FA_WRITE);
-    if (res != FR_OK) {
+    f = allochandle(&i);
+    if (f == NULL) {
         return -1;
     }
-    handle_ready[i] = 1;
+
+    res = f_open(f, path, FA_OPEN_EXISTING | FA_WRITE);
+    if (res != FR_OK) {
+        releasehandle(i);
+        return -1;
+    }
 
     return i;
 }
@@ -156,58 +170,48 @@ int Sys_FileOpenWrite (char *path)
 void Sys_FileClose (int handle)
 {
     if ( handle >= 0 ) {
-        f_close (&sys_handles[handle]);
-        handle_ready[handle] = 0;
+        f_close(gethandle(handle));
+        releasehandle(handle);
     }
 }
 
 void Sys_FileSeek (int handle, int position)
 {
     if ( handle >= 0 ) {
-        f_lseek(&sys_handles[handle], position);
+        f_lseek(gethandle(handle), position);
     }
 }
 
 int Sys_FileRead (int handle, void *dst, int count)
 {
     char *data;
-    UINT size, done;
+    UINT done;
+    FRESULT res = FR_NOT_READY;
 
-    size = 0;
     if ( handle >= 0 ) {
         data = dst;
-        while ( count > 0 ) {
-            f_read (&sys_handles[handle], data, count, &done);
-            if ( done == 0 ) {
-                break;
-            }
-            data += done;
-            count -= done;
-            size += done;
-        }
+        res = f_read(gethandle(handle), data, count, &done);
     }
-    return size;
+    if (res != FR_OK) {
+        Sys_Error("Could not read file from handle : %d\n", handle);
+    }
+    return done;
 }
 
 int Sys_FileWrite (int handle, void *src, int count)
 {
-        char *data;
-    UINT size, done;
+    char *data;
+    UINT done;
+    FRESULT res = FR_NOT_READY;
 
-    size = 0;
     if ( handle >= 0 ) {
         data = src;
-        while ( count > 0 ) {
-            f_write (&sys_handles[handle], data, count, &done);
-            if ( done == 0 ) {
-                break;
-            }
-            data += done;
-            count -= done;
-            size += done;
-        }
+        res = f_write (gethandle(handle), data, count, &done);
     }
-    return size;
+    if (res != FR_OK) {
+        Sys_Error("Could not write file from handle : %d\n", handle);
+    }
+    return done;
 }
 
 int	Sys_FileTime (char *path)
@@ -220,8 +224,12 @@ void Sys_mkdir (char *path)
 #ifdef __WIN32__
     mkdir (path);
 #else
+    FRESULT res;
     static DIR dp;
-    f_opendir(&dp, path);
+    res = f_opendir(&dp, path);
+    if (res != FR_OK) {
+        Sys_Error("Mkdir fail for path : %s\n", path);
+    }
 #endif
 }
 

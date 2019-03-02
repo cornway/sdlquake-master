@@ -1431,7 +1431,7 @@ int COM_FindFile (char *filename, int *handle, FIL *file)
 					continue;
 			}
 			
-			//sprintf (netpath, "%s/%s",search->filename, filename);
+			sprintf (netpath, "%s/%s",search->filename, filename);
 			
 			findtime = Sys_FileTime (netpath);
 			if (findtime == -1)
@@ -1448,7 +1448,7 @@ int COM_FindFile (char *filename, int *handle, FIL *file)
 				else
 					sprintf (cachepath,"%s%s", com_cachedir, netpath+2);
 #else
-				//sprintf (cachepath,"%s/%s", com_cachedir, netpath);
+				sprintf (cachepath,"%s/%s", com_cachedir, netpath);
 #endif
 
 				cachetime = Sys_FileTime (cachepath);

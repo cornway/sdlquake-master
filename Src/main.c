@@ -50,7 +50,7 @@ void fatal_error (const char* message)
 {
     for (;;) {}
 }
-extern void qspi_flash_init (void);
+
 extern void gamepad_init (void);
 /** The prototype for the application's main() function */
 extern int SDL_main(int argc, const char *argv[]);
@@ -91,7 +91,6 @@ int main(void)
     BSP_LED_Init(LED1);
     BSP_LED_Init(LED2);
 
-    qspi_flash_init();
     screen_init();
     gamepad_init();
     audio_init();
