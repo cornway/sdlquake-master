@@ -4,6 +4,7 @@
 #include "d_local.h"
 #include "gfx.h"
 #include "sdl_video.h"
+#include "lcd_main.h"
 
 viddef_t    vid;                // global video state
 unsigned short  d_8to16table[256];
@@ -12,8 +13,12 @@ unsigned short  d_8to16table[256];
 //#define    BASEWIDTH    320
 //#define    BASEHEIGHT   200
 // Much better for high resolution displays
-#define    BASEWIDTH    (320*2)
-#define    BASEHEIGHT   (200*2)
+#define    BASEWIDTH    (320)
+#define    BASEHEIGHT   (200)
+
+#define D_SCREEN_PIX_CNT (BASEWIDTH * BASEHEIGHT)
+#define D_SCREEN_BYTE_CNT (D_SCREEN_PIX_CNT * sizeof(pix_t))
+
 
 int    VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes = 0;
 byte    *VGA_pagebase;
@@ -28,21 +33,24 @@ static int mouse_oldbuttonstate = 0;
 void (*vid_menudrawfn)(void) = NULL;
 void (*vid_menukeyfn)(int key) = NULL;
 
-void    VID_SetPalette (unsigned char *palette)
+void VID_SetPalette (byte* palette)
 {
-#if 0
-    int i;
-    SDL_Color colors[256];
+    unsigned int i;
+    pal_t pal[256];
+	  byte r, g, b;
 
-    for ( i=0; i<256; ++i )
+    for (i = 0; i < 256; i++)
     {
-        colors[i].r = *palette++;
-        colors[i].g = *palette++;
-        colors[i].b = *palette++;
+				r = *palette++;
+			  g = *palette++;
+				b = *palette++;
+        pal[i] = GFX_RGB(GFX_OPAQUE, r, g, b);
     }
-    SDL_SetColors(screen, colors, 0, 256);
-#endif
+    screen_sync(1);
+    screen_set_clut(pal, 256);
+    return;
 }
+
 
 void    VID_ShiftPalette (unsigned char *palette)
 {
@@ -51,17 +59,11 @@ void    VID_ShiftPalette (unsigned char *palette)
 
 void    VID_Init (unsigned char *palette)
 {
-#if 0
-    int pnum, chunk;
+    int chunk;
     byte *cache;
     int cachesize;
-    Uint8 video_bpp;
-    Uint16 video_w, video_h;
     Uint32 flags;
-
-    // Load the SDL library
-    if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_CDROM) < 0)
-        Sys_Error("VID: Couldn't load SDL: %s", SDL_GetError());
+    screen_t lcd_screen;
 
     // Set up display mode (width and height)
     vid.width = BASEWIDTH;
@@ -69,46 +71,31 @@ void    VID_Init (unsigned char *palette)
     vid.maxwarpwidth = WARP_WIDTH;
     vid.maxwarpheight = WARP_HEIGHT;
 
-    // check for command-line window size
-    if ((pnum=COM_CheckParm("-winsize")))
-    {
-        if (pnum >= com_argc-2)
-            Sys_Error("VID: -winsize <width> <height>\n");
-        vid.width = Q_atoi(com_argv[pnum+1]);
-        vid.height = Q_atoi(com_argv[pnum+2]);
-        if (!vid.width || !vid.height)
-            Sys_Error("VID: Bad window width/height\n");
-    }
-    if ((pnum=COM_CheckParm("-width"))) {
-        if (pnum >= com_argc-1)
-            Sys_Error("VID: -width <width>\n");
-        vid.width = Q_atoi(com_argv[pnum+1]);
-        if (!vid.width)
-            Sys_Error("VID: Bad window width\n");
-    }
-    if ((pnum=COM_CheckParm("-height"))) {
-        if (pnum >= com_argc-1)
-            Sys_Error("VID: -height <height>\n");
-        vid.height = Q_atoi(com_argv[pnum+1]);
-        if (!vid.height)
-            Sys_Error("VID: Bad window height\n");
-    }
+    lcd_screen.buf = NULL;
+    lcd_screen.width = BASEWIDTH;
+    lcd_screen.height = BASEHEIGHT;
+
+    screen_win_cfg(&lcd_screen);
+
+    screen = (SDL_Surface *)Hunk_HighAllocName(BASEWIDTH * BASEHEIGHT * sizeof(pix_t) + sizeof(SDL_Surface), "screen");
+
+    if (screen == NULL)
+        Sys_Error ("Not enough memory for video mode\n");
 
     // Set video width, height and flags
     flags = (SDL_SWSURFACE|SDL_HWPALETTE|SDL_FULLSCREEN);
 
-    if ( COM_CheckParm ("-fullscreen") )
-        flags |= SDL_FULLSCREEN;
+    memset(screen, 0, sizeof(SDL_Surface));
 
-    if ( COM_CheckParm ("-window") ) {
-        flags &= ~SDL_FULLSCREEN;
-    }
+    screen->pixels = (void *)(screen + 1);
+    screen->flags = flags;
+    screen->w = BASEWIDTH;
+    screen->h = BASEHEIGHT;
+    screen->offset = 0;
+    screen->pitch = BASEWIDTH;
 
-    // Initialize display 
-    if (!(screen = SDL_SetVideoMode(vid.width, vid.height, 8, flags)))
-        Sys_Error("VID: Couldn't set video mode: %s\n", SDL_GetError());
     VID_SetPalette(palette);
-    SDL_WM_SetCaption("sdlquake","sdlquake");
+
     // now know everything we need to know about the buffer
     VGA_width = vid.conwidth = vid.width;
     VGA_height = vid.conheight = vid.height;
@@ -121,7 +108,7 @@ void    VID_Init (unsigned char *palette)
     vid.conbuffer = vid.buffer;
     vid.conrowbytes = vid.rowbytes;
     vid.direct = 0;
-    
+
     // allocate z buffer and surface cache
     chunk = vid.width * vid.height * sizeof (*d_pzbuffer);
     cachesize = D_SurfaceCacheForRes (vid.width, vid.height);
@@ -130,14 +117,20 @@ void    VID_Init (unsigned char *palette)
     if (d_pzbuffer == NULL)
         Sys_Error ("Not enough memory for video mode\n");
 
-    // initialize the cache memory 
-        cache = (byte *) d_pzbuffer
+    // initialize the cache memory
+    cache = (byte *) d_pzbuffer
                 + vid.width * vid.height * sizeof (*d_pzbuffer);
     D_InitCaches (cache, cachesize);
 
-    // initialize the mouse
-    SDL_ShowCursor(0);
-#endif
+    chunk += cachesize;
+    d_pzbuffer = Hunk_HighAllocName(chunk, "video");
+    if (d_pzbuffer == NULL)
+        Sys_Error ("Not enough memory for video mode\n");
+
+    // initialize the cache memory
+    cache = (byte *) d_pzbuffer
+                + vid.width * vid.height * sizeof (*d_pzbuffer);
+    D_InitCaches (cache, cachesize);
 }
 
 void    VID_Shutdown (void)
@@ -145,34 +138,109 @@ void    VID_Shutdown (void)
     SDL_Quit();
 }
 
+#if GFX_COLOR_MODE != GFX_COLOR_MODE_CLUT
+#error "Unsupported mode"
+#endif
+
+#if 1
+
+typedef struct {
+    pix_t a[4];
+} scanline_t;
+
+typedef union {
+#if (GFX_COLOR_MODE == GFX_COLOR_MODE_CLUT)
+    uint32_t w;
+#elif (GFX_COLOR_MODE == GFX_COLOR_MODE_RGB565)
+    uint64_t w;
+#endif
+    scanline_t sl;
+} scanline_u;
+
+#define DST_NEXT_LINE(x) (((uint32_t)(x) + BASEWIDTH * 2 * sizeof(pix_t)))
+#define W_STEP (sizeof(scanline_t) / sizeof(pix_t))
+
+void uiUpdate (vrect_t *rect, screen_t *lcd_screen)
+{
+    uint64_t *d_y0;
+    uint64_t *d_y1;
+    uint64_t pix;
+    int s_y, i;
+    scanline_t *scanline;
+    scanline_u d_yt0, d_yt1;
+    pix_t *videbuf = (pix_t *)screen->pixels;
+
+    d_y0 = (uint64_t *)lcd_screen->buf;
+    d_y1 = (uint64_t *)DST_NEXT_LINE(d_y0);
+
+    for (s_y = 0; s_y < D_SCREEN_PIX_CNT; s_y += BASEWIDTH) {
+
+        scanline = (scanline_t *)&videbuf[s_y];
+
+        for (i = 0; i < BASEWIDTH; i += W_STEP) {
+
+            d_yt0.sl = *scanline++;
+            d_yt1    = d_yt0;
+
+            d_yt0.sl.a[3] = d_yt0.sl.a[1];
+            d_yt0.sl.a[2] = d_yt0.sl.a[1];
+            d_yt0.sl.a[1] = d_yt0.sl.a[0];
+
+            d_yt1.sl.a[0] = d_yt1.sl.a[2];
+            d_yt1.sl.a[1] = d_yt1.sl.a[2];
+            d_yt1.sl.a[2] = d_yt1.sl.a[3];
+
+            pix = (uint64_t)(((uint64_t)d_yt1.w << 32) | d_yt0.w);
+            *d_y0++     = pix;
+            *d_y1++     = pix;
+        }
+        d_y0 = d_y1;
+        d_y1 = (uint64_t *)DST_NEXT_LINE(d_y0);
+    }
+}
+
+#else
+
+void uiUpdate (vrect_t *rect, screen_t *lcd_screen)
+{
+    pix_t *scanline;
+    pix_t *dest, *src;
+    int pix_cnt;
+    int x0, w, line, pix;
+
+    dest = (pix_t *)lcd_screen->buf;
+    pix_cnt = screen->w * screen->h;
+    w = screen->w;
+
+    src = (pix_t *)screen->pixels;
+    line = rect->x + (rect->y * w);
+    src = src + line;
+    x0 = rect->x;
+
+    for (; line < pix_cnt; line += w) {
+
+        scanline = (pix_t *)screen->pixels;
+        scanline = &scanline[line];
+
+        for (pix = x0; pix < w; pix++) {
+            dest[pix] = scanline[pix];
+        }
+    }
+}
+
+#endif
+
 void    VID_Update (vrect_t *rects)
 {
-#if 0
-    SDL_Rect *sdlrects;
-    int n, i;
     vrect_t *rect;
+    screen_t lcd_screen;
 
-    // Two-pass system, since Quake doesn't do it the SDL way...
+    screen_sync (0);
+    screen_get_invis_screen(&lcd_screen);
 
-    // First, count the number of rectangles
-    n = 0;
-    for (rect = rects; rect; rect = rect->pnext)
-        ++n;
-
-    // Second, copy them to SDL rectangles and update
-    if (!(sdlrects = (SDL_Rect *)alloca(n*sizeof(*sdlrects))))
-        Sys_Error("Out of memory");
-    i = 0;
-    for (rect = rects; rect; rect = rect->pnext)
-    {
-        sdlrects[i].x = rect->x;
-        sdlrects[i].y = rect->y;
-        sdlrects[i].w = rect->width;
-        sdlrects[i].h = rect->height;
-        ++i;
+    for (rect = rects; rect; rect = rect->pnext) {
+        uiUpdate(rect, &lcd_screen);
     }
-    SDL_UpdateRects(screen, n, sdlrects);
-#endif
 }
 
 /*
