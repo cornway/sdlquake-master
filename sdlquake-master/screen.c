@@ -619,6 +619,7 @@ void SCR_ScreenShot_f (void)
 // 
 // find a file name to save it to 
 // 
+    int fhandle;
 	strcpy(pcxname,"quake00.pcx");
 		
 	for (i=0 ; i<=99 ; i++) 
@@ -648,6 +649,7 @@ void SCR_ScreenShot_f (void)
 									//  for linear writes all the time
 
 	Con_Printf ("Wrote %s\n", pcxname);
+    Sys_FileClose(fhandle);
 } 
 
 

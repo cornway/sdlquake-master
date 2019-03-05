@@ -218,7 +218,7 @@ Called to play the next demo in the demo loop
 */
 void CL_NextDemo (void)
 {
-	char	str[1024];
+	char	str[1024];/*!!*/
 
 	if (cls.demonum == -1)
 		return;		// don't play demos

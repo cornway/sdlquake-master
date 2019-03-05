@@ -952,9 +952,9 @@ r_refdef must be set before the first call
 */
 void R_RenderView_ (void)
 {
-	byte	warpbuffer[WARP_WIDTH * WARP_HEIGHT];
+	//byte	warpbuffer[WARP_WIDTH * WARP_HEIGHT];
 
-	r_warpbuffer = warpbuffer;
+	r_warpbuffer = (void *)(byte *)vid.buffer;//warpbuffer;
 
 	if (r_timegraph.value || r_speeds.value || r_dspeeds.value)
 		r_time1 = Sys_FloatTime ();

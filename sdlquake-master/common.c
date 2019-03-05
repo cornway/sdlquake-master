@@ -1371,7 +1371,7 @@ Finds the file in the search path.
 Sets com_filesize and one of handle or file
 ===========
 */
-int COM_FindFile (char *filename, int *handle, FIL *file)
+int COM_FindFile (char *filename, int *handle, void *file)
 {
     FRESULT res = FR_OK;
 	searchpath_t    *search;
@@ -1381,12 +1381,17 @@ int COM_FindFile (char *filename, int *handle, FIL *file)
 	int                     i;
 	int                     findtime, cachetime;
 
+    if (file) {
+        Sys_Error ("COM_FindFile: file deprecated");
+    }
+
 	if (file && handle)
 		Sys_Error ("COM_FindFile: both handle and file set");
 	if (!file && !handle)
 		Sys_Error ("COM_FindFile: neither handle or file set");
 		
 //
+
 // search through the path, one element at a time
 //
 	search = com_searchpaths;
@@ -1411,12 +1416,6 @@ int COM_FindFile (char *filename, int *handle, FIL *file)
 					{
 						*handle = pak->handle;
 						Sys_FileSeek (pak->handle, pak->files[i].filepos);
-					}
-					else
-					{       // open a new file on the pakfile
-						res = f_open (file, pak->filename, FA_OPEN_EXISTING | FA_READ);
-						if (file)
-							f_lseek (file, pak->files[i].filepos);
 					}
 					com_filesize = pak->files[i].filelen;
 					return com_filesize;
@@ -1504,9 +1503,9 @@ If the requested file is inside a packfile, a new FILE * will be opened
 into the file.
 ===========
 */
-int COM_FOpenFile (char *filename, FIL *file)
+int COM_FOpenFile (char *filename, int *handle)
 {
-	return COM_FindFile (filename, NULL, file);
+	return COM_FindFile (filename, handle, NULL);
 }
 
 /*

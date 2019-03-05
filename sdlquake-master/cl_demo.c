@@ -48,7 +48,8 @@ void CL_StopPlayback (void)
 	if (!cls.demoplayback)
 		return;
 
-	f_close (&cls.demofile);
+	Sys_FileClose(cls.demofile);
+    cls.demofile = -1;
 	cls.demoplayback = false;
 	cls.state = ca_disconnected;
 
@@ -91,7 +92,6 @@ Handles recording and playback of demos, on top of NET_ code
 */
 int CL_GetMessage (void)
 {
-#if 0
 	int		r, i;
 	float	f;
 	
@@ -117,19 +117,19 @@ int CL_GetMessage (void)
 		}
 		
 	// get the next message
-		fread (&net_message.cursize, 4, 1, cls.demofile);
+		Sys_FileRead(cls.demofile, &net_message.cursize, sizeof(net_message.cursize));
 		VectorCopy (cl.mviewangles[0], cl.mviewangles[1]);
 		for (i=0 ; i<3 ; i++)
 		{
-			r = fread (&f, 4, 1, cls.demofile);
+			r = Sys_FileRead (cls.demofile, &f, sizeof(f));
 			cl.mviewangles[0][i] = LittleFloat (f);
 		}
 		
 		net_message.cursize = LittleLong (net_message.cursize);
 		if (net_message.cursize > MAX_MSGLEN)
 			Sys_Error ("Demo message > MAX_MSGLEN");
-		r = fread (net_message.data, net_message.cursize, 1, cls.demofile);
-		if (r != 1)
+		r = Sys_FileRead(cls.demofile, net_message.data, net_message.cursize);
+		if (r != net_message.cursize)
 		{
 			CL_StopPlayback ();
 			return 0;
@@ -156,7 +156,6 @@ int CL_GetMessage (void)
 		CL_WriteDemoMessage ();
 	
 	return r;
-#endif
         return 0;
 }
 
@@ -170,7 +169,6 @@ stop recording a demo
 */
 void CL_Stop_f (void)
 {
-#if 0
 	if (cmd_source != src_command)
 		return;
 
@@ -186,11 +184,10 @@ void CL_Stop_f (void)
 	CL_WriteDemoMessage ();
 
 // finish up
-	fclose (cls.demofile);
-	cls.demofile = NULL;
+	Sys_FileClose(cls.demofile);
+	cls.demofile = -1;
 	cls.demorecording = false;
 	Con_Printf ("Completed demo\n");
-#endif
 }
 
 /*
@@ -276,7 +273,6 @@ play [demoname]
 */
 void CL_PlayDemo_f (void)
 {
-    UINT btr;
 	char	name[256];
 	int c;
 	qboolean neg = false;
@@ -308,13 +304,13 @@ void CL_PlayDemo_f (void)
 	cls.state = ca_connected;
 	cls.forcetrack = 0;
 
-    f_read(&cls.demofile, &c, 1, &btr);
+    Sys_FileRead(cls.demofile, &c, 1);
 	while (c != '\n') {
 		if (c == '-')
 			neg = true;
 		else
 			cls.forcetrack = cls.forcetrack * 10 + (c - '0');
-        f_read(&cls.demofile, &c, 1, &btr);
+        Sys_FileRead(cls.demofile, &c, 1);
     }
 
 	if (neg)

@@ -93,7 +93,7 @@ FILE IO
 #include "ff.h"
 #include "main.h"
 
-#define MAX_HANDLES		2
+#define MAX_HANDLES		3
 
 typedef struct {
     FIL file;
@@ -185,7 +185,7 @@ void Sys_FileSeek (int handle, int position)
 int Sys_FileRead (int handle, void *dst, int count)
 {
     char *data;
-    UINT done;
+    UINT done = 0;
     FRESULT res = FR_NOT_READY;
 
     if ( handle >= 0 ) {
@@ -196,6 +196,14 @@ int Sys_FileRead (int handle, void *dst, int count)
         Sys_Error("Could not read file from handle : %d\n", handle);
     }
     return done;
+}
+
+char *Sys_FileGetS (int handle, char *dst, int count)
+{
+    if (f_gets(dst, count, gethandle(handle)) == NULL) {
+        Sys_Error("Could not read file from handle : %d\n", handle);
+    }
+    return dst;
 }
 
 int Sys_FileWrite (int handle, void *src, int count)

@@ -196,17 +196,17 @@ void R_ClearParticles (void)
 
 void R_ReadPointFile_f (void)
 {
-	FIL	f;
     char *s, s_buf[128];
 	vec3_t	org;
 	int		r;
 	int		c;
 	particle_t	*p;
 	char	name[MAX_OSPATH];
+    int fhandle;
 	
 	sprintf (name,"maps/%s.pts", sv.name);
 
-	if (COM_FOpenFile (name, &f) < 0) {
+	if (COM_FOpenFile (name, &fhandle) < 0) {
         Sys_Error("");
     }
 
@@ -214,7 +214,7 @@ void R_ReadPointFile_f (void)
 	c = 0;
 	for ( ;; )
 	{
-	    s = f_gets(s_buf, sizeof(s_buf), &f);
+	    s = Sys_FileGetS(fhandle, s_buf, sizeof(s_buf));
 		r = sscanf (s,"%f %f %f\n", &org[0], &org[1], &org[2]);
 		if (r != 3)
 			break;
@@ -237,7 +237,7 @@ void R_ReadPointFile_f (void)
 		VectorCopy (org, p->org);
 	}
 
-	f_close (&f);
+	Sys_FileClose(fhandle);
 	Con_Printf ("%i points read\n", c);
 }
 

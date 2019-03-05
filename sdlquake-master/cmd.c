@@ -95,7 +95,7 @@ void Cbuf_AddText (char *text)
 		return;
 	}
 
-	SZ_Write (&cmd_text, text, Q_strlen (text));
+	SZ_Write (&cmd_text, text, Q_strlen (text));/*strlen*/
 }
 
 
@@ -144,7 +144,7 @@ void Cbuf_Execute (void)
 {
 	int		i;
 	char	*text;
-	char	line[1024];
+	static char	line[1024];
 	int		quotes;
 	
 	while (cmd_text.cursize)
