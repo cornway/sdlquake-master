@@ -1371,7 +1371,7 @@ Finds the file in the search path.
 Sets com_filesize and one of handle or file
 ===========
 */
-int COM_FindFile (char *filename, int *handle, void *file)
+int COM_FindFile (char *filename, int *handle, int *pos)
 {
     FRESULT res = FR_OK;
 	searchpath_t    *search;
@@ -1381,13 +1381,7 @@ int COM_FindFile (char *filename, int *handle, void *file)
 	int                     i;
 	int                     findtime, cachetime;
 
-    if (file) {
-        Sys_Error ("COM_FindFile: file deprecated");
-    }
-
-	if (file && handle)
-		Sys_Error ("COM_FindFile: both handle and file set");
-	if (!file && !handle)
+	if (!handle)
 		Sys_Error ("COM_FindFile: neither handle or file set");
 		
 //
@@ -1412,11 +1406,10 @@ int COM_FindFile (char *filename, int *handle, void *file)
 				if (!strcmp (pak->files[i].name, filename))
 				{       // found it!
 					Sys_Printf ("PackFile: %s : %s\n",pak->filename, filename);
-					if (handle)
-					{
-						*handle = pak->handle;
-						Sys_FileSeek (pak->handle, pak->files[i].filepos);
-					}
+					*handle = pak->handle;
+											if (pos)
+													*pos = pak->files[i].filepos;
+					Sys_FileSeek (pak->handle, pak->files[i].filepos);
 					com_filesize = pak->files[i].filelen;
 					return com_filesize;
 				}
@@ -1459,13 +1452,7 @@ int COM_FindFile (char *filename, int *handle, void *file)
 
 			Sys_Printf ("FindFile: %s\n",netpath);
 			com_filesize = Sys_FileOpenRead (netpath, &i);
-			if (handle)
-				*handle = i;
-			else
-			{
-				Sys_FileClose (i);
-				res = f_open (file, netpath, FA_OPEN_ALWAYS | FA_READ);
-			}
+		  *handle = i;
 			return com_filesize;
 		}
 		
@@ -1503,9 +1490,9 @@ If the requested file is inside a packfile, a new FILE * will be opened
 into the file.
 ===========
 */
-int COM_FOpenFile (char *filename, int *handle)
+int COM_FOpenFile (char *filename, int *handle, int *pos)
 {
-	return COM_FindFile (filename, handle, NULL);
+	return COM_FindFile (filename, handle, pos);
 }
 
 /*

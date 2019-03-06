@@ -43,12 +43,15 @@ CL_StopPlayback
 Called when a demo file runs out, or the user starts a game
 ==============
 */
+extern int          demo_message_start;
+
 void CL_StopPlayback (void)
 {
 	if (!cls.demoplayback)
 		return;
 
-	Sys_FileClose(cls.demofile);
+	COM_CloseFile(cls.demofile);
+    demo_message_start = 0;
     cls.demofile = -1;
 	cls.demoplayback = false;
 	cls.state = ca_disconnected;
@@ -117,23 +120,19 @@ int CL_GetMessage (void)
 		}
 		
 	// get the next message
-		Sys_FileRead(cls.demofile, &net_message.cursize, sizeof(net_message.cursize));
+	  Sys_FileSeek(cls.demofile, demo_message_start + cls.demofilepos);
+		demo_message_start += Sys_FileRead(cls.demofile, &net_message.cursize, sizeof(net_message.cursize));
 		VectorCopy (cl.mviewangles[0], cl.mviewangles[1]);
 		for (i=0 ; i<3 ; i++)
 		{
-			r = Sys_FileRead (cls.demofile, &f, sizeof(f));
+			demo_message_start += Sys_FileRead (cls.demofile, &f, sizeof(f));
 			cl.mviewangles[0][i] = LittleFloat (f);
 		}
 		
 		net_message.cursize = LittleLong (net_message.cursize);
 		if (net_message.cursize > MAX_MSGLEN)
 			Sys_Error ("Demo message > MAX_MSGLEN");
-		r = Sys_FileRead(cls.demofile, net_message.data, net_message.cursize);
-		if (r != net_message.cursize)
-		{
-			CL_StopPlayback ();
-			return 0;
-		}
+		demo_message_start += Sys_FileRead(cls.demofile, net_message.data, net_message.cursize);
 	
 		return 1;
 	}
@@ -184,7 +183,8 @@ void CL_Stop_f (void)
 	CL_WriteDemoMessage ();
 
 // finish up
-	Sys_FileClose(cls.demofile);
+	COM_CloseFile(cls.demofile);
+    demo_message_start = 0;
 	cls.demofile = -1;
 	cls.demorecording = false;
 	Con_Printf ("Completed demo\n");
@@ -274,8 +274,9 @@ play [demoname]
 void CL_PlayDemo_f (void)
 {
 	char	name[256];
-	int c;
+	byte c;
 	qboolean neg = false;
+    int btr;
 
 	if (cmd_source != src_command)
 		return;
@@ -298,21 +299,23 @@ void CL_PlayDemo_f (void)
 	COM_DefaultExtension (name, ".dem");
 
 	Con_Printf ("Playing demo from %s.\n", name);
-	COM_FOpenFile (name, &cls.demofile);
+	COM_FOpenFile (name, &cls.demofile, &cls.demofilepos);
 
 	cls.demoplayback = true;
 	cls.state = ca_connected;
 	cls.forcetrack = 0;
 
     Sys_FileRead(cls.demofile, &c, 1);
+    btr = 1;
 	while (c != '\n') {
 		if (c == '-')
 			neg = true;
 		else
 			cls.forcetrack = cls.forcetrack * 10 + (c - '0');
         Sys_FileRead(cls.demofile, &c, 1);
+        btr++;
     }
-
+    demo_message_start = btr;
 	if (neg)
 		cls.forcetrack = -cls.forcetrack;
 // ZOID, fscanf is evil

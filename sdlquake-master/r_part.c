@@ -206,7 +206,7 @@ void R_ReadPointFile_f (void)
 	
 	sprintf (name,"maps/%s.pts", sv.name);
 
-	if (COM_FOpenFile (name, &fhandle) < 0) {
+	if (COM_FOpenFile (name, &fhandle, NULL) < 0) {
         Sys_Error("");
     }
 

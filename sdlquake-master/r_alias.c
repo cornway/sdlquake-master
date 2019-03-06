@@ -702,10 +702,14 @@ R_AliasDrawModel
 */
 void R_AliasDrawModel (alight_t *plighting)
 {
-	finalvert_t		finalverts[MAXALIASVERTS +
-						((CACHE_SIZE - 1) / sizeof(finalvert_t)) + 1];
-	auxvert_t		auxverts[MAXALIASVERTS];
+	static finalvert_t		*finalverts = NULL;
+	static auxvert_t		*auxverts = NULL;
 
+
+    if (!finalverts)
+        finalverts = (finalvert_t *)static_cache_alloc((MAXALIASVERTS +((CACHE_SIZE - 1) / sizeof(finalvert_t)) + 1) * sizeof(finalvert_t));
+    if (!auxverts)
+        auxverts = (auxvert_t *)static_cache_alloc(MAXALIASVERTS * sizeof(auxvert_t));
 	r_amodels_drawn++;
 
 // cache align

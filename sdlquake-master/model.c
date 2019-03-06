@@ -256,7 +256,7 @@ Loads a model into the cache
 model_t *Mod_LoadModel (model_t *mod, qboolean crash)
 {
 	unsigned *buf;
-	byte	stackbuf[1024];		// avoid dirtying the cache heap
+    byte stackbuf[2048];
 
 	if (mod->type == mod_alias)
 	{
@@ -1232,29 +1232,29 @@ ALIAS MODELS
 Mod_LoadAliasFrame
 =================
 */
-void * Mod_LoadAliasFrame (void * pin, int *pframeindex, int numv,
-	trivertx_t *pbboxmin, trivertx_t *pbboxmax, aliashdr_t *pheader, char *name)
+void * Mod_LoadAliasFrame (aliashdr_t *pheader, int framenum, void * pin, int numv)
 {
 	trivertx_t		*pframe, *pinframe;
 	int				i, j;
 	daliasframe_t	*pdaliasframe;
+    maliasframedesc_t	*frame = &pheader->frames[framenum];
 
 	pdaliasframe = (daliasframe_t *)pin;
 
-	strcpy (name, pdaliasframe->name);
+	strcpy (frame->name, pdaliasframe->name);
 
 	for (i=0 ; i<3 ; i++)
 	{
 	// these are byte values, so we don't have to worry about
 	// endianness
-		pbboxmin->v[i] = pdaliasframe->bboxmin.v[i];
-		pbboxmax->v[i] = pdaliasframe->bboxmax.v[i];
+		frame->bboxmin.v[i] = pdaliasframe->bboxmin.v[i];
+		frame->bboxmax.v[i] = pdaliasframe->bboxmax.v[i];
 	}
 
 	pinframe = (trivertx_t *)(pdaliasframe + 1);
 	pframe = Hunk_AllocName (numv * sizeof(*pframe), loadname);
 
-	*pframeindex = (byte *)pframe - (byte *)pheader;
+	frame->frame = (byte *)pframe - (byte *)pheader;
 
 	for (j=0 ; j<numv ; j++)
 	{
@@ -1280,8 +1280,7 @@ void * Mod_LoadAliasFrame (void * pin, int *pframeindex, int numv,
 Mod_LoadAliasGroup
 =================
 */
-void * Mod_LoadAliasGroup (void * pin, int *pframeindex, int numv,
-	trivertx_t *pbboxmin, trivertx_t *pbboxmax, aliashdr_t *pheader, char *name)
+void * Mod_LoadAliasGroup (aliashdr_t *pheader, int framenum, void * pin, int numv)
 {
 	daliasgroup_t		*pingroup;
 	maliasgroup_t		*paliasgroup;
@@ -1289,10 +1288,11 @@ void * Mod_LoadAliasGroup (void * pin, int *pframeindex, int numv,
 	daliasinterval_t	*pin_intervals;
 	float				*poutintervals;
 	void				*ptemp;
+    maliasframedesc_t	*frame = &pheader->frames[framenum];
 	
 	pingroup = (daliasgroup_t *)pin;
 
-	numframes = LittleLong (pingroup->numframes);
+	numframes = LittleLong(pingroup->numframes);
 
 	paliasgroup = Hunk_AllocName (sizeof (maliasgroup_t) +
 			(numframes - 1) * sizeof (paliasgroup->frames[0]), loadname);
@@ -1302,11 +1302,11 @@ void * Mod_LoadAliasGroup (void * pin, int *pframeindex, int numv,
 	for (i=0 ; i<3 ; i++)
 	{
 	// these are byte values, so we don't have to worry about endianness
-		pbboxmin->v[i] = pingroup->bboxmin.v[i];
-		pbboxmax->v[i] = pingroup->bboxmax.v[i];
+		frame->bboxmin.v[i] = pingroup->bboxmin.v[i];
+		frame->bboxmax.v[i] = pingroup->bboxmax.v[i];
 	}
 
-	*pframeindex = (byte *)paliasgroup - (byte *)pheader;
+    frame->frame = (byte *)paliasgroup - (byte *)pheader;
 
 	pin_intervals = (daliasinterval_t *)(pingroup + 1);
 
@@ -1328,12 +1328,7 @@ void * Mod_LoadAliasGroup (void * pin, int *pframeindex, int numv,
 
 	for (i=0 ; i<numframes ; i++)
 	{
-		ptemp = Mod_LoadAliasFrame (ptemp,
-									&paliasgroup->frames[i].frame,
-									numv,
-									&paliasgroup->frames[i].bboxmin,
-									&paliasgroup->frames[i].bboxmax,
-									pheader, name);
+		ptemp = Mod_LoadAliasFrame (pheader, i, ptemp, numv);
 	}
 
 	return ptemp;
@@ -1575,10 +1570,10 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 
 	for (i=0 ; i<pmodel->numverts ; i++)
 	{
-		pstverts[i].onseam = LittleLong (pinstverts[i].onseam);
-	// put s and t in 16.16 format
-		pstverts[i].s = LittleLong (pinstverts[i].s) << 16;
-		pstverts[i].t = LittleLong (pinstverts[i].t) << 16;
+		pstverts[i].onseam = LittleLong(pinstverts[i].onseam);
+        // put s and t in 16.16 format
+        pstverts[i].s = LittleLong(pinstverts[i].s) << 16;
+        pstverts[i].t = LittleLong(pinstverts[i].t) << 16;
 	}
 
 //
@@ -1593,12 +1588,11 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 	{
 		int		j;
 
-		ptri[i].facesfront = LittleLong (pintriangles[i].facesfront);
+        ptri[i].facesfront = LittleLong(pintriangles[i].facesfront);
 
 		for (j=0 ; j<3 ; j++)
 		{
-			ptri[i].vertindex[j] =
-					LittleLong (pintriangles[i].vertindex[j]);
+		    ptri[i].vertindex[j] = LittleLong(pintriangles[i].vertindex[j]);
 		}
 	}
 
@@ -1614,28 +1608,21 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 	{
 		aliasframetype_t	frametype;
 
-		frametype = LittleLong (pframetype->type);
+		frametype = LittleLong(pframetype->type);
 		pheader->frames[i].type = frametype;
 
 		if (frametype == ALIAS_SINGLE)
 		{
 			pframetype = (daliasframetype_t *)
-					Mod_LoadAliasFrame (pframetype + 1,
-										&pheader->frames[i].frame,
-										pmodel->numverts,
-										&pheader->frames[i].bboxmin,
-										&pheader->frames[i].bboxmax,
-										pheader, pheader->frames[i].name);
+					Mod_LoadAliasFrame (pheader, i,
+					                    pframetype + 1,
+										pmodel->numverts);
 		}
 		else
 		{
 			pframetype = (daliasframetype_t *)
-					Mod_LoadAliasGroup (pframetype + 1,
-										&pheader->frames[i].frame,
-										pmodel->numverts,
-										&pheader->frames[i].bboxmin,
-										&pheader->frames[i].bboxmax,
-										pheader, pheader->frames[i].name);
+					Mod_LoadAliasGroup (pheader, i, pframetype + 1,
+										pmodel->numverts);
 		}
 	}
 

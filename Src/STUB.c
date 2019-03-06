@@ -7,6 +7,7 @@
 #include "SDL_keysym.h"
 
 sizebuf_t   net_message;
+int         demo_message_start;
 int         net_activeconnections = 0;
 int         vcrFile = -1;
 cvar_t      hostname = {"hostname", "UNNAMED"};
