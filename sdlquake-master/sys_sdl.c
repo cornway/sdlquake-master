@@ -10,6 +10,7 @@
 #endif
 
 #include "quakedef.h"
+#include "audio_main.h"
 
 qboolean        isDedicated;
 
@@ -73,7 +74,7 @@ void Sys_HighFPPrecision (void)
 #endif	// !id386
 
 
-void Sys_Error (char *error, ...)
+void Sys_Error_ (char *error)
 { 
     Sys_Quit();
 } 
@@ -130,6 +131,7 @@ int Sys_FileOpenRead (char *path, int *hndl)
 {
     FRESULT res;
     FIL *f;
+    int irq;
 
     f = allochandle(hndl);
     if (f == NULL) {
@@ -137,7 +139,9 @@ int Sys_FileOpenRead (char *path, int *hndl)
         return -1;
     }
 
+    audio_irq_save(&irq);
     res = f_open(f, path, FA_OPEN_EXISTING | FA_READ);
+    audio_irq_restore(irq);
     if (res != FR_OK) {
         releasehandle(*hndl);
         *hndl = -1;
@@ -152,13 +156,16 @@ int Sys_FileOpenWrite (char *path)
     FRESULT res;
     FIL *f;
     int i;
+    int irq;
 
     f = allochandle(&i);
     if (f == NULL) {
         return -1;
     }
 
+    audio_irq_save(&irq);
     res = f_open(f, path, FA_OPEN_EXISTING | FA_WRITE);
+    audio_irq_restore(irq);
     if (res != FR_OK) {
         releasehandle(i);
         return -1;
@@ -187,10 +194,13 @@ int Sys_FileRead (int handle, void *dst, int count)
     char *data;
     UINT done = 0;
     FRESULT res = FR_NOT_READY;
+    int irq;
 
     if ( handle >= 0 ) {
         data = dst;
+        audio_irq_save(&irq);
         res = f_read(gethandle(handle), data, count, &done);
+        audio_irq_restore(irq);
     }
     if (res != FR_OK) {
         Sys_Error("Could not read file from handle : %d\n", handle);
@@ -200,9 +210,12 @@ int Sys_FileRead (int handle, void *dst, int count)
 
 char *Sys_FileGetS (int handle, char *dst, int count)
 {
+    int irq;
+    audio_irq_save(&irq);
     if (f_gets(dst, count, gethandle(handle)) == NULL) {
         Sys_Error("Could not read file from handle : %d\n", handle);
     }
+    audio_irq_restore(irq);
     return dst;
 }
 
@@ -211,10 +224,13 @@ int Sys_FileWrite (int handle, void *src, int count)
     char *data;
     UINT done;
     FRESULT res = FR_NOT_READY;
+    int irq;
 
     if ( handle >= 0 ) {
         data = src;
+        audio_irq_save(&irq);
         res = f_write (gethandle(handle), data, count, &done);
+        audio_irq_restore(irq);
     }
     if (res != FR_OK) {
         Sys_Error("Could not write file from handle : %d\n", handle);

@@ -100,8 +100,8 @@ void S_ClearBuffer (void);
 void S_Update (vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up);
 void S_ExtraUpdate (void);
 
-sfx_t *S_PrecacheSound (char *sample);
-void S_TouchSound (char *sample);
+sfx_t *S_PrecacheSound (char *sample, sfx_t *sfx);
+void S_TouchSound (char *sample, sfx_t	*sfx);
 void S_ClearPrecache (void);
 void S_BeginPrecaching (void);
 void S_EndPrecaching (void);
@@ -109,7 +109,7 @@ void S_PaintChannels(int endtime);
 void S_InitPaintChannels (void);
 
 // picks a channel based on priorities, empty slots, number of channels
-channel_t *SND_PickChannel(int entnum, int entchannel);
+channel_t *SND_PickChannel(int entnum, int entchannel, int *chidx);
 
 // spatializes a channel
 void SND_Spatialize(channel_t *ch);
@@ -127,8 +127,8 @@ void SNDDMA_Shutdown(void);
 // User-setable variables
 // ====================================================================
 
-#define	MAX_CHANNELS			128
-#define	MAX_DYNAMIC_CHANNELS	8
+#define	MAX_CHANNELS			16
+#define	MAX_DYNAMIC_CHANNELS	12
 
 
 extern	channel_t   channels[MAX_CHANNELS];

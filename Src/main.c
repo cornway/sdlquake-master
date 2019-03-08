@@ -67,7 +67,7 @@ static void CPU_CACHE_Enable(void);
 #define SCREEN_FB_X_MAX 800
 #define SCREEN_FB_Y_MAX 600
 #define SCREEN_FB_MEM_SIZE_MAX (SCREEN_FB_X_MAX * SCREEN_FB_Y_MAX * sizeof(pix_t) * 2)
-#define STATIC_CACHE_SIZE (0x00100000)
+#define STATIC_CACHE_SIZE (0x0005a000)
 
 #define SDRAM_VOL_START 0xC0000000
 #define SDRAM_VOL_END   0xC1000000

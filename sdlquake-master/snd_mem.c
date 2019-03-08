@@ -36,6 +36,7 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 	int		srcsample;
 	float	stepscale;
 	int		i;
+    int     idest;
 	int		sample, samplefrac, fracstep;
 	sfxcache_t	*sc;
 	
@@ -51,10 +52,7 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 		sc->loopstart = sc->loopstart / stepscale;
 
 	sc->speed = shm->speed;
-	if (loadas8bit.value)
-		sc->width = 1;
-	else
-		sc->width = inwidth;
+    sc->width = shm->samplebits / 8;
 	sc->stereo = 0;
 
 // resample / decimate to the current source rate
@@ -71,7 +69,7 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 // general case
 		samplefrac = 0;
 		fracstep = stepscale*256;
-		for (i=0 ; i<outcount ; i++)
+		for (i=0, idest = 0; i<outcount ; i++)
 		{
 			srcsample = samplefrac >> 8;
 			samplefrac += fracstep;
@@ -80,9 +78,18 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 			else
 				sample = (int)( (unsigned char)(data[srcsample]) - 128) << 8;
 			if (sc->width == 2)
-				((short *)sc->data)[i] = sample;
+				((short *)sc->data)[idest] = sample;
 			else
-				((signed char *)sc->data)[i] = sample >> 8;
+				((signed char *)sc->data)[idest] = sample >> 8;
+
+            if ((shm->channels > 1) && !sc->stereo) {
+                idest++;
+                if (sc->width == 2)
+                    ((short *)sc->data)[idest] = sample;
+                else
+                    ((signed char *)sc->data)[idest] = sample >> 8;
+            }
+            idest++;
 		}
 	}
 }
@@ -102,7 +109,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	int		len;
 	float	stepscale;
 	sfxcache_t	*sc;
-	byte	stackbuf[1*1024];		// avoid dirtying the cache heap
+	int width = shm->samplebits / sizeof(byte);
 
 // see if still in memory
 	sc = Cache_Check (&s->cache);
@@ -116,7 +123,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 
 //	Con_Printf ("loading %s\n",namebuffer);
 
-	data = COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
+	data = COM_LoadStackFile(namebuffer, NULL, 0);
 
 	if (!data)
 	{
@@ -134,7 +141,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	stepscale = (float)info.rate / shm->speed;	
 	len = info.samples / stepscale;
 
-	len = len * info.width * info.channels;
+	len = len * width * shm->channels;
 
 	sc = Cache_Alloc ( &s->cache, len + sizeof(sfxcache_t), s->name);
 	if (!sc)
