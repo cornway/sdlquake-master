@@ -1619,12 +1619,16 @@ pack_t *COM_LoadPackFile (char *packfile)
 	int                             numpackfiles;
 	pack_t                  *pack;
 	int                             packhandle;
-	dpackfile_t             info[MAX_FILES_IN_PACK];
+	dpackfile_t             *info;
 	unsigned short          crc;
+    int                     cachesize = sizeof(dpackfile_t) * MAX_FILES_IN_PACK;
+
+    info = (dpackfile_t *)static_cache_pop(cachesize);
 
 	if (Sys_FileOpenRead (packfile, &packhandle) == -1)
 	{
 //              Con_Printf ("Couldn't open %s\n", packfile);
+        static_cache_push(cachesize);
 		return NULL;
 	}
 	Sys_FileRead (packhandle, (void *)&header, sizeof(header));
@@ -1669,6 +1673,9 @@ pack_t *COM_LoadPackFile (char *packfile)
 	pack->files = newfiles;
 	
 	Con_Printf ("Added packfile %s (%i files)\n", packfile, numpackfiles);
+
+    static_cache_push(cachesize);
+
 	return pack;
 }
 

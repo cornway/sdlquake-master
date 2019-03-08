@@ -79,7 +79,7 @@ volatile uint8_t *__heap_buf_raw = (void *)(SDRAM_VOL_START + SCREEN_FB_MEM_SIZE
 volatile size_t   __heap_buf_raw_size = (SDRAM_VOL_SIZE - SCREEN_FB_MEM_SIZE_MAX - STATIC_CACHE_SIZE);
 volatile pix_t   *screen_fb_mem_start = (void *)SDRAM_VOL_START;
 
-void *static_cache_alloc (int size)
+void *static_cache_pop (int size)
 {
     void *p;
     if (__heap_buf_cache_size < size) {
@@ -89,6 +89,12 @@ void *static_cache_alloc (int size)
     __heap_buf_cache += size;
     __heap_buf_cache_size -= size;
     return p;
+}
+
+void static_cache_push (int size)
+{
+    __heap_buf_cache -= size;
+    __heap_buf_cache_size += size;
 }
 
 const char *argv[] =

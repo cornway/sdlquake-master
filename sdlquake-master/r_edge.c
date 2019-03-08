@@ -663,12 +663,12 @@ Each surface has a linked list of its visible spans
 void R_ScanEdges (void)
 {
 	int		iv, bottom;
-	static byte	*basespans = NULL;
+	byte	*basespans = NULL;
+    int     basespans_cachesize = MAXSPANS*sizeof(espan_t)+CACHE_SIZE;
 	espan_t	*basespan_p;
 	surf_t	*s;
 
-    if (!basespans)
-        basespans = static_cache_alloc(MAXSPANS*sizeof(espan_t)+CACHE_SIZE);
+    basespans = static_cache_pop(basespans_cachesize);
 
 	basespan_p = (espan_t *)
 			((long)(basespans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
@@ -772,6 +772,8 @@ void R_ScanEdges (void)
 		R_DrawCulledPolys ();
 	else
 		D_DrawSurfaces ();
+
+    static_cache_push(basespans_cachesize);
 }
 
 

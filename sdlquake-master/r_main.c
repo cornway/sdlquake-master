@@ -587,7 +587,7 @@ void R_DrawEntitiesOnList (void)
 				if (lighting.ambientlight + lighting.shadelight > 192)
 					lighting.shadelight = 192 - lighting.ambientlight;
 
-                "FIXME :"
+                /*"FIXME :"*/
 				if (strcmp(currententity->model->name, "progs/flame2.mdl") != 0)
 					if (strcmp(currententity->model->name, "progs/flame.mdl") != 0)
 					R_AliasDrawModel (&lighting);
@@ -878,14 +878,16 @@ R_EdgeDrawing
 */
 void R_EdgeDrawing (void)
 {
-	static edge_t	*ledges = NULL;
-	static surf_t	*lsurfs = NULL;
+	edge_t	*ledges = NULL;
+    int     ledges_cachesize =
+        (NUMSTACKEDGES +((CACHE_SIZE - 1) / sizeof(edge_t)) + 1) * sizeof(edge_t);
+	surf_t	*lsurfs = NULL;
+    int     lsurfs_cachesize =
+        (NUMSTACKEDGES +((CACHE_SIZE - 1) / sizeof(surf_t)) + 1) * sizeof(surf_t);
 
 
-    if (!ledges)
-        ledges = (edge_t *)static_cache_alloc((NUMSTACKEDGES +((CACHE_SIZE - 1) / sizeof(edge_t)) + 1) * sizeof(edge_t));
-    if (!lsurfs)
-        lsurfs = (surf_t *)static_cache_alloc((NUMSTACKEDGES +((CACHE_SIZE - 1) / sizeof(surf_t)) + 1) * sizeof(surf_t));
+    ledges = (edge_t *)static_cache_pop(ledges_cachesize);
+    lsurfs = (surf_t *)static_cache_pop(lsurfs_cachesize);
 
     if (!ledges || !lsurfs) {
         Sys_Error("");
@@ -950,6 +952,9 @@ void R_EdgeDrawing (void)
 	
 	if (!(r_drawpolys | r_drawculledpolys))
 		R_ScanEdges ();
+
+    static_cache_push(lsurfs_cachesize);
+    static_cache_push(ledges_cachesize);
 }
 
 

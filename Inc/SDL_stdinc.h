@@ -148,7 +148,7 @@ typedef enum {
 } SDL_DUMMY_ENUM;
 
 #ifndef __NDS__
-//SDL_COMPILE_TIME_ASSERT(enum, sizeof(SDL_DUMMY_ENUM) == sizeof(int));
+SDL_COMPILE_TIME_ASSERT(enum, sizeof(SDL_DUMMY_ENUM) == sizeof(int));
 #endif
 /*@}*/
 

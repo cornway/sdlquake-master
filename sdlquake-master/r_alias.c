@@ -702,14 +702,14 @@ R_AliasDrawModel
 */
 void R_AliasDrawModel (alight_t *plighting)
 {
-	static finalvert_t		*finalverts = NULL;
-	static auxvert_t		*auxverts = NULL;
+	finalvert_t		*finalverts = NULL;
+    int             finalverts_cahcesize = 
+        (MAXALIASVERTS +((CACHE_SIZE - 1) / sizeof(finalvert_t)) + 1) * sizeof(finalvert_t);
+	auxvert_t		*auxverts = NULL;
+    int             auxverts_cachesize = MAXALIASVERTS * sizeof(auxvert_t);
 
-
-    if (!finalverts)
-        finalverts = (finalvert_t *)static_cache_alloc((MAXALIASVERTS +((CACHE_SIZE - 1) / sizeof(finalvert_t)) + 1) * sizeof(finalvert_t));
-    if (!auxverts)
-        auxverts = (auxvert_t *)static_cache_alloc(MAXALIASVERTS * sizeof(auxvert_t));
+    finalverts = (finalvert_t *)static_cache_pop(finalverts_cahcesize);
+    auxverts = (auxvert_t *)static_cache_pop(auxverts_cachesize);
 	r_amodels_drawn++;
 
 // cache align
@@ -753,5 +753,8 @@ void R_AliasDrawModel (alight_t *plighting)
 		R_AliasPrepareUnclippedPoints ();
 	else
 		R_AliasPreparePoints ();
+
+    static_cache_push(auxverts_cachesize);
+    static_cache_push(finalverts_cahcesize);
 }
 
