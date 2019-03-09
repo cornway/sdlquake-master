@@ -649,7 +649,10 @@ void R_RenderWorld (void)
 {
 	int			i;
 	model_t		*clmodel;
-	btofpoly_t	btofpolys[MAX_BTOFPOLYS];
+	btofpoly_t	*btofpolys;
+    int         btofpolys_cachesize = sizeof(btofpoly_t) * MAX_BTOFPOLYS;
+
+    btofpolys = (btofpoly_t *)static_cache_pop(btofpolys_cachesize);
 
 	pbtofpolys = btofpolys;
 
@@ -669,6 +672,8 @@ void R_RenderWorld (void)
 			R_RenderPoly (btofpolys[i].psurf, btofpolys[i].clipflags);
 		}
 	}
+
+    static_cache_push(btofpolys_cachesize);
 }
 
 
