@@ -276,7 +276,7 @@ void D_EndDirectRect (int x, int y, int width, int height)
 {
     if (!screen) return;
     if (x < 0) x = screen->w+x-1;
-    SDL_UpdateRect(screen, x, y, width, height);
+    //SDL_UpdateRect(screen, x, y, width, height);
 }
 
 

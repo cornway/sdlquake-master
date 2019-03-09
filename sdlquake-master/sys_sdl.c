@@ -75,7 +75,7 @@ void Sys_HighFPPrecision (void)
 #endif	// !id386
 
 
-void Sys_Error_ (char *error)
+void Sys_Error (char *error, ...)
 { 
     Sys_Quit();
 } 
