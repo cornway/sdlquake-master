@@ -383,6 +383,8 @@ int SDL_main (int argc, const char *argv[])
 // graphic debugging aids
         if (sys_linerefresh.value)
             Sys_LineRefresh ();
+
+        gamepad_process();
     }
 
 }

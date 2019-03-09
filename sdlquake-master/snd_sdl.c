@@ -129,7 +129,7 @@ volatile dma_t  *shm = 0;
 int recording = 0;
 
 cvar_t nosound = {"nosound", "0"};
-cvar_t precache = {"precache", "1"};
+cvar_t precache = {"precache", "0"};
 
 channel_t   channels[MAX_CHANNELS];
 int			total_channels;
@@ -361,10 +361,9 @@ static void S_PushSound (channel_t *ch, int channel)
         audio_stop_channel(channel);
     }///*
     ach = audio_play_channel(&chunk, channel);
-    if (!ach) {
-        Sys_Error("");
+    if (ach) {
+        ach->complete = NULL;
     }
-    ach->complete = NULL;
     //*/
 }
 
