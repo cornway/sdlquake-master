@@ -35,6 +35,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "ff_gen_drv.h"
+#include "sd_diskio.h"
 #include "quakedef.h"
 #include "lcd_main.h"
 #include "audio_main.h"
@@ -97,6 +99,16 @@ void static_cache_push (int size)
     __heap_buf_cache_size += size;
 }
 
+void hdd_led_on (void)
+{
+    BSP_LED_On(LED2);
+}
+
+void hdd_led_off (void)
+{
+    BSP_LED_Off(LED2);
+}
+
 const char *argv[] =
 {
     __FILE__,
@@ -113,9 +125,9 @@ int main(void)
     BSP_LED_Init(LED2);
 
     screen_init();
-    gamepad_init();
+    //gamepad_init();
     audio_init();
-    touch_init();
+    //touch_init();
 
     if(FATFS_LinkDriver(&SD_Driver, SDPath)) {
         return -1;

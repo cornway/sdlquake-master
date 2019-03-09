@@ -27,8 +27,6 @@ typedef unsigned char 		byte;
 #undef true
 #undef false
 
-#include "ff.h"
-
 typedef enum {false, true}	qboolean;
 
 //============================================================================

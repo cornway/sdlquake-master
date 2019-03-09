@@ -1,6 +1,5 @@
 /* -*- Mode: C; tab-width: 4 -*- */ 
 
-#include "main.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -11,6 +10,8 @@
 
 #include "quakedef.h"
 #include "audio_main.h"
+#include "input_main.h"
+#include "ff.h"
 
 qboolean        isDedicated;
 
@@ -91,8 +92,6 @@ FILE IO
 
 ===============================================================================
 */
-#include "ff.h"
-#include "main.h"
 
 #define MAX_HANDLES		3
 

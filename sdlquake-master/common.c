@@ -1373,7 +1373,6 @@ Sets com_filesize and one of handle or file
 */
 int COM_FindFile (char *filename, int *handle, int *pos)
 {
-    FRESULT res = FR_OK;
 	searchpath_t    *search;
 	char            netpath[MAX_OSPATH];
 	char            cachepath[MAX_OSPATH];

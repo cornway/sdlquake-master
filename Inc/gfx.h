@@ -7,7 +7,7 @@
 
 #define GFX_COLOR_MODE GFX_COLOR_MODE_CLUT
 
-
+#include "stdint.h"
 
 
 #if (GFX_COLOR_MODE == GFX_COLOR_MODE_CLUT)

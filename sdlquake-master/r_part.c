@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "r_local.h"
-#include "ff.h"
 
 #define MAX_PARTICLES			2048	// default max # of particles at one
 										//  time

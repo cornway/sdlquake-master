@@ -1,4 +1,3 @@
-#include "main.h"
 #include "quakedef.h"
 #include "SDL_keysym.h"
 #include "begin_code.h"

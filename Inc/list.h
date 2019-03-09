@@ -2,8 +2,6 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
-#include "main.h"
-
 #define WRITE_ONCE(a, b) ((a) = (b))
 #define READ_ONCE(a) ((a))
 
