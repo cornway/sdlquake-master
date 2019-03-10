@@ -148,6 +148,11 @@ Cvar_RegisterVariable
 Adds a freestanding variable to the variable list.
 ============
 */
+#if CVAR_TINY
+void Cvar_RegisterVariable (cvar_t *variable)
+{
+}
+#else
 void Cvar_RegisterVariable (cvar_t *variable)
 {
 	char	*oldstr;
@@ -165,9 +170,6 @@ void Cvar_RegisterVariable (cvar_t *variable)
 		Con_Printf ("Cvar_RegisterVariable: %s is a command\n", CVAR_NAME(variable));
 		return;
 	}
-#if CVAR_TINY
-    Sys_Error("CVAR_TINY : Z_Malloc");
-#endif
 		
 // copy the value off, because future sets will Z_Free it
 	oldstr = CVAR_STRING(variable);
@@ -179,6 +181,7 @@ void Cvar_RegisterVariable (cvar_t *variable)
 	CVAR_NEXT(variable) = cvar_vars;
 	cvar_vars = variable;
 }
+#endif /*CVAR_TINY*/
 
 /*
 ============
@@ -216,12 +219,12 @@ Writes lines containing "set variable value" for all variables
 with the archive flag set to true.
 ============
 */
-void Cvar_WriteVariables (FILE *f)
+void Cvar_WriteVariables (int handle)
 {
 	cvar_t	*var;
 	
 	for (var = cvar_vars ; var ; var = CVAR_NEXT(var))
 		if (CVAR_ARCH(var))
-			fprintf (f, "%s \"%s\"\n", CVAR_NAME(var), CVAR_STRING(var));
+			Sys_FPrintf(handle, "%s \"%s\"\n", CVAR_NAME(var), CVAR_STRING(var));
 }
 

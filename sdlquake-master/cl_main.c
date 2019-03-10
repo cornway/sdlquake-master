@@ -48,7 +48,7 @@ Q_CVAR_DEF(m_side, "m_side", 0.8, true);
 client_static_t	cls;
 client_state_t	cl;
 struct sfx_s cl_sound_precache[MAX_SOUNDS];
-// FIXME: put these on hunk?
+// FIXME: put these on hunk?//----------------------------!
 efrag_t			cl_efrags[MAX_EFRAGS];
 entity_t		cl_entities[MAX_EDICTS];
 entity_t		cl_static_entities[MAX_STATIC_ENTITIES];

@@ -465,9 +465,9 @@ Host_Savegame_f
 void Host_Savegame_f (void)
 {
 	char	name[256];
-	FILE	*f;
 	int		i;
 	char	comment[SAVEGAME_COMMENT_LENGTH+1];
+    int fhandle;
 
 	if (cmd_source != src_command)
 		return;
@@ -515,40 +515,41 @@ void Host_Savegame_f (void)
 	COM_DefaultExtension (name, ".sav");
 	
 	Con_Printf ("Saving game to %s...\n", name);
-	f = fopen (name, "w");
-	if (!f)
+    fhandle = Sys_FileOpenWrite(name);
+	if (fhandle < 0)
 	{
 		Con_Printf ("ERROR: couldn't open.\n");
 		return;
 	}
-	
-	fprintf (f, "%i\n", SAVEGAME_VERSION);
+
+
+	Sys_FPrintf (fhandle, "%i\n", SAVEGAME_VERSION);
 	Host_SavegameComment (comment);
-	fprintf (f, "%s\n", comment);
+	Sys_FPrintf (fhandle, "%s\n", comment);
 	for (i=0 ; i<NUM_SPAWN_PARMS ; i++)
-		fprintf (f, "%f\n", svs.clients->spawn_parms[i]);
-	fprintf (f, "%d\n", current_skill);
-	fprintf (f, "%s\n", sv.name);
-	fprintf (f, "%f\n",sv.time);
+		Sys_FPrintf (fhandle, "%f\n", svs.clients->spawn_parms[i]);
+	Sys_FPrintf (fhandle, "%d\n", current_skill);
+	Sys_FPrintf (fhandle, "%s\n", sv.name);
+	Sys_FPrintf (fhandle, "%f\n",sv.time);
 
 // write the light styles
 
 	for (i=0 ; i<MAX_LIGHTSTYLES ; i++)
 	{
 		if (sv.lightstyles[i])
-			fprintf (f, "%s\n", sv.lightstyles[i]);
+			Sys_FPrintf (fhandle, "%s\n", sv.lightstyles[i]);
 		else
-			fprintf (f,"m\n");
+			Sys_FPrintf (fhandle,"m\n");
 	}
 
 
-	ED_WriteGlobals (f);
+	ED_WriteGlobals (fhandle);
 	for (i=0 ; i<sv.num_edicts ; i++)
 	{
-		ED_Write (f, EDICT_NUM(i));
-		fflush (f);
+		ED_Write (fhandle, EDICT_NUM(i));
+		//fflush (fhandle);
 	}
-	fclose (f);
+	Sys_FileClose(fhandle);
 	Con_Printf ("done.\n");
 }
 
@@ -561,23 +562,27 @@ Host_Loadgame_f
 void Host_Loadgame_f (void)
 {
 	char	name[MAX_OSPATH];
-	FILE	*f;
+	int fhandle;
 	char	mapname[MAX_QPATH];
 	float	time, tfloat;
-	char	str[32768], *start;
+	char	*str, *start;
+    int str_cachesize = 32768;
+    char    scantmp[128];
 	int		i, r;
 	edict_t	*ent;
 	int		entnum;
 	int		version;
 	float			spawn_parms[NUM_SPAWN_PARMS];
 
+    str = (char *)static_cache_pop(str_cachesize * sizeof(char));
+
 	if (cmd_source != src_command)
-		return;
+		goto exit;
 
 	if (Cmd_Argc() != 2)
 	{
 		Con_Printf ("load <savename> : load a game\n");
-		return;
+		goto exit;
 	}
 
 	cls.demonum = -1;		// stop demo loop in case this fails
@@ -590,25 +595,31 @@ void Host_Loadgame_f (void)
 //	SCR_BeginLoadingPlaque ();
 
 	Con_Printf ("Loading game from %s...\n", name);
-	f = fopen (name, "r");
-	if (!f)
+    Sys_FileOpenRead(name, &fhandle);
+	if (fhandle < 0)
 	{
 		Con_Printf ("ERROR: couldn't open.\n");
-		return;
+		goto exit;
 	}
 
-	fscanf (f, "%i\n", &version);
+    Sys_FileGetS(fhandle, scantmp, 0);
+	sscanf(scantmp, "%i\n", &version);
 	if (version != SAVEGAME_VERSION)
 	{
-		fclose (f);
+        Sys_FileClose(fhandle);
 		Con_Printf ("Savegame is version %i, not %i\n", version, SAVEGAME_VERSION);
-		return;
+		goto exit;
 	}
-	fscanf (f, "%s\n", str);
-	for (i=0 ; i<NUM_SPAWN_PARMS ; i++)
-		fscanf (f, "%f\n", &spawn_parms[i]);
+    Sys_FileGetS(fhandle, scantmp, 0);
+	sscanf(scantmp, "%s\n", str);
+	for (i=0 ; i<NUM_SPAWN_PARMS ; i++) {
+		Sys_FileGetS(fhandle, scantmp, 0);
+	    sscanf(scantmp, "%s\n", str);
+    }
 // this silliness is so we can load 1.06 save files, which have float skill values
-	fscanf (f, "%f\n", &tfloat);
+    Sys_FileGetS(fhandle, scantmp, 0);
+    sscanf(scantmp, "%f\n", &tfloat);
+
 	current_skill = (int)(tfloat + 0.1);
 	Cvar_SetValue ("skill", (float)current_skill);
 
@@ -618,8 +629,11 @@ void Host_Loadgame_f (void)
 	Cvar_SetValue ("teamplay", 0);
 #endif
 
-	fscanf (f, "%s\n",mapname);
-	fscanf (f, "%f\n",&time);
+    Sys_FileGetS(fhandle, scantmp, 0);
+    sscanf(scantmp, "%s\n",mapname);
+
+    Sys_FileGetS(fhandle, scantmp, 0);
+    sscanf(scantmp, "%f\n",&time);
 
 	CL_Disconnect_f ();
 	
@@ -631,7 +645,7 @@ void Host_Loadgame_f (void)
 	if (!sv.active)
 	{
 		Con_Printf ("Couldn't load map\n");
-		return;
+		goto exit;
 	}
 	sv.paused = true;		// pause until all clients connect
 	sv.loadgame = true;
@@ -640,28 +654,28 @@ void Host_Loadgame_f (void)
 
 	for (i=0 ; i<MAX_LIGHTSTYLES ; i++)
 	{
-		fscanf (f, "%s\n", str);
+	    Sys_FileGetS(fhandle, scantmp, 0);
+        sscanf(scantmp, "%s\n", str);
 		sv.lightstyles[i] = Hunk_Alloc (strlen(str)+1);
 		strcpy (sv.lightstyles[i], str);
 	}
 
 // load the edicts out of the savegame file
 	entnum = -1;		// -1 is the globals
-	while (!feof(f))
+	while (!Sys_Feof(fhandle))
 	{
-		for (i=0 ; i<sizeof(str)-1 ; i++)
+	    char *p;
+		Sys_FileGetS(fhandle, scantmp, 0);
+        p = scantmp;
+		for (i=0 ; i < str_cachesize - 1 ; i++)
 		{
-			r = fgetc (f);
-			if (r == EOF || !r)
-				break;
-			str[i] = r;
-			if (r == '}')
+			if (*p++ == '}')
 			{
 				i++;
 				break;
 			}
 		}
-		if (i == sizeof(str)-1)
+		if (i == str_cachesize - 1)
 			Sys_Error ("Loadgame buffer overflow");
 		str[i] = 0;
 		start = str;
@@ -694,7 +708,7 @@ void Host_Loadgame_f (void)
 	sv.num_edicts = entnum;
 	sv.time = time;
 
-	fclose (f);
+    Sys_FileClose(fhandle);
 
 	for (i=0 ; i<NUM_SPAWN_PARMS ; i++)
 		svs.clients->spawn_parms[i] = spawn_parms[i];
@@ -704,6 +718,10 @@ void Host_Loadgame_f (void)
 		CL_EstablishConnection ("local");
 		Host_Reconnect_f ();
 	}
+
+exit:
+
+    static_cache_push(str_cachesize);
 }
 
 #ifdef QUAKE2

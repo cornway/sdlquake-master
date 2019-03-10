@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <stdarg.h>
 #ifndef __WIN32__
 
 #endif
@@ -76,7 +77,15 @@ void Sys_HighFPPrecision (void)
 
 
 void Sys_Error (char *error, ...)
-{ 
+{
+    va_list ap;
+    char p[256];
+    int   r;
+
+    va_start (ap, error);
+    r = r = vsnprintf(p, sizeof(p), error, ap);
+    va_end (ap);
+
     Sys_Quit();
 } 
 
@@ -157,6 +166,8 @@ int Sys_FileOpenWrite (char *path)
     int i;
     int irq;
 
+    Sys_Error("Not supported yet");
+
     f = allochandle(&i);
     if (f == NULL) {
         return -1;
@@ -186,6 +197,14 @@ void Sys_FileSeek (int handle, int position)
     if ( handle >= 0 ) {
         f_lseek(gethandle(handle), position);
     }
+}
+
+int Sys_Feof (int handle)
+{
+    if (handle < 0) {
+        return handle;
+    }
+    return f_eof(gethandle(handle));
 }
 
 int Sys_FileRead (int handle, void *dst, int count)
@@ -236,6 +255,28 @@ int Sys_FileWrite (int handle, void *src, int count)
     }
     return done;
 }
+
+int Sys_FPrintf (int handle, char *fmt, ...)
+{
+    FRESULT res = FR_NOT_READY;
+    va_list ap;
+    char p[256];
+    int   r;
+
+    va_start (ap, fmt);
+    r = vsnprintf(p, sizeof(p), fmt, ap);
+    va_end (ap);
+
+    if (handle < 0) {
+        return handle;
+    }
+    res = f_printf(gethandle(handle), fmt);
+    if (res != FR_OK) {
+        return -1;
+    }
+    return FR_OK;
+}
+
 
 int	Sys_FileTime (char *path)
 {

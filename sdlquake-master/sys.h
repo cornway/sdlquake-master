@@ -31,8 +31,10 @@ char *Sys_FileGetS (int handle, char *dst, int count);
 int Sys_FileOpenWrite (char *path);
 void Sys_FileClose (int handle);
 void Sys_FileSeek (int handle, int position);
+int Sys_Feof (int handle);
 int Sys_FileRead (int handle, void *dest, int count);
 int Sys_FileWrite (int handle, void *data, int count);
+int Sys_FPrintf (int handle, char *msg, ...);
 int	Sys_FileTime (char *path);
 void Sys_mkdir (char *path);
 
