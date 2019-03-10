@@ -20,8 +20,8 @@ int noconinput = 0;
 char *basedir = ".";
 char *cachedir = "/tmp";
 
-cvar_t  sys_linerefresh = {"sys_linerefresh","0"};// set for entity display
-cvar_t  sys_nostdout = {"sys_nostdout","0"};
+Q_CVAR_DEF(sys_linerefresh, "sys_linerefresh", 0);// set for entity display
+Q_CVAR_DEF(sys_nostdout, "sys_nostdout", 0);
 
 // =======================================================================
 // General routines

@@ -52,6 +52,30 @@ r_draworder 0		sets the current value to 0
 Cvars are restricted from having the same names as commands to keep this
 interface from being ambiguous.
 */
+#if QEMBED
+#define CVAR_TINY 1
+#else
+#define CVAR_TINY 0
+#endif
+
+
+#if CVAR_TINY
+
+typedef struct cvar_s
+{
+    float	value;
+} cvar_t;
+
+#define Q_CVAR_DEF(var, name, value, args ...) \
+        cvar_t var = {(float)(value)}
+
+#define CVAR_NAME(cvar) cvar_null_string
+#define CVAR_ARCH(cvar) false
+#define CVAR_STRING(cvar) cvar_null_string
+#define CVAR_NEXT(cvar)   (cvar)
+#define CVAR_SERVER(cvar) false
+
+#else /*CVAR_TINY*/
 
 typedef struct cvar_s
 {
@@ -62,6 +86,19 @@ typedef struct cvar_s
 	float	value;
 	struct cvar_s *next;
 } cvar_t;
+
+#define Q_CVAR_DEF(var, name, value, args ...) \
+        cvar_t var = {name, #value, args}
+
+#define CVAR_NAME(cvar) (cvar)->name
+#define CVAR_ARCH(cvar) (cvar)->archive
+#define CVAR_STRING(cvar) (cvar)->string
+#define CVAR_NEXT(cvar) (cvar)->next
+#define CVAR_SERVER(cvar) (cvar)->server
+
+#endif /*CVAR_TINY*/
+
+#define CVAR_VALUE(cvar) (cvar)->value
 
 void 	Cvar_RegisterVariable (cvar_t *variable);
 // registers a cvar that allready has the name, string, and optionally the

@@ -30,14 +30,16 @@ float		scr_con_current;
 float		scr_conlines;		// lines of console to display
 
 float		oldscreensize, oldfov;
-cvar_t		scr_viewsize = {"viewsize","100", true};
-cvar_t		scr_fov = {"fov","90"};	// 10 - 170
-cvar_t		scr_conspeed = {"scr_conspeed","300"};
-cvar_t		scr_centertime = {"scr_centertime","2"};
-cvar_t		scr_showram = {"showram","1"};
-cvar_t		scr_showturtle = {"showturtle","0"};
-cvar_t		scr_showpause = {"showpause","1"};
-cvar_t		scr_printspeed = {"scr_printspeed","8"};
+
+Q_CVAR_DEF(scr_viewsize, "viewsize", 100, true);
+Q_CVAR_DEF(scr_fov, "fov", 90);// 10 - 170
+Q_CVAR_DEF(scr_conspeed, "scr_conspeed", 300);
+Q_CVAR_DEF(scr_centertime, "scr_centertime", 2);
+Q_CVAR_DEF(scr_showram, "scr_showram", 1);
+Q_CVAR_DEF(scr_showturtle, "showturtle", 0);
+Q_CVAR_DEF(scr_showpause, "showpause", 1);
+Q_CVAR_DEF(scr_printspeed, "scr_printspeed", 8);
+
 
 qboolean	scr_initialized;		// ready to draw
 

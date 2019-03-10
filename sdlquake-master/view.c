@@ -30,39 +30,38 @@ entities sent from the server may not include everything in the pvs, especially
 when crossing a water boudnary.
 
 */
+Q_CVAR_DEF(lcd_x, "lcd_x", 0);
+Q_CVAR_DEF(lcd_yaw, "lcd_yaw", 0);
 
-cvar_t		lcd_x = {"lcd_x","0"};
-cvar_t		lcd_yaw = {"lcd_yaw","0"};
+Q_CVAR_DEF(scr_ofsx, "scr_ofsx", 0, false);
+Q_CVAR_DEF(scr_ofsy, "scr_ofsy", 0, false);
+Q_CVAR_DEF(scr_ofsz, "scr_ofsz", 0, false);
 
-cvar_t	scr_ofsx = {"scr_ofsx","0", false};
-cvar_t	scr_ofsy = {"scr_ofsy","0", false};
-cvar_t	scr_ofsz = {"scr_ofsz","0", false};
+Q_CVAR_DEF(cl_rollspeed, "cl_rollspeed", 200);
+Q_CVAR_DEF(cl_rollangle, "cl_rollangle", 2.0);
 
-cvar_t	cl_rollspeed = {"cl_rollspeed", "200"};
-cvar_t	cl_rollangle = {"cl_rollangle", "2.0"};
+Q_CVAR_DEF(cl_bob, "cl_bob", 0.02, false);
+Q_CVAR_DEF(cl_bobcycle, "cl_bobcycle", 0.6, false);
+Q_CVAR_DEF(cl_bobup, "cl_bobup", 0.5, false);
 
-cvar_t	cl_bob = {"cl_bob","0.02", false};
-cvar_t	cl_bobcycle = {"cl_bobcycle","0.6", false};
-cvar_t	cl_bobup = {"cl_bobup","0.5", false};
+Q_CVAR_DEF(v_kicktime, "v_kicktime", 0.5, false);
+Q_CVAR_DEF(v_kickroll, "v_kickroll", 0.6, false);
+Q_CVAR_DEF(v_kickpitch, "v_kickpitch", 0.6, false);
 
-cvar_t	v_kicktime = {"v_kicktime", "0.5", false};
-cvar_t	v_kickroll = {"v_kickroll", "0.6", false};
-cvar_t	v_kickpitch = {"v_kickpitch", "0.6", false};
+Q_CVAR_DEF(v_iyaw_cycle, "v_iyaw_cycle", 2, false);
+Q_CVAR_DEF(v_iroll_cycle, "v_iroll_cycle", 0.5, false);
+Q_CVAR_DEF(v_ipitch_cycle, "v_ipitch_cycle", 1, false);
+Q_CVAR_DEF(v_iyaw_level, "v_iyaw_level", 0.3, false);
+Q_CVAR_DEF(v_iroll_level, "v_iroll_level", 0.1, false);
+Q_CVAR_DEF(v_ipitch_level, "v_ipitch_level", 0.3, false);
 
-cvar_t	v_iyaw_cycle = {"v_iyaw_cycle", "2", false};
-cvar_t	v_iroll_cycle = {"v_iroll_cycle", "0.5", false};
-cvar_t	v_ipitch_cycle = {"v_ipitch_cycle", "1", false};
-cvar_t	v_iyaw_level = {"v_iyaw_level", "0.3", false};
-cvar_t	v_iroll_level = {"v_iroll_level", "0.1", false};
-cvar_t	v_ipitch_level = {"v_ipitch_level", "0.3", false};
+Q_CVAR_DEF(v_idlescale, "v_idlescale", 0, false);
 
-cvar_t	v_idlescale = {"v_idlescale", "0", false};
+Q_CVAR_DEF(crosshair, "crosshair", 0, false);
+Q_CVAR_DEF(cl_crossx, "cl_crossx", 0, false);
+Q_CVAR_DEF(cl_crossy, "cl_crossy", 0, false);
 
-cvar_t	crosshair = {"crosshair", "0", true};
-cvar_t	cl_crossx = {"cl_crossx", "0", false};
-cvar_t	cl_crossy = {"cl_crossy", "0", false};
-
-cvar_t	gl_cshiftpercent = {"gl_cshiftpercent", "100", false};
+Q_CVAR_DEF(gl_cshiftpercent, "gl_cshiftpercent", 100, false);
 
 float	v_dmg_time, v_dmg_roll, v_dmg_pitch;
 
@@ -137,10 +136,8 @@ float V_CalcBob (void)
 
 
 //=============================================================================
-
-
-cvar_t	v_centermove = {"v_centermove", "0.15", false};
-cvar_t	v_centerspeed = {"v_centerspeed","500"};
+Q_CVAR_DEF(v_centermove, "v_centermove", 0.15, false);
+Q_CVAR_DEF(v_centerspeed, "v_centerspeed", 500);
 
 
 void V_StartPitchDrift (void)
@@ -256,7 +253,7 @@ cshift_t	cshift_water = { {130,80,50}, 128 };
 cshift_t	cshift_slime = { {0,25,5}, 150 };
 cshift_t	cshift_lava = { {255,80,0}, 150 };
 
-cvar_t		v_gamma = {"gamma", "1", true};
+Q_CVAR_DEF(v_gamma, "gamma", 1, true);
 
 byte		gammatable[256];	// palette is sent through this
 

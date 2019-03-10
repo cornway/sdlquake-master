@@ -6,7 +6,11 @@ sizebuf_t   net_message;
 int         demo_message_start;
 int         net_activeconnections = 0;
 int         vcrFile = -1;
-cvar_t      hostname = {"hostname", "UNNAMED"};
+#if CVAR_TINY
+Q_CVAR_DEF(hostname, "hostname", 0);
+#else
+Q_CVAR_DEF(hostname, "hostname", "UNNAMED");
+#endif
 qboolean    ipxAvailable = false;
 char        my_ipx_address[NET_NAMELEN];
 char        my_tcpip_address[NET_NAMELEN];

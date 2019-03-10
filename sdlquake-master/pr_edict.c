@@ -38,17 +38,17 @@ int		type_size[8] = {1,sizeof(string_t)/4,1,3,1,1,sizeof(func_t)/4,sizeof(void *
 ddef_t *ED_FieldAtOfs (int ofs);
 qboolean	ED_ParseEpair (void *base, ddef_t *key, char *s);
 
-cvar_t	nomonsters = {"nomonsters", "0"};
-cvar_t	gamecfg = {"gamecfg", "0"};
-cvar_t	scratch1 = {"scratch1", "0"};
-cvar_t	scratch2 = {"scratch2", "0"};
-cvar_t	scratch3 = {"scratch3", "0"};
-cvar_t	scratch4 = {"scratch4", "0"};
-cvar_t	savedgamecfg = {"savedgamecfg", "0", true};
-cvar_t	saved1 = {"saved1", "0", true};
-cvar_t	saved2 = {"saved2", "0", true};
-cvar_t	saved3 = {"saved3", "0", true};
-cvar_t	saved4 = {"saved4", "0", true};
+Q_CVAR_DEF(nomonsters, "nomonsters", 0);
+Q_CVAR_DEF(gamecfg, "gamecfg", 0);
+Q_CVAR_DEF(scratch1, "scratch1", 0);
+Q_CVAR_DEF(scratch2, "scratch2", 0);
+Q_CVAR_DEF(scratch3, "scratch3", 0);
+Q_CVAR_DEF(scratch4, "scratch4", 0);
+Q_CVAR_DEF(savedgamecfg, "savedgamecfg", 0, true);
+Q_CVAR_DEF(saved1, "saved1", 0, true);
+Q_CVAR_DEF(saved2, "saved2", 0, true);
+Q_CVAR_DEF(saved3, "saved3", 0, true);
+Q_CVAR_DEF(saved4, "saved4", 0, true);
 
 #define	MAX_FIELD_LEN	64
 #define GEFV_CACHESIZE	2

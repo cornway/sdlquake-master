@@ -33,10 +33,9 @@ cvar_t *Cvar_FindVar (char *var_name)
 {
 	cvar_t	*var;
 	
-	for (var=cvar_vars ; var ; var=var->next)
-		if (!Q_strcmp (var_name, var->name))
+	for (var=cvar_vars ; var ; var=CVAR_NEXT(var))
+		if (!Q_strcmp (var_name, CVAR_NAME(var)))
 			return var;
-
 	return NULL;
 }
 
@@ -52,7 +51,7 @@ float	Cvar_VariableValue (char *var_name)
 	var = Cvar_FindVar (var_name);
 	if (!var)
 		return 0;
-	return Q_atof (var->string);
+	return Q_atof (CVAR_NAME(var));
 }
 
 
@@ -66,9 +65,10 @@ char *Cvar_VariableString (char *var_name)
 	cvar_t *var;
 	
 	var = Cvar_FindVar (var_name);
-	if (!var)
-		return cvar_null_string;
-	return var->string;
+	if (var)
+        return CVAR_NAME(var);
+
+    return cvar_null_string;
 }
 
 
@@ -88,10 +88,9 @@ char *Cvar_CompleteVariable (char *partial)
 		return NULL;
 		
 // check functions
-	for (cvar=cvar_vars ; cvar ; cvar=cvar->next)
-		if (!Q_strncmp (partial,cvar->name, len))
-			return cvar->name;
-
+	for (cvar=cvar_vars ; cvar ; cvar=CVAR_NEXT(cvar))
+		if (!Q_strncmp (partial,CVAR_NAME(cvar), len))
+			return CVAR_NAME(cvar);
 	return NULL;
 }
 
@@ -113,17 +112,18 @@ void Cvar_Set (char *var_name, char *value)
 		return;
 	}
 
-	changed = Q_strcmp(var->string, value);
-	
-	Z_Free (var->string);	// free the old value string
-	
-	var->string = Z_Malloc (Q_strlen(value)+1);
-	Q_strcpy (var->string, value);
-	var->value = Q_atof (var->string);
-	if (var->server && changed)
+	changed = Q_strcmp(CVAR_NAME(var), value);
+#if CVAR_TINY
+    Sys_Error("CVAR_TINY : Z_Malloc");
+#endif
+	Z_Free (CVAR_NAME(var));	// free the old value string
+	CVAR_NAME(var) = Z_Malloc (Q_strlen(value)+1);
+	Q_strcpy (CVAR_NAME(var), value);
+	var->value = Q_atof (CVAR_NAME(var));
+	if (CVAR_SERVER(var) && changed)
 	{
 		if (sv.active)
-			SV_BroadcastPrintf ("\"%s\" changed to \"%s\"\n", var->name, var->string);
+			SV_BroadcastPrintf ("\"%s\" changed to \"%s\"\n", CVAR_NAME(var), CVAR_STRING(var));
 	}
 }
 
@@ -153,27 +153,30 @@ void Cvar_RegisterVariable (cvar_t *variable)
 	char	*oldstr;
 	
 // first check to see if it has allready been defined
-	if (Cvar_FindVar (variable->name))
+	if (Cvar_FindVar (CVAR_NAME(variable)))
 	{
-		Con_Printf ("Can't register variable %s, allready defined\n", variable->name);
+		Con_Printf ("Can't register variable %s, allready defined\n",CVAR_NAME(variable));
 		return;
 	}
 	
 // check for overlap with a command
-	if (Cmd_Exists (variable->name))
+	if (Cmd_Exists (CVAR_NAME(variable)))
 	{
-		Con_Printf ("Cvar_RegisterVariable: %s is a command\n", variable->name);
+		Con_Printf ("Cvar_RegisterVariable: %s is a command\n", CVAR_NAME(variable));
 		return;
 	}
+#if CVAR_TINY
+    Sys_Error("CVAR_TINY : Z_Malloc");
+#endif
 		
 // copy the value off, because future sets will Z_Free it
-	oldstr = variable->string;
-	variable->string = Z_Malloc (Q_strlen(variable->string)+1);	
-	Q_strcpy (variable->string, oldstr);
-	variable->value = Q_atof (variable->string);
+	oldstr = CVAR_STRING(variable);
+	CVAR_STRING(variable) = Z_Malloc (Q_strlen(CVAR_STRING(variable))+1);	
+	Q_strcpy (CVAR_STRING(variable), oldstr);
+	CVAR_VALUE(variable) = Q_atof (CVAR_STRING(variable));
 	
 // link the variable in
-	variable->next = cvar_vars;
+	CVAR_NEXT(variable) = cvar_vars;
 	cvar_vars = variable;
 }
 
@@ -196,11 +199,11 @@ qboolean	Cvar_Command (void)
 // perform a variable print or set
 	if (Cmd_Argc() == 1)
 	{
-		Con_Printf ("\"%s\" is \"%s\"\n", v->name, v->string);
+		Con_Printf ("\"%s\" is \"%s\"\n", CVAR_NAME(v), CVAR_STRING(v));
 		return true;
 	}
 
-	Cvar_Set (v->name, Cmd_Argv(1));
+	Cvar_Set (CVAR_NAME(v), Cmd_Argv(1));
 	return true;
 }
 
@@ -217,8 +220,8 @@ void Cvar_WriteVariables (FILE *f)
 {
 	cvar_t	*var;
 	
-	for (var = cvar_vars ; var ; var = var->next)
-		if (var->archive)
-			fprintf (f, "%s \"%s\"\n", var->name, var->string);
+	for (var = cvar_vars ; var ; var = CVAR_NEXT(var))
+		if (CVAR_ARCH(var))
+			fprintf (f, "%s \"%s\"\n", CVAR_NAME(var), CVAR_STRING(var));
 }
 

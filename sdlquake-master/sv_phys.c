@@ -38,12 +38,11 @@ flying/floating monsters are SOLID_SLIDEBOX and MOVETYPE_FLY
 solid_edge items only clip against bsp models.
 
 */
-
-cvar_t	sv_friction = {"sv_friction","4",false,true};
-cvar_t	sv_stopspeed = {"sv_stopspeed","100"};
-cvar_t	sv_gravity = {"sv_gravity","800",false,true};
-cvar_t	sv_maxvelocity = {"sv_maxvelocity","2000"};
-cvar_t	sv_nostep = {"sv_nostep","0"};
+Q_CVAR_DEF(sv_friction, "sv_friction", 4, false, true);
+Q_CVAR_DEF(sv_stopspeed, "sv_stopspeed", 100,);
+Q_CVAR_DEF(sv_gravity, "sv_gravity", 800, false, true);
+Q_CVAR_DEF(sv_maxvelocity, "sv_maxvelocity", 2000);
+Q_CVAR_DEF(sv_nostep, "sv_nostep", 0);
 
 #ifdef QUAKE2
 static	vec3_t	vec_origin = {0.0, 0.0, 0.0};

@@ -25,20 +25,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // references them even when on a unix system.
 
 // these two are not intended to be set directly
-cvar_t	cl_name = {"_cl_name", "player", true};
-cvar_t	cl_color = {"_cl_color", "0", true};
+#if CVAR_TINY
+Q_CVAR_DEF(cl_name, "_cl_name", 0, true);
+#else
+Q_CVAR_DEF(cl_name, "_cl_name", "player", true);
+#endif /*CVAR_TINY*/
+Q_CVAR_DEF(cl_color, "_cl_color", 0, true);
 
-cvar_t	cl_shownet = {"cl_shownet","0"};	// can be 0, 1, or 2
-cvar_t	cl_nolerp = {"cl_nolerp","0"};
+Q_CVAR_DEF(cl_shownet, "cl_shownet", 0);
+Q_CVAR_DEF(cl_nolerp, "cl_nolerp", 0);  // can be 0, 1, or 2
 
-cvar_t	lookspring = {"lookspring","0", true};
-cvar_t	lookstrafe = {"lookstrafe","0", true};
-cvar_t	sensitivity = {"sensitivity","3", true};
+Q_CVAR_DEF(lookspring, "lookspring", 0, true);
+Q_CVAR_DEF(lookstrafe, "lookstrafe", 0, true);
+Q_CVAR_DEF(sensitivity, "sensitivity", 3, true);
 
-cvar_t	m_pitch = {"m_pitch","0.022", true};
-cvar_t	m_yaw = {"m_yaw","0.022", true};
-cvar_t	m_forward = {"m_forward","1", true};
-cvar_t	m_side = {"m_side","0.8", true};
+Q_CVAR_DEF(m_pitch, "m_pitch", 0.022, true);
+Q_CVAR_DEF(m_yaw, "m_yaw", 0.022, true);
+Q_CVAR_DEF(m_forward, "m_forward", 1, true);
+Q_CVAR_DEF(m_side, "m_side", 0.8, true);
 
 
 client_static_t	cls;
@@ -188,7 +192,7 @@ Con_DPrintf ("CL_SignonReply: %i\n", cls.signon);
 		
 	case 2:		
 		MSG_WriteByte (&cls.message, clc_stringcmd);
-		MSG_WriteString (&cls.message, va("name \"%s\"\n", cl_name.string));
+		MSG_WriteString (&cls.message, va("name \"%s\"\n", CVAR_CL_NAME(&cl_name)));
 	
 		MSG_WriteByte (&cls.message, clc_stringcmd);
 		MSG_WriteString (&cls.message, va("color %i %i\n", ((int)cl_color.value)>>4, ((int)cl_color.value)&15));

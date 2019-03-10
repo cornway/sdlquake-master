@@ -238,6 +238,14 @@ extern struct sfx_s cl_sound_precache[MAX_SOUNDS];
 //
 // cvars
 //
+#if CVAR_TINY
+#define CVAR_CL_NAME(cvar)"player"
+#define CVAR_HOST_NAME(cvar) "LOCAL"
+#else
+#define CVAR_CL_NAME(cvar) (cvar)->string
+#define CVAR_HOST_NAME(cvar) (cvar)->string
+#endif
+
 extern	cvar_t	cl_name;
 extern	cvar_t	cl_color;
 

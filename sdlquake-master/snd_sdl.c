@@ -118,8 +118,8 @@ void SNDDMA_Shutdown(void)
 
 int sound_started=0;
 
-cvar_t bgmvolume = {"bgmvolume", "1", true};
-cvar_t volume = {"volume", "0.7", true};
+Q_CVAR_DEF(bgmvolume, "bgmvolume", 1, true);
+Q_CVAR_DEF(volume, "volume", 0,7, true);
 
 int         desired_speed = 11025; //11025;
 int         desired_bits = 16;
@@ -128,8 +128,9 @@ volatile dma_t  *shm = 0;
 
 int recording = 0;
 
-cvar_t nosound = {"nosound", "0"};
-cvar_t precache = {"precache", "0"};
+Q_CVAR_DEF(nosound, "nosound", 0);
+Q_CVAR_DEF(precache, "precache", 0);
+
 
 channel_t   channels[MAX_CHANNELS];
 int			total_channels;
