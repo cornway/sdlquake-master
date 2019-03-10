@@ -8,6 +8,8 @@
 #include "input_main.h"
 #include "sdl_keysym.h"
 
+#define VIDEO_IN_IRAM 1
+
 viddef_t    vid;                // global video state
 unsigned short  d_8to16table[256];
 
@@ -21,6 +23,9 @@ unsigned short  d_8to16table[256];
 #define D_SCREEN_PIX_CNT (BASEWIDTH * BASEHEIGHT)
 #define D_SCREEN_BYTE_CNT (D_SCREEN_PIX_CNT * sizeof(pix_t))
 
+#if VIDEO_IN_IRAM
+pix_t screenbuf[BASEWIDTH * BASEHEIGHT * sizeof(pix_t) + sizeof(SDL_Surface)] = {0};
+#endif
 
 int    VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes = 0;
 byte    *VGA_pagebase;
@@ -79,10 +84,13 @@ void    VID_Init (unsigned char *palette)
 
     screen_win_cfg(&lcd_screen);
 
+#if VIDEO_IN_IRAM
+    screen = (SDL_Surface *)&screenbuf[0];
+#else
     screen = (SDL_Surface *)Hunk_HighAllocName(BASEWIDTH * BASEHEIGHT * sizeof(pix_t) + sizeof(SDL_Surface), "screen");
-
     if (screen == NULL)
         Sys_Error ("Not enough memory for video mode\n");
+#endif
 
     // Set video width, height and flags
     flags = (SDL_SWSURFACE|SDL_HWPALETTE|SDL_FULLSCREEN);
