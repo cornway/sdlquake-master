@@ -201,14 +201,23 @@ void CL_KeepaliveMessage (void)
 CL_ParseServerInfo
 ==================
 */
+typedef struct {
+    char name[MAX_QPATH];
+} char_cache_t;
+
 void CL_ParseServerInfo (void)
 {
 	char	*str;
 	int		i;
 	int		nummodels, numsounds;
-	char	model_precache[MAX_MODELS][MAX_QPATH];
-	char	sound_precache[MAX_SOUNDS][MAX_QPATH];
-	
+	char_cache_t	*model_precache;
+    int     model_cachesize = MAX_MODELS * sizeof(char_cache_t);
+	char_cache_t	*sound_precache;
+    int     sound_cachesize = MAX_SOUNDS * sizeof(char_cache_t);
+
+    model_precache = (char_cache_t *)static_cache_pop(model_cachesize);
+    sound_precache = (char_cache_t *)static_cache_pop(sound_cachesize);
+
 	Con_DPrintf ("Serverinfo packet received.\n");
 //
 // wipe the client_state_t struct
@@ -220,7 +229,7 @@ void CL_ParseServerInfo (void)
 	if (i != PROTOCOL_VERSION)
 	{
 		Con_Printf ("Server returned version %i, not %i", i, PROTOCOL_VERSION);
-		return;
+		goto exit;
 	}
 
 // parse maxclients
@@ -228,7 +237,7 @@ void CL_ParseServerInfo (void)
 	if (cl.maxclients < 1 || cl.maxclients > MAX_SCOREBOARD)
 	{
 		Con_Printf("Bad maxclients (%u) from server\n", cl.maxclients);
-		return;
+		goto exit;
 	}
 	cl.scores = Hunk_AllocName (cl.maxclients*sizeof(*cl.scores), "scores");
 
@@ -259,14 +268,18 @@ void CL_ParseServerInfo (void)
 		if (nummodels==MAX_MODELS)
 		{
 			Con_Printf ("Server sent too many model precaches\n");
-			return;
+			goto exit;
 		}
-		strcpy (model_precache[nummodels], str);
+		strcpy (model_precache[nummodels].name, str);
 		Mod_TouchModel (str);
 	}
 
 // precache sounds
+    /*We don't need memzero now, because of static storage for sfx'es*/
+    /*Cache data pointer will be zeroed during cache free*/
+    /*
 	memset (&cl_sound_precache, 0, sizeof(cl_sound_precache));
+       */
 	for (numsounds=1 ; ; numsounds++)
 	{
 		str = MSG_ReadString ();
@@ -275,9 +288,9 @@ void CL_ParseServerInfo (void)
 		if (numsounds==MAX_SOUNDS)
 		{
 			Con_Printf ("Server sent too many sound precaches\n");
-			return;
+			goto exit;
 		}
-		strcpy (sound_precache[numsounds], str);
+		strcpy (sound_precache[numsounds].name, str);
         if (arrlen(cl_sound_precache) > numsounds)
 		    S_TouchSound (str, &cl_sound_precache[numsounds]);
 	}
@@ -288,11 +301,11 @@ void CL_ParseServerInfo (void)
 
 	for (i=1 ; i<nummodels ; i++)
 	{
-		cl.model_precache[i] = Mod_ForName (model_precache[i], false);
+		cl.model_precache[i] = Mod_ForName (model_precache[i].name, false);
 		if (cl.model_precache[i] == NULL)
 		{
-			Con_Printf("Model %s not found\n", model_precache[i]);
-			return;
+			Con_Printf("Model %s not found\n", model_precache[i].name);
+			goto exit;
 		}
 		CL_KeepaliveMessage ();
 	}
@@ -300,7 +313,7 @@ void CL_ParseServerInfo (void)
 	S_BeginPrecaching ();
 	for (i=1 ; i<numsounds ; i++)
 	{
-		S_PrecacheSound (sound_precache[i], &cl_sound_precache[i]);
+		S_PrecacheSound (sound_precache[i].name, &cl_sound_precache[i]);
 		CL_KeepaliveMessage ();
 	}
 	S_EndPrecaching ();
@@ -314,6 +327,9 @@ void CL_ParseServerInfo (void)
 	Hunk_Check ();		// make sure nothing is hurt
 	
 	noclip_anglehack = false;		// noclip is turned off at start	
+exit:
+    static_cache_push(sound_cachesize);
+    static_cache_push(model_cachesize);
 }
 
 
