@@ -71,3 +71,12 @@ void Sys_LowFPPrecision (void);
 void Sys_HighFPPrecision (void);
 void Sys_SetFPCW (void);
 
+#define alignup(v, al) \
+    (((long)(v) + (al) - 1) & ~((al) - 1))
+
+#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+
+#define container_of(ptr, type, member)     \
+    (type *)((uint8_t *)(ptr) - offsetof(type,member))
+
+

@@ -373,6 +373,7 @@ Con_Printf
 Handles cursor positioning, line wrapping, etc
 ================
 */
+//FIXME! : reduce buffer size.
 #define	MAXPRINTMSG	4096
 // FIXME: make a buffer size safe vsprintf?
 void Con_Printf (char *fmt, ...)

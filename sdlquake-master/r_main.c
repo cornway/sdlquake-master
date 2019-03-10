@@ -880,34 +880,27 @@ R_EdgeDrawing
 */
 void R_EdgeDrawing (void)
 {
-	edge_t	*ledges = NULL;
-    int     ledges_cachesize =
-        (NUMSTACKEDGES +((CACHE_SIZE - 1) / sizeof(edge_t)) + 1) * sizeof(edge_t);
-	surf_t	*lsurfs = NULL;
-    int     lsurfs_cachesize =
-        (NUMSTACKEDGES +((CACHE_SIZE - 1) / sizeof(surf_t)) + 1) * sizeof(surf_t);
+    edge_t        *ledges = NULL;
+    const int     ledges_cachesize = (NUMSTACKEDGES + 1) * sizeof(edge_t);
+    surf_t        *lsurfs = NULL;
+    const int     lsurfs_cachesize =  (NUMSTACKEDGES + 1) * sizeof(surf_t);
 
 
-    ledges = (edge_t *)static_cache_pop(ledges_cachesize);
-    lsurfs = (surf_t *)static_cache_pop(lsurfs_cachesize);
+    ledges = (edge_t *)dram_cache_pop(ledges_cachesize);
+    lsurfs = (surf_t *)dram_cache_pop(lsurfs_cachesize);
 
-    if (!ledges || !lsurfs) {
-        Sys_Error("");
-    }
     if (auxedges)
 	{
 		r_edges = auxedges;
 	}
 	else
 	{
-		r_edges =  (edge_t *)
-				(((long)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+		r_edges =  (edge_t *)alignup(&ledges[0], CACHE_SIZE);
 	}
 
 	if (r_surfsonstack)
 	{
-		surfaces =  (surf_t *)
-				(((long)&lsurfs[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+		surfaces =  (surf_t *)alignup(&lsurfs[0], CACHE_SIZE);
 		surf_max = &surfaces[r_cnumsurfs];
 	// surface 0 doesn't really exist; it's just a dummy because index 0
 	// is used to indicate no edge attached to surface
@@ -955,8 +948,8 @@ void R_EdgeDrawing (void)
 	if (!(r_drawpolys | r_drawculledpolys))
 		R_ScanEdges ();
 
-    static_cache_push(lsurfs_cachesize);
-    static_cache_push(ledges_cachesize);
+    dram_cache_push(lsurfs_cachesize);
+    dram_cache_push(ledges_cachesize);
 }
 
 

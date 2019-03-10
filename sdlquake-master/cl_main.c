@@ -48,10 +48,13 @@ Q_CVAR_DEF(m_side, "m_side", 0.8, true);
 client_static_t	cls;
 client_state_t	cl;
 struct sfx_s cl_sound_precache[MAX_SOUNDS];
-// FIXME: put these on hunk?//----------------------------!
 efrag_t			cl_efrags[MAX_EFRAGS];
-entity_t		cl_entities[MAX_EDICTS];
-entity_t		cl_static_entities[MAX_STATIC_ENTITIES];
+
+const int       cl_ent_cachesize = (MAX_EDICTS) * sizeof(entity_t);
+const int       cl_static_ent_cachesize = (MAX_STATIC_ENTITIES) * sizeof(entity_t);
+entity_t        *cl_entities = NULL;
+entity_t        *cl_static_entities = NULL;
+
 lightstyle_t	cl_lightstyle[MAX_LIGHTSTYLES];
 dlight_t		cl_dlights[MAX_DLIGHTS];
 
@@ -68,6 +71,12 @@ void CL_ClearState (void)
 {
 	int			i;
 
+    if (!cl_entities || !cl_static_entities) {
+
+        cl_entities = (entity_t *)dram_cache_top(cl_ent_cachesize + cl_static_ent_cachesize);
+        cl_static_entities = cl_entities + MAX_EDICTS;
+    }
+
 	if (!sv.active)
 		Host_ClearMemory ();
 
@@ -78,7 +87,7 @@ void CL_ClearState (void)
 
 // clear other arrays	
 	memset (cl_efrags, 0, sizeof(cl_efrags));
-	memset (cl_entities, 0, sizeof(cl_entities));
+	memset (cl_entities, 0, cl_ent_cachesize);
 	memset (cl_dlights, 0, sizeof(cl_dlights));
 	memset (cl_lightstyle, 0, sizeof(cl_lightstyle));
 	memset (cl_temp_entities, 0, sizeof(cl_temp_entities));

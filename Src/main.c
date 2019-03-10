@@ -69,19 +69,34 @@ static void CPU_CACHE_Enable(void);
 #define SCREEN_FB_X_MAX 800
 #define SCREEN_FB_Y_MAX 600
 #define SCREEN_FB_MEM_SIZE_MAX (SCREEN_FB_X_MAX * SCREEN_FB_Y_MAX * sizeof(pix_t) * 2)
-#define STATIC_CACHE_SIZE (0x0005a000)
+#define STATIC_CACHE_SIZE (0x00070000)
 
 #define SDRAM_VOL_START 0xC0000000
 #define SDRAM_VOL_END   0xC1000000
 #define SDRAM_VOL_SIZE (SDRAM_VOL_END - SDRAM_VOL_START)
+#define SDRAM_CACHE_SIZE    (STATIC_CACHE_SIZE)
+#define SDRAM_CACHE_OFFSET  (SDRAM_VOL_START + SCREEN_FB_MEM_SIZE_MAX)
 
-volatile uint8_t *__heap_buf_cache = (void *)(SDRAM_VOL_START + SCREEN_FB_MEM_SIZE_MAX);
-volatile size_t   __heap_buf_cache_size = (STATIC_CACHE_SIZE);
-volatile uint8_t *__heap_buf_raw = (void *)(SDRAM_VOL_START + SCREEN_FB_MEM_SIZE_MAX + STATIC_CACHE_SIZE);
-volatile size_t   __heap_buf_raw_size = (SDRAM_VOL_SIZE - SCREEN_FB_MEM_SIZE_MAX - STATIC_CACHE_SIZE);
+volatile uint8_t *__heap_buf_cache = (void *)(SDRAM_CACHE_OFFSET);
+volatile uint8_t *__heap_buf_cache_top = (void *)(SDRAM_CACHE_OFFSET + SDRAM_CACHE_SIZE);
+volatile size_t   __heap_buf_cache_size = (SDRAM_CACHE_SIZE);
+volatile uint8_t *__heap_buf_raw = (void *)(SDRAM_CACHE_OFFSET + SDRAM_CACHE_SIZE);
+volatile size_t   __heap_buf_raw_size = (SDRAM_VOL_SIZE - SCREEN_FB_MEM_SIZE_MAX - SDRAM_CACHE_SIZE);
 volatile pix_t   *screen_fb_mem_start = (void *)SDRAM_VOL_START;
 
-void *static_cache_pop (int size)
+void *dram_cache_top (int size)
+{
+    if (__heap_buf_cache_size < size) {
+        fatal_error("");
+    }
+
+    __heap_buf_cache_top -= size;
+    __heap_buf_cache_size -= size;
+    return __heap_buf_cache_top;
+}
+
+
+void *dram_cache_pop (int size)
 {
     void *p;
     if (__heap_buf_cache_size < size) {
@@ -93,7 +108,7 @@ void *static_cache_pop (int size)
     return p;
 }
 
-void static_cache_push (int size)
+void dram_cache_push (int size)
 {
     __heap_buf_cache -= size;
     __heap_buf_cache_size += size;

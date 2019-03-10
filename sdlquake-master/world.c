@@ -284,7 +284,7 @@ void SV_TouchLinks ( edict_t *ent, areanode_t *node )
 	for (l = node->trigger_edicts.next ; l != &node->trigger_edicts ; l = next)
 	{
 		next = l->next;
-		touch = EDICT_FROM_AREA(l);
+        touch = container_of(l, edict_t, area);
 		if (touch == ent)
 			continue;
 		if (!touch->v.touch || touch->v.solid != SOLID_TRIGGER)
@@ -821,7 +821,7 @@ void SV_ClipToLinks ( areanode_t *node, moveclip_t *clip )
 	for (l = node->solid_edicts.next ; l != &node->solid_edicts ; l = next)
 	{
 		next = l->next;
-		touch = EDICT_FROM_AREA(l);
+        touch = container_of(l, edict_t, area);
 		if (touch->v.solid == SOLID_NOT)
 			continue;
 		if (touch == clip->passedict)

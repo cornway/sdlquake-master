@@ -663,17 +663,14 @@ Each surface has a linked list of its visible spans
 void R_ScanEdges (void)
 {
 	int		iv, bottom;
-	byte	*basespans = NULL;
-    int     basespans_cachesize = MAXSPANS*sizeof(espan_t)+CACHE_SIZE;
+    const int     basespans_cachesize = MAXSPANS*sizeof(espan_t)+CACHE_SIZE;
 	espan_t	*basespan_p;
 	surf_t	*s;
 
-    basespans = static_cache_pop(basespans_cachesize);
+    basespan_p = dram_cache_pop(basespans_cachesize);
+    basespan_p = (espan_t *)alignup(basespan_p, CACHE_SIZE);
 
-	basespan_p = (espan_t *)
-			((long)(basespans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
 	max_span_p = &basespan_p[MAXSPANS - r_refdef.vrect.width];
-
 	span_p = basespan_p;
 
 // clear active edges to just the background edges around the whole screen
@@ -773,7 +770,7 @@ void R_ScanEdges (void)
 	else
 		D_DrawSurfaces ();
 
-    static_cache_push(basespans_cachesize);
+    dram_cache_push(basespans_cachesize);
 }
 
 

@@ -649,12 +649,9 @@ void R_RenderWorld (void)
 {
 	int			i;
 	model_t		*clmodel;
-	btofpoly_t	*btofpolys;
-    int         btofpolys_cachesize = sizeof(btofpoly_t) * MAX_BTOFPOLYS;
+    const int    btofpolys_cachesize = sizeof(btofpoly_t) * MAX_BTOFPOLYS;
 
-    btofpolys = (btofpoly_t *)static_cache_pop(btofpolys_cachesize);
-
-	pbtofpolys = btofpolys;
+    pbtofpolys = (btofpoly_t *)dram_cache_pop(btofpolys_cachesize);
 
 	currententity = &cl_entities[0];
 	VectorCopy (r_origin, modelorg);
@@ -669,11 +666,11 @@ void R_RenderWorld (void)
 	{
 		for (i=numbtofpolys-1 ; i>=0 ; i--)
 		{
-			R_RenderPoly (btofpolys[i].psurf, btofpolys[i].clipflags);
+			R_RenderPoly (pbtofpolys[i].psurf, pbtofpolys[i].clipflags);
 		}
 	}
 
-    static_cache_push(btofpolys_cachesize);
+    dram_cache_push(btofpolys_cachesize);
 }
 
 

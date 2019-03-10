@@ -211,12 +211,12 @@ void CL_ParseServerInfo (void)
 	int		i;
 	int		nummodels, numsounds;
 	char_cache_t	*model_precache;
-    int     model_cachesize = MAX_MODELS * sizeof(char_cache_t);
+    const int     model_cachesize = MAX_MODELS * sizeof(char_cache_t);
 	char_cache_t	*sound_precache;
-    int     sound_cachesize = MAX_SOUNDS * sizeof(char_cache_t);
+    const int     sound_cachesize = MAX_SOUNDS * sizeof(char_cache_t);
 
-    model_precache = (char_cache_t *)static_cache_pop(model_cachesize);
-    sound_precache = (char_cache_t *)static_cache_pop(sound_cachesize);
+    model_precache = (char_cache_t *)dram_cache_pop(model_cachesize);
+    sound_precache = (char_cache_t *)dram_cache_pop(sound_cachesize);
 
 	Con_DPrintf ("Serverinfo packet received.\n");
 //
@@ -328,8 +328,8 @@ void CL_ParseServerInfo (void)
 	
 	noclip_anglehack = false;		// noclip is turned off at start	
 exit:
-    static_cache_push(sound_cachesize);
-    static_cache_push(model_cachesize);
+    dram_cache_push(sound_cachesize);
+    dram_cache_push(model_cachesize);
 }
 
 

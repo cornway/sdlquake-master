@@ -702,20 +702,15 @@ R_AliasDrawModel
 */
 void R_AliasDrawModel (alight_t *plighting)
 {
-	finalvert_t		*finalverts = NULL;
-    int             finalverts_cahcesize = 
-        (MAXALIASVERTS +((CACHE_SIZE - 1) / sizeof(finalvert_t)) + 1) * sizeof(finalvert_t);
-	auxvert_t		*auxverts = NULL;
-    int             auxverts_cachesize = MAXALIASVERTS * sizeof(auxvert_t);
+    const int             finalverts_cahcesize = (MAXALIASVERTS + 1) * sizeof(finalvert_t);
+    const int             auxverts_cachesize = MAXALIASVERTS * sizeof(auxvert_t);
 
-    finalverts = (finalvert_t *)static_cache_pop(finalverts_cahcesize);
-    auxverts = (auxvert_t *)static_cache_pop(auxverts_cachesize);
+    pfinalverts = (finalvert_t *)dram_cache_pop(finalverts_cahcesize);
+    pauxverts = (auxvert_t *)dram_cache_pop(auxverts_cachesize);
 	r_amodels_drawn++;
 
 // cache align
-	pfinalverts = (finalvert_t *)
-			(((long)&finalverts[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
-	pauxverts = &auxverts[0];
+	pfinalverts = (finalvert_t *)alignup(&pfinalverts[0], CACHE_SIZE);
 
 	paliashdr = (aliashdr_t *)Mod_Extradata (currententity->model);
 	pmdl = (mdl_t *)((byte *)paliashdr + paliashdr->model);
@@ -754,7 +749,7 @@ void R_AliasDrawModel (alight_t *plighting)
 	else
 		R_AliasPreparePoints ();
 
-    static_cache_push(auxverts_cachesize);
-    static_cache_push(finalverts_cahcesize);
+    dram_cache_push(auxverts_cachesize);
+    dram_cache_push(finalverts_cahcesize);
 }
 
