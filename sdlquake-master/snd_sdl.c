@@ -129,7 +129,7 @@ volatile dma_t  *shm = 0;
 int recording = 0;
 
 Q_CVAR_DEF(nosound, "nosound", 0);
-Q_CVAR_DEF(precache, "precache", 0);
+Q_CVAR_DEF(precache, "precache", 1);
 
 
 channel_t   channels[MAX_CHANNELS];
@@ -356,8 +356,9 @@ static void S_PushSound (channel_t *ch, int channel)
     sc = Cache_Check (&ch->sfx->cache);
 
     chunk.abuf = (snd_sample_t *)sc->data;
-    chunk.alen = sc->length * sizeof(snd_sample_t);
+    chunk.alen = sc->length * sizeof(snd_sample_t) * 2;
     chunk.volume = (ch->leftvol + ch->rightvol) / 4;
+    chunk.cache = &ch->sfx->cache.data;
     if (audio_is_playing(channel)) {
         audio_stop_channel(channel);
     }///*
