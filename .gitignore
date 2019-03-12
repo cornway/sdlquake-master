@@ -1,6 +1,7 @@
 /SW4STM32
 /EWARM
 /MDK-ARM/*
+!/MDK-ARM/*.sct
 !/MDK-ARM/Project.uvoptx
 !/MDK-ARM/Project.uvprojx
 !/MDK-ARM/startup_stm32f769xx.s
