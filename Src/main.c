@@ -112,6 +112,7 @@ int main(void)
         return -1;
     }
 
+    VID_PreConfig();
     SDL_main(argc, argv);
 
     return 0;

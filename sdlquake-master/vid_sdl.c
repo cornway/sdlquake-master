@@ -64,6 +64,16 @@ void    VID_ShiftPalette (unsigned char *palette)
     VID_SetPalette(palette);
 }
 
+void VID_PreConfig (void)
+{
+    screen_t lcd_screen;
+
+    lcd_screen.buf = NULL;
+    lcd_screen.width = BASEWIDTH;
+    lcd_screen.height = BASEHEIGHT;
+    screen_win_cfg(&lcd_screen);
+}
+
 void    VID_Init (unsigned char *palette)
 {
     int chunk;
