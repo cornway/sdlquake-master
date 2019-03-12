@@ -243,7 +243,7 @@ void PF_setmodel (void)
 
 // check to see if model was properly precached
 	for (i=0, check = sv.model_precache ; *check ; i++, check++)
-		if (!strcmp(*check, m))
+		if (!Q_strcmp(*check, m))
 			break;
 			
 	if (!*check)
@@ -518,7 +518,7 @@ void PF_ambientsound (void)
 	
 // check to see if samp was properly precached
 	for (soundnum=0, check = sv.sound_precache ; *check ; check++, soundnum++)
-		if (!strcmp(*check,samp))
+		if (!Q_strcmp(*check,samp))
 			break;
 			
 	if (!*check)
@@ -728,7 +728,7 @@ int PF_newcheckclient (int check)
 	VectorAdd (ent->v.origin, ent->v.view_ofs, org);
 	leaf = Mod_PointInLeaf (org, sv.worldmodel);
 	pvs = Mod_LeafPVS (leaf, sv.worldmodel);
-	memcpy (checkpvs, pvs, (sv.worldmodel->numleafs+7)>>3 );
+	Q_memcpy (checkpvs, pvs, (sv.worldmodel->numleafs+7)>>3 );
 
 	return i;
 }
@@ -998,7 +998,7 @@ void PF_Find (void)
 		t = E_STRING(ed,f);
 		if (!t)
 			continue;
-		if (!strcmp(t,s))
+		if (!Q_strcmp(t,s))
 		{
 			if (first == (edict_t *)sv.edicts)
 				first = ed;
@@ -1042,7 +1042,7 @@ void PF_Find (void)
 		t = E_STRING(ed,f);
 		if (!t)
 			continue;
-		if (!strcmp(t,s))
+		if (!Q_strcmp(t,s))
 		{
 			RETURN_EDICT(ed);
 			return;
@@ -1083,7 +1083,7 @@ void PF_precache_sound (void)
 			sv.sound_precache[i] = s;
 			return;
 		}
-		if (!strcmp(sv.sound_precache[i], s))
+		if (!Q_strcmp(sv.sound_precache[i], s))
 			return;
 	}
 	PR_RunError ("PF_precache_sound: overflow");
@@ -1109,7 +1109,7 @@ void PF_precache_model (void)
 			sv.models[i] = Mod_ForName (s, true);
 			return;
 		}
-		if (!strcmp(sv.model_precache[i], s))
+		if (!Q_strcmp(sv.model_precache[i], s))
 			return;
 	}
 	PR_RunError ("PF_precache_model: overflow");

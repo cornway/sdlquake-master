@@ -150,7 +150,7 @@ void R_BeginEdgeFrame (void)
 		r_currentkey = 0;
 	}
 
-// FIXME: set with memset
+// FIXME: set with Q_memset
 	for (v=r_refdef.vrect.y ; v<r_refdef.vrectbottom ; v++)
 	{
 		newedges[v] = removeedges[v] = NULL;

@@ -83,11 +83,11 @@ extern void *Sys_HeapCacheTop (int size);
 extern void Sys_HeapCachePush (int size);
 extern void *Sys_HeapCachePop (int size);
 
-extern void Sys_HeapInit (void);
-extern void *Sys_HeapMAlloc (int size);
-extern void *Sys_HeapHunkAlloc (int *size);
-extern void Sys_HeapFree (void *p);
-extern void *Sys_HeapAllocFb (int *size);
-extern int Sys_HeapMaxSize (void);
+extern void Sys_AllocInit (void);
+extern void *Sys_Malloc (int size);
+extern void *Sys_AllocShared (int *size);
+extern void Sys_Free (void *p);
+extern void *Sys_AllocVideo (int *size);
+extern int Sys_AllocBytesLeft (void);
 
 

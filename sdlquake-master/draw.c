@@ -68,7 +68,7 @@ qpic_t	*Draw_CachePic (char *path)
 	qpic_t		*dat;
 	
 	for (pic=menu_cachepics, i=0 ; i<menu_numcachepics ; pic++, i++)
-		if (!strcmp (path, pic->name))
+		if (!Q_strcmp (path, pic->name))
 			break;
 
 	if (i == menu_numcachepics)
@@ -76,7 +76,7 @@ qpic_t	*Draw_CachePic (char *path)
 		if (menu_numcachepics == MAX_CACHED_PICS)
 			Sys_Error ("menu_numcachepics == MAX_CACHED_PICS");
 		menu_numcachepics++;
-		strcpy (pic->name, path);
+		Q_strcpy (pic->name, path);
 	}
 
 	dat = Cache_Check (&pic->cache);
@@ -575,7 +575,7 @@ void Draw_ConsoleBackground (int lines)
 			v = (vid.conheight - lines + y)*200/vid.conheight;
 			src = conback->data + v*320;
 			if (vid.conwidth == 320)
-				memcpy (dest, src, vid.conwidth);
+				Q_memcpy (dest, src, vid.conwidth);
 			else
 			{
 				f = 0;
@@ -663,7 +663,7 @@ void R_DrawRect8 (vrect_t *prect, int rowbytes, byte *psrc,
 	{
 		for (i=0 ; i<prect->height ; i++)
 		{
-			memcpy (pdest, psrc, prect->width);
+			Q_memcpy (pdest, psrc, prect->width);
 			psrc += rowbytes;
 			pdest += vid.rowbytes;
 		}

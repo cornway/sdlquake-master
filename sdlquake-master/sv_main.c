@@ -138,7 +138,7 @@ void SV_StartSound (edict_t *entity, int channel, char *sample, int volume,
 // find precache number for sound
     for (sound_num=1 ; sound_num<MAX_SOUNDS
         && sv.sound_precache[sound_num] ; sound_num++)
-        if (!strcmp(sample, sv.sound_precache[sound_num]))
+        if (!Q_strcmp(sample, sv.sound_precache[sound_num]))
             break;
     
     if ( sound_num == MAX_SOUNDS || !sv.sound_precache[sound_num] )
@@ -261,11 +261,11 @@ void SV_ConnectClient (int clientnum)
 	netconnection = client->netconnection;
 	
 	if (sv.loadgame)
-		memcpy (spawn_parms, client->spawn_parms, sizeof(spawn_parms));
-	memset (client, 0, sizeof(*client));
+		Q_memcpy (spawn_parms, client->spawn_parms, sizeof(spawn_parms));
+	Q_memset (client, 0, sizeof(*client));
 	client->netconnection = netconnection;
 
-	strcpy (client->name, "unconnected");
+	Q_strcpy (client->name, "unconnected");
 	client->active = true;
 	client->spawned = false;
 	client->edict = ent;
@@ -280,7 +280,7 @@ void SV_ConnectClient (int clientnum)
 #endif
 
 	if (sv.loadgame)
-		memcpy (client->spawn_parms, spawn_parms, sizeof(spawn_parms));
+		Q_memcpy (client->spawn_parms, spawn_parms, sizeof(spawn_parms));
 	else
 	{
 	// call the progs to get default spawn parms for the new client
@@ -909,7 +909,7 @@ int SV_ModelIndex (char *name)
 		return 0;
 
 	for (i=0 ; i<MAX_MODELS && sv.model_precache[i] ; i++)
-		if (!strcmp(sv.model_precache[i], name))
+		if (!Q_strcmp(sv.model_precache[i], name))
 			return i;
 	if (i==MAX_MODELS || !sv.model_precache[i])
 		Sys_Error ("SV_ModelIndex: model %s not precached", name);
@@ -1084,9 +1084,9 @@ void SV_SpawnServer (char *server)
 //
 	Host_ClearMemory ();
 
-	memset (&sv, 0, sizeof(sv));
+	Q_memset (&sv, 0, sizeof(sv));
 
-	strcpy (sv.name, server);
+	Q_strcpy (sv.name, server);
 #ifdef QUAKE2
 	if (startspot)
 		strcpy(sv.startspot, startspot);
@@ -1125,7 +1125,7 @@ void SV_SpawnServer (char *server)
 
 	sv.time = 1.0;
 	
-	strcpy (sv.name, server);
+	Q_strcpy (sv.name, server);
 	sprintf (sv.modelname,"maps/%s.bsp", server);
 	sv.worldmodel = Mod_ForName (sv.modelname, false);
 	if (!sv.worldmodel)
@@ -1155,7 +1155,7 @@ void SV_SpawnServer (char *server)
 // load the rest of the entities
 //	
 	ent = EDICT_NUM(0);
-	memset (&ent->v, 0, progs->entityfields * 4);
+	Q_memset (&ent->v, 0, progs->entityfields * 4);
 	ent->free = false;
 	ent->v.model = sv.worldmodel->name - pr_strings;
 	ent->v.modelindex = 1;		// world model

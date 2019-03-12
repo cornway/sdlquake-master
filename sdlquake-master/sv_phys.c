@@ -1578,7 +1578,7 @@ trace_t SV_Trace_Toss (edict_t *ent, edict_t *ignore)
 	save_frametime = host_frametime;
 	host_frametime = 0.05;
 
-	memcpy(&tempent, ent, sizeof(edict_t));
+	Q_memcpy(&tempent, ent, sizeof(edict_t));
 	tent = &tempent;
 
 	while (1)

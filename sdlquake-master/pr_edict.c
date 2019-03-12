@@ -69,7 +69,7 @@ Sets everything to NULL
 */
 void ED_ClearEdict (edict_t *e)
 {
-	memset (&e->v, 0, progs->entityfields * 4);
+	Q_memset (&e->v, 0, progs->entityfields * 4);
 	e->free = false;
 }
 
@@ -191,7 +191,7 @@ ddef_t *ED_FindField (char *name)
 	for (i=0 ; i<progs->numfielddefs ; i++)
 	{
 		def = &pr_fielddefs[i];
-		if (!strcmp(pr_strings + def->s_name,name) )
+		if (!Q_strcmp(pr_strings + def->s_name,name) )
 			return def;
 	}
 	return NULL;
@@ -211,7 +211,7 @@ ddef_t *ED_FindGlobal (char *name)
 	for (i=0 ; i<progs->numglobaldefs ; i++)
 	{
 		def = &pr_globaldefs[i];
-		if (!strcmp(pr_strings + def->s_name,name) )
+		if (!Q_strcmp(pr_strings + def->s_name,name) )
 			return def;
 	}
 	return NULL;
@@ -231,7 +231,7 @@ dfunction_t *ED_FindFunction (char *name)
 	for (i=0 ; i<progs->numfunctions ; i++)
 	{
 		func = &pr_functions[i];
-		if (!strcmp(pr_strings + func->s_name,name) )
+		if (!Q_strcmp(pr_strings + func->s_name,name) )
 			return func;
 	}
 	return NULL;
@@ -246,7 +246,7 @@ eval_t *GetEdictFieldValue(edict_t *ed, char *field)
 
 	for (i=0 ; i<GEFV_CACHESIZE ; i++)
 	{
-		if (!strcmp(field, gefvCache[i].field))
+		if (!Q_strcmp(field, gefvCache[i].field))
 		{
 			def = gefvCache[i].pcache;
 			goto Done;
@@ -258,7 +258,7 @@ eval_t *GetEdictFieldValue(edict_t *ed, char *field)
 	if (strlen(field) < MAX_FIELD_LEN)
 	{
 		gefvCache[rep].pcache = def;
-		strcpy (gefvCache[rep].field, field);
+		Q_strcpy (gefvCache[rep].field, field);
 		rep ^= 1;
 	}
 
@@ -660,7 +660,7 @@ void ED_ParseGlobals (char *data)
 		if (!data)
 			Sys_Error ("ED_ParseEntity: EOF without closing brace");
 
-		strcpy (keyname, com_token);
+		Q_strcpy (keyname, com_token);
 
 	// parse value	
 		data = COM_Parse (data);
@@ -747,7 +747,7 @@ qboolean	ED_ParseEpair (void *base, ddef_t *key, char *s)
 		break;
 		
 	case ev_vector:
-		strcpy (string, s);
+		Q_strcpy (string, s);
 		v = string;
 		w = string;
 		for (i=0 ; i<3 ; i++)
@@ -811,7 +811,7 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 
 // clear it
 	if (ent != sv.edicts)	// hack
-		memset (&ent->v, 0, progs->entityfields * 4);
+		Q_memset (&ent->v, 0, progs->entityfields * 4);
 
 // go through all the dictionary pairs
 	while (1)
@@ -825,19 +825,19 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 		
 // anglehack is to allow QuakeEd to write single scalar angles
 // and allow them to be turned into vectors. (FIXME...)
-if (!strcmp(com_token, "angle"))
+if (!Q_strcmp(com_token, "angle"))
 {
-	strcpy (com_token, "angles");
+	Q_strcpy (com_token, "angles");
 	anglehack = true;
 }
 else
 	anglehack = false;
 
 // FIXME: change light to _light to get rid of this hack
-if (!strcmp(com_token, "light"))
-	strcpy (com_token, "light_lev");	// hack for single light def
+if (!Q_strcmp(com_token, "light"))
+	Q_strcpy (com_token, "light_lev");	// hack for single light def
 
-		strcpy (keyname, com_token);
+		Q_strcpy (keyname, com_token);
 
 		// another hack to fix heynames with trailing spaces
 		n = strlen(keyname);
@@ -872,7 +872,7 @@ if (!strcmp(com_token, "light"))
 if (anglehack)
 {
 char	temp[32];
-strcpy (temp, com_token);
+Q_strcpy (temp, com_token);
 sprintf (com_token, "0 %s 0", temp);
 }
 

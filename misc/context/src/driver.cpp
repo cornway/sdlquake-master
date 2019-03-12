@@ -75,7 +75,7 @@ int32_t drv_detach (uint32_t id)
         return -ENOMEM;
     }
     drivers[id].handle->unload(0);
-    memset(&drivers[id], 0, sizeof(drv_t));
+    Q_memset(&drivers[id], 0, sizeof(drv_t));
     drivers[id].id = NULL;
     return 0;
 }
@@ -126,7 +126,7 @@ int32_t drv_get_id (const char *name)
 {
     for (uint8_t i = 0; i < VM_MAX_DRIVERS; i++) {
         if(drivers[i].id != 0) {
-            if (!strcmp(drivers[i].handle->name, name)) {
+            if (!Q_strcmp(drivers[i].handle->name, name)) {
                 return i + 1;
             } 
         }

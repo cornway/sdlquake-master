@@ -278,7 +278,7 @@ void Host_Map_f (void)
 	strcat (cls.mapstring, "\n");
 
 	svs.serverflags = 0;			// haven't completed an episode yet
-	strcpy (name, Cmd_Argv(1));
+	Q_strcpy (name, Cmd_Argv(1));
 #ifdef QUAKE2
 	SV_SpawnServer (name, NULL);
 #else
@@ -289,7 +289,7 @@ void Host_Map_f (void)
 	
 	if (cls.state != ca_dedicated)
 	{
-		strcpy (cls.spawnparms, "");
+		Q_strcpy (cls.spawnparms, "");
 
 		for (i=2 ; i<Cmd_Argc() ; i++)
 		{
@@ -326,12 +326,12 @@ void Host_Changelevel_f (void)
 		return;
 	}
 
-	strcpy (level, Cmd_Argv(1));
+	Q_strcpy (level, Cmd_Argv(1));
 	if (Cmd_Argc() == 2)
 		startspot = NULL;
 	else
 	{
-		strcpy (_startspot, Cmd_Argv(2));
+		Q_strcpy (_startspot, Cmd_Argv(2));
 		startspot = _startspot;
 	}
 
@@ -351,7 +351,7 @@ void Host_Changelevel_f (void)
 		return;
 	}
 	SV_SaveSpawnparms ();
-	strcpy (level, Cmd_Argv(1));
+	Q_strcpy (level, Cmd_Argv(1));
 	SV_SpawnServer (level);
 #endif
 }
@@ -375,7 +375,7 @@ void Host_Restart_f (void)
 
 	if (cmd_source != src_command)
 		return;
-	strcpy (mapname, sv.name);	// must copy out, because it gets cleared
+	Q_strcpy (mapname, sv.name);	// must copy out, because it gets cleared
 								// in sv_spawnserver
 #ifdef QUAKE2
 	strcpy(startspot, sv.startspot);
@@ -416,7 +416,7 @@ void Host_Connect_f (void)
 		CL_StopPlayback ();
 		CL_Disconnect ();
 	}
-	strcpy (name, Cmd_Argv(1));
+	Q_strcpy (name, Cmd_Argv(1));
 	CL_EstablishConnection (name);
 	Host_Reconnect_f ();
 }
@@ -446,9 +446,9 @@ void Host_SavegameComment (char *text)
 
 	for (i=0 ; i<SAVEGAME_COMMENT_LENGTH ; i++)
 		text[i] = ' ';
-	memcpy (text, cl.levelname, strlen(cl.levelname));
+	Q_memcpy (text, cl.levelname, strlen(cl.levelname));
 	sprintf (kills,"kills:%3i/%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
-	memcpy (text+22, kills, strlen(kills));
+	Q_memcpy (text+22, kills, strlen(kills));
 // convert space to _ to make stdio happy
 	for (i=0 ; i<SAVEGAME_COMMENT_LENGTH ; i++)
 		if (text[i] == ' ')
@@ -657,7 +657,7 @@ void Host_Loadgame_f (void)
 	    Sys_FileGetS(fhandle, scantmp, 0);
         sscanf(scantmp, "%s\n", str);
 		sv.lightstyles[i] = Hunk_Alloc (strlen(str)+1);
-		strcpy (sv.lightstyles[i], str);
+		Q_strcpy (sv.lightstyles[i], str);
 	}
 
 // load the edicts out of the savegame file
@@ -682,7 +682,7 @@ void Host_Loadgame_f (void)
 		start = COM_Parse(str);
 		if (!com_token[0])
 			break;		// end of file
-		if (strcmp(com_token,"{"))
+		if (Q_strcmp(com_token,"{"))
 			Sys_Error ("First token isn't a brace");
 			
 		if (entnum == -1)
@@ -693,7 +693,7 @@ void Host_Loadgame_f (void)
 		{	// parse an edict
 
 			ent = EDICT_NUM(entnum);
-			memset (&ent->v, 0, progs->entityfields * 4);
+			Q_memset (&ent->v, 0, progs->entityfields * 4);
 			ent->free = false;
 			ED_ParseEdict (start, ent);
 	
@@ -854,13 +854,13 @@ int LoadGamestate(char *level, char *startspot)
 		start = COM_Parse(str);
 		if (!com_token[0])
 			break;		// end of file
-		if (strcmp(com_token,"{"))
+		if (Q_strcmp(com_token,"{"))
 			Sys_Error ("First token isn't a brace");
 			
 		// parse an edict
 
 		ent = EDICT_NUM(entnum);
-		memset (&ent->v, 0, progs->entityfields * 4);
+		Q_memset (&ent->v, 0, progs->entityfields * 4);
 		ent->free = false;
 		ED_ParseEdict (start, ent);
 	
@@ -897,12 +897,12 @@ void Host_Changelevel2_f (void)
 		return;
 	}
 
-	strcpy (level, Cmd_Argv(1));
+	Q_strcpy (level, Cmd_Argv(1));
 	if (Cmd_Argc() == 2)
 		startspot = NULL;
 	else
 	{
-		strcpy (_startspot, Cmd_Argv(2));
+		Q_strcpy (_startspot, Cmd_Argv(2));
 		startspot = _startspot;
 	}
 
@@ -950,7 +950,7 @@ void Host_Name_f (void)
 		return;
 	}
 
-	if (host_client->name[0] && strcmp(host_client->name, "unconnected") )
+	if (host_client->name[0] && Q_strcmp(host_client->name, "unconnected") )
 		if (Q_strcmp(host_client->name, newName) != 0)
 			Con_Printf ("%s renamed to %s\n", host_client->name, newName);
 	Q_strcpy (host_client->name, newName);
@@ -1323,7 +1323,7 @@ void Host_Spawn_f (void)
 		// set up the edict
 		ent = host_client->edict;
 
-		memset (&ent->v, 0, progs->entityfields * 4);
+		Q_memset (&ent->v, 0, progs->entityfields * 4);
 		ent->v.colormap = NUM_FOR_EDICT(ent);
 		ent->v.team = (host_client->colors & 15) + 1;
 		ent->v.netname = host_client->name - pr_strings;
@@ -1693,7 +1693,7 @@ edict_t	*FindViewthing (void)
 	for (i=0 ; i<sv.num_edicts ; i++)
 	{
 		e = EDICT_NUM(i);
-		if ( !strcmp (pr_strings + e->v.classname, "viewthing") )
+		if ( !Q_strcmp (pr_strings + e->v.classname, "viewthing") )
 			return e;
 	}
 	Con_Printf ("No viewthing on map\n");

@@ -354,8 +354,8 @@ int SDL_main (int argc, const char *argv[])
 
     moncontrol(0);
 
-    parms.memsize = Sys_HeapMaxSize();
-    parms.membase = Sys_HeapHunkAlloc(&parms.memsize);
+    parms.memsize = Sys_AllocBytesLeft();
+    parms.membase = Sys_AllocShared(&parms.memsize);
     parms.basedir = basedir;
     // Disable cache, else it looks in the cache for config.cfg.
     parms.cachedir = NULL;

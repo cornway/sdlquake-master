@@ -47,6 +47,12 @@
 #error "ff_malloc, ff_free must be redefined to Sys_HeapAlloc"
 #endif
 
+#ifdef STM32F7
+int const __cache_line_size = 32;
+#else
+#error "Cache line size unknown"
+#endif
+
 volatile uint32_t systime = 0;
 
 void fatal_error (const char* message)
@@ -89,7 +95,7 @@ int main(void)
     CPU_CACHE_Enable();
     HAL_Init();
     SystemClock_Config();
-    Sys_HeapInit();
+    Sys_AllocInit();
     BSP_LED_Init(LED1);
     BSP_LED_Init(LED2);
 

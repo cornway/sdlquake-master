@@ -590,8 +590,8 @@ void R_DrawEntitiesOnList (void)
 					lighting.shadelight = 192 - lighting.ambientlight;
 
                 /*"FIXME :"*/
-				if (strcmp(currententity->model->name, "progs/flame2.mdl") != 0)
-					if (strcmp(currententity->model->name, "progs/flame.mdl") != 0)
+				if (Q_strcmp(currententity->model->name, "progs/flame2.mdl") != 0)
+					if (Q_strcmp(currententity->model->name, "progs/flame.mdl") != 0)
 					R_AliasDrawModel (&lighting);
 			}
 

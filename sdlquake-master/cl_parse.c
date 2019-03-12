@@ -158,7 +158,7 @@ void CL_KeepaliveMessage (void)
 
 // read messages from server, should just be nops
 	old = net_message;
-	memcpy (olddata, net_message.data, net_message.cursize);
+	Q_memcpy (olddata, net_message.data, net_message.cursize);
 	
 	do
 	{
@@ -180,7 +180,7 @@ void CL_KeepaliveMessage (void)
 	} while (ret);
 
 	net_message = old;
-	memcpy (net_message.data, olddata, net_message.cursize);
+	Q_memcpy (net_message.data, olddata, net_message.cursize);
 
 // check time
 	time = Sys_FloatTime ();
@@ -259,7 +259,7 @@ void CL_ParseServerInfo (void)
 //
 
 // precache models
-	memset (cl.model_precache, 0, sizeof(cl.model_precache));
+	Q_memset (cl.model_precache, 0, sizeof(cl.model_precache));
 	for (nummodels=1 ; ; nummodels++)
 	{
 		str = MSG_ReadString ();
@@ -270,7 +270,7 @@ void CL_ParseServerInfo (void)
 			Con_Printf ("Server sent too many model precaches\n");
 			goto exit;
 		}
-		strcpy (model_precache[nummodels].name, str);
+		Q_strcpy (model_precache[nummodels].name, str);
 		Mod_TouchModel (str);
 	}
 
@@ -290,7 +290,7 @@ void CL_ParseServerInfo (void)
 			Con_Printf ("Server sent too many sound precaches\n");
 			goto exit;
 		}
-		strcpy (sound_precache[numsounds].name, str);
+		Q_strcpy (sound_precache[numsounds].name, str);
         if (arrlen(cl_sound_precache) > numsounds)
 		    S_TouchSound (str, &cl_sound_precache[numsounds]);
 	}
@@ -654,7 +654,7 @@ void CL_NewTranslation (int slot)
 		Sys_Error ("CL_NewTranslation: slot > cl.maxclients");
 	dest = cl.scores[slot].translations;
 	source = vid.colormap;
-	memcpy (dest, vid.colormap, sizeof(cl.scores[slot].translations));
+	Q_memcpy (dest, vid.colormap, sizeof(cl.scores[slot].translations));
 	top = cl.scores[slot].colors & 0xf0;
 	bottom = (cl.scores[slot].colors &15)<<4;
 #ifdef GLQUAKE
@@ -664,13 +664,13 @@ void CL_NewTranslation (int slot)
 	for (i=0 ; i<VID_GRADES ; i++, dest += 256, source+=256)
 	{
 		if (top < 128)	// the artists made some backwards ranges.  sigh.
-			memcpy (dest + TOP_RANGE, source + top, 16);
+			Q_memcpy (dest + TOP_RANGE, source + top, 16);
 		else
 			for (j=0 ; j<16 ; j++)
 				dest[TOP_RANGE+j] = source[top+15-j];
 				
 		if (bottom < 128)
-			memcpy (dest + BOTTOM_RANGE, source + bottom, 16);
+			Q_memcpy (dest + BOTTOM_RANGE, source + bottom, 16);
 		else
 			for (j=0 ; j<16 ; j++)
 				dest[BOTTOM_RANGE+j] = source[bottom+15-j];		
@@ -858,7 +858,7 @@ void CL_ParseServerMessage (void)
 			i = MSG_ReadByte ();
 			if (i >= cl.maxclients)
 				Host_Error ("CL_ParseServerMessage: svc_updatename > MAX_SCOREBOARD");
-			strcpy (cl.scores[i].name, MSG_ReadString ());
+			Q_strcpy (cl.scores[i].name, MSG_ReadString ());
 			break;
 			
 		case svc_updatefrags:

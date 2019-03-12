@@ -394,7 +394,7 @@ void S_StartSound(int entnum, int entchannel, sfx_t *sfx, vec3_t origin, float f
         return;
 
 // spatialize
-    memset (target_chan, 0, sizeof(*target_chan));
+    Q_memset (target_chan, 0, sizeof(*target_chan));
     VectorCopy(origin, target_chan->origin);
     target_chan->dist_mult = attenuation / sound_nominal_clip_dist;
     target_chan->master_vol = vol;

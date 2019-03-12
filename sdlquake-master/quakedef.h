@@ -82,7 +82,8 @@ void	VID_UnlockBuffer (void);
 #endif
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
-#define CACHE_SIZE	32		// used to align key data structures
+extern const int __cache_line_size;
+#define CACHE_SIZE	(__cache_line_size) // used to align key data structures
 
 #ifndef UNUSED
 #define UNUSED(x)	(x = x)	// for pesky compiler / lint warnings

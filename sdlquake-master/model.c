@@ -51,7 +51,7 @@ Mod_Init
 */
 void Mod_Init (void)
 {
-	memset (mod_novis, 0xff, sizeof(mod_novis));
+	Q_memset (mod_novis, 0xff, sizeof(mod_novis));
 }
 
 /*
@@ -197,7 +197,7 @@ model_t *Mod_FindName (char *name)
 //
 	for (i=0 , mod=mod_known ; i<mod_numknown ; i++, mod++)
 	{
-		if (!strcmp (mod->name, name) )
+		if (!Q_strcmp (mod->name, name) )
 			break;
 		if (mod->needload == NL_UNREFERENCED)
 			if (!avail || mod->type != mod_alias)
@@ -220,7 +220,7 @@ model_t *Mod_FindName (char *name)
 		}
 		else
 			mod_numknown++;
-		strcpy (mod->name, name);
+		Q_strcpy (mod->name, name);
 		mod->needload = NL_NEEDS_LOADED;
 	}
 
@@ -390,13 +390,13 @@ void Mod_LoadTextures (lump_t *l)
 		tx = Hunk_AllocName (sizeof(texture_t) +pixels, loadname );
 		loadmodel->textures[i] = tx;
 
-		memcpy (tx->name, mt->name, sizeof(tx->name));
+		Q_memcpy (tx->name, mt->name, sizeof(tx->name));
 		tx->width = mt->width;
 		tx->height = mt->height;
 		for (j=0 ; j<MIPLEVELS ; j++)
 			tx->offsets[j] = mt->offsets[j] + sizeof(texture_t) - sizeof(miptex_t);
 		// the pixels immediately follow the structures
-		memcpy ( tx+1, mt+1, pixels);
+		Q_memcpy ( tx+1, mt+1, pixels);
 		
 		if (!Q_strncmp(mt->name,"sky",3))	
 			R_InitSky (tx);
@@ -414,8 +414,8 @@ void Mod_LoadTextures (lump_t *l)
 			continue;	// allready sequenced
 
 	// find the number of frames in the animation
-		memset (anims, 0, sizeof(anims));
-		memset (altanims, 0, sizeof(altanims));
+		Q_memset (anims, 0, sizeof(anims));
+		Q_memset (altanims, 0, sizeof(altanims));
 
 		max = tx->name[1];
 		altmax = 0;
@@ -443,7 +443,7 @@ void Mod_LoadTextures (lump_t *l)
 			tx2 = loadmodel->textures[j];
 			if (!tx2 || tx2->name[0] != '+')
 				continue;
-			if (strcmp (tx2->name+2, tx->name+2))
+			if (Q_strcmp (tx2->name+2, tx->name+2))
 				continue;
 
 			num = tx2->name[1];
@@ -509,7 +509,7 @@ void Mod_LoadLighting (lump_t *l)
 		return;
 	}
 	loadmodel->lightdata = Hunk_AllocName ( l->filelen, loadname);	
-	memcpy (loadmodel->lightdata, mod_base + l->fileofs, l->filelen);
+	Q_memcpy (loadmodel->lightdata, mod_base + l->fileofs, l->filelen);
 }
 
 
@@ -526,7 +526,7 @@ void Mod_LoadVisibility (lump_t *l)
 		return;
 	}
 	loadmodel->visdata = Hunk_AllocName ( l->filelen, loadname);	
-	memcpy (loadmodel->visdata, mod_base + l->fileofs, l->filelen);
+	Q_memcpy (loadmodel->visdata, mod_base + l->fileofs, l->filelen);
 }
 
 
@@ -543,7 +543,7 @@ void Mod_LoadEntities (lump_t *l)
 		return;
 	}
 	loadmodel->entities = Hunk_AllocName ( l->filelen, loadname);	
-	memcpy (loadmodel->entities, mod_base + l->fileofs, l->filelen);
+	Q_memcpy (loadmodel->entities, mod_base + l->fileofs, l->filelen);
 }
 
 
@@ -1213,7 +1213,7 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 			sprintf (name, "*%i", i+1);
 			loadmodel = Mod_FindName (name);
 			*loadmodel = *mod;
-			strcpy (loadmodel->name, name);
+			Q_strcpy (loadmodel->name, name);
 			mod = loadmodel;
 		}
 	}
@@ -1241,7 +1241,7 @@ void * Mod_LoadAliasFrame (aliashdr_t *pheader, int framenum, void * pin, int nu
 
 	pdaliasframe = (daliasframe_t *)pin;
 
-	strcpy (frame->name, pdaliasframe->name);
+	Q_strcpy (frame->name, pdaliasframe->name);
 
 	for (i=0 ; i<3 ; i++)
 	{
@@ -1641,7 +1641,7 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 	Cache_Alloc (&mod->cache, total, loadname);
 	if (!mod->cache.data)
 		return;
-	memcpy (mod->cache.data, pheader, total);
+	Q_memcpy (mod->cache.data, pheader, total);
 
 	Hunk_FreeToLowMark (start);
 }

@@ -461,8 +461,8 @@ void Host_ShutdownServer(qboolean crash)
 //
 // clear structures
 //
-	memset (&sv, 0, sizeof(sv));
-	memset (svs.clients, 0, svs.maxclientslimit*sizeof(client_t));
+	Q_memset (&sv, 0, sizeof(sv));
+	Q_memset (svs.clients, 0, svs.maxclientslimit*sizeof(client_t));
 }
 
 
@@ -483,8 +483,8 @@ void Host_ClearMemory (void)
 		Hunk_FreeToLowMark (host_hunklevel);
 
 	cls.signon = 0;
-	memset (&sv, 0, sizeof(sv));
-	memset (&cl, 0, sizeof(cl));
+	Q_memset (&sv, 0, sizeof(sv));
+	Q_memset (&cl, 0, sizeof(cl));
 }
 
 
@@ -788,12 +788,12 @@ void Host_InitVCR (quakeparms_t *parms)
 			Sys_Error("Invalid signature in vcr file\n");
 
 		Sys_FileRead (vcrFile, &com_argc, sizeof(int));
-		com_argv = Sys_HeapMAlloc(com_argc * sizeof(char *));
+		com_argv = Sys_Malloc(com_argc * sizeof(char *));
 		com_argv[0] = parms->argv[0];
 		for (i = 0; i < com_argc; i++)
 		{
 			Sys_FileRead (vcrFile, &len, sizeof(int));
-			p = Sys_HeapMAlloc(len);
+			p = Sys_Malloc(len);
 			Sys_FileRead (vcrFile, p, len);
 			com_argv[i+1] = p;
 		}

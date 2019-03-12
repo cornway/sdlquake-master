@@ -164,7 +164,7 @@ void Cbuf_Execute (void)
 		}
 			
 				
-		memcpy (line, text, i);
+		Q_memcpy (line, text, i);
 		line[i] = 0;
 		
 // delete the text from the command buffer and move remaining commands down
@@ -334,7 +334,7 @@ char *CopyString (char *in)
 	char	*out;
 	
 	out = Z_Malloc (strlen(in)+1);
-	strcpy (out, in);
+	Q_strcpy (out, in);
 	return out;
 }
 
@@ -363,7 +363,7 @@ void Cmd_Alias_f (void)
 	// if the alias allready exists, reuse it
 	for (a = cmd_alias ; a ; a=a->next)
 	{
-		if (!strcmp(s, a->name))
+		if (!Q_strcmp(s, a->name))
 		{
 			Z_Free (a->value);
 			break;
@@ -376,7 +376,7 @@ void Cmd_Alias_f (void)
 		a->next = cmd_alias;
 		cmd_alias = a;
 	}
-	strcpy (a->name, s);	
+	Q_strcpy (a->name, s);	
 
 // copy the rest of the command line
 	cmd[0] = 0;		// start out with a null string
