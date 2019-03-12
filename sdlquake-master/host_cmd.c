@@ -574,7 +574,7 @@ void Host_Loadgame_f (void)
 	int		version;
 	float			spawn_parms[NUM_SPAWN_PARMS];
 
-    str = (char *)dram_cache_pop(str_cachesize * sizeof(char));
+    str = (char *)Sys_HeapCachePop(str_cachesize * sizeof(char));
 
 	if (cmd_source != src_command)
 		goto exit;
@@ -721,7 +721,7 @@ void Host_Loadgame_f (void)
 
 exit:
 
-    dram_cache_push(str_cachesize);
+    Sys_HeapCachePush(str_cachesize);
 }
 
 #ifdef QUAKE2

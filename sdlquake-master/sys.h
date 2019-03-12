@@ -79,4 +79,15 @@ void Sys_SetFPCW (void);
 #define container_of(ptr, type, member)     \
     (type *)((uint8_t *)(ptr) - offsetof(type,member))
 
+extern void *Sys_HeapCacheTop (int size);
+extern void Sys_HeapCachePush (int size);
+extern void *Sys_HeapCachePop (int size);
+
+extern void Sys_HeapInit (void);
+extern void *Sys_HeapMAlloc (int size);
+extern void *Sys_HeapHunkAlloc (int *size);
+extern void Sys_HeapFree (void *p);
+extern void *Sys_HeapAllocFb (int *size);
+extern int Sys_HeapMaxSize (void);
+
 

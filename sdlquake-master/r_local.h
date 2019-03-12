@@ -22,10 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef GLQUAKE
 #include "r_shared.h"
 
-extern void *dram_cache_top (int size);
-extern void dram_cache_push (int size);
-extern void *dram_cache_pop (int size);
-
 #define ALIAS_BASE_SIZE_RATIO		(1.0 / 11.0)
 					// normalizing factor so player model works out to about
 					//  1 pixel per triangle

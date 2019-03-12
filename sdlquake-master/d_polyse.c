@@ -127,7 +127,7 @@ void D_PolysetDraw (void)
     const int spans_cachesize = (DPS_MAXSPANS + 3) * sizeof(spanpackage_t);
 						// one extra because of cache line pretouching
 
-    a_spans = dram_cache_pop(spans_cachesize);
+    a_spans = Sys_HeapCachePop(spans_cachesize);
 	a_spans = (spanpackage_t *)alignup(&a_spans[0], CACHE_SIZE);
 
 	if (r_affinetridesc.drawtype)
@@ -138,7 +138,7 @@ void D_PolysetDraw (void)
 	{
 		D_DrawNonSubdiv ();
 	}
-    dram_cache_push(spans_cachesize);
+    Sys_HeapCachePush(spans_cachesize);
 }
 
 

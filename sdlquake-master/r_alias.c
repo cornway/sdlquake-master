@@ -705,8 +705,8 @@ void R_AliasDrawModel (alight_t *plighting)
     const int             finalverts_cahcesize = (MAXALIASVERTS + 1) * sizeof(finalvert_t);
     const int             auxverts_cachesize = MAXALIASVERTS * sizeof(auxvert_t);
 
-    pfinalverts = (finalvert_t *)dram_cache_pop(finalverts_cahcesize);
-    pauxverts = (auxvert_t *)dram_cache_pop(auxverts_cachesize);
+    pfinalverts = (finalvert_t *)Sys_HeapCachePop(finalverts_cahcesize);
+    pauxverts = (auxvert_t *)Sys_HeapCachePop(auxverts_cachesize);
 	r_amodels_drawn++;
 
 // cache align
@@ -749,7 +749,7 @@ void R_AliasDrawModel (alight_t *plighting)
 	else
 		R_AliasPreparePoints ();
 
-    dram_cache_push(auxverts_cachesize);
-    dram_cache_push(finalverts_cahcesize);
+    Sys_HeapCachePush(auxverts_cachesize);
+    Sys_HeapCachePush(finalverts_cahcesize);
 }
 

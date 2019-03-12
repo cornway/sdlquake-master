@@ -43,8 +43,9 @@
 #include "usbh_hid.h"
 #include "touch.h"
 
-int screen_res_x;
-int screen_res_y;
+#if (_USE_LFN == 3)
+#error "ff_malloc, ff_free must be redefined to Sys_HeapAlloc"
+#endif
 
 volatile uint32_t systime = 0;
 
@@ -65,54 +66,6 @@ char SDPath[4]; /* SD card logical drive path */
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
 static void CPU_CACHE_Enable(void);
-
-#define SCREEN_FB_X_MAX 800
-#define SCREEN_FB_Y_MAX 600
-#define SCREEN_FB_MEM_SIZE_MAX (SCREEN_FB_X_MAX * SCREEN_FB_Y_MAX * sizeof(pix_t) * 2)
-#define STATIC_CACHE_SIZE (0x00070000)
-
-#define SDRAM_VOL_START 0xC0000000
-#define SDRAM_VOL_END   0xC1000000
-#define SDRAM_VOL_SIZE (SDRAM_VOL_END - SDRAM_VOL_START)
-#define SDRAM_CACHE_SIZE    (STATIC_CACHE_SIZE)
-#define SDRAM_CACHE_OFFSET  (SDRAM_VOL_START + SCREEN_FB_MEM_SIZE_MAX)
-
-volatile uint8_t *__heap_buf_cache = (void *)(SDRAM_CACHE_OFFSET);
-volatile uint8_t *__heap_buf_cache_top = (void *)(SDRAM_CACHE_OFFSET + SDRAM_CACHE_SIZE);
-volatile size_t   __heap_buf_cache_size = (SDRAM_CACHE_SIZE);
-volatile uint8_t *__heap_buf_raw = (void *)(SDRAM_CACHE_OFFSET + SDRAM_CACHE_SIZE);
-volatile size_t   __heap_buf_raw_size = (SDRAM_VOL_SIZE - SCREEN_FB_MEM_SIZE_MAX - SDRAM_CACHE_SIZE);
-volatile pix_t   *screen_fb_mem_start = (void *)SDRAM_VOL_START;
-
-void *dram_cache_top (int size)
-{
-    if (__heap_buf_cache_size < size) {
-        fatal_error("");
-    }
-
-    __heap_buf_cache_top -= size;
-    __heap_buf_cache_size -= size;
-    return __heap_buf_cache_top;
-}
-
-
-void *dram_cache_pop (int size)
-{
-    void *p;
-    if (__heap_buf_cache_size < size) {
-        fatal_error("");
-    }
-    p = __heap_buf_cache;
-    __heap_buf_cache += size;
-    __heap_buf_cache_size -= size;
-    return p;
-}
-
-void dram_cache_push (int size)
-{
-    __heap_buf_cache -= size;
-    __heap_buf_cache_size += size;
-}
 
 void hdd_led_on (void)
 {
@@ -136,6 +89,7 @@ int main(void)
     CPU_CACHE_Enable();
     HAL_Init();
     SystemClock_Config();
+    Sys_HeapInit();
     BSP_LED_Init(LED1);
     BSP_LED_Init(LED2);
 
@@ -223,5 +177,3 @@ static void CPU_CACHE_Enable(void)
     /* Enable D-Cache */
     SCB_EnableDCache();
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

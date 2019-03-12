@@ -187,7 +187,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>1</useUlib>
+            <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -358,7 +358,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -367,7 +367,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>STM32F769I_DISCOVERY\Exe\Project.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -569,9 +569,9 @@
           <GroupName>Example/MDK-ARM</GroupName>
           <Files>
             <File>
-              <FileName>startup_stm32f769xx.s</FileName>
+              <FileName>startup_stm32f769xx.S</FileName>
               <FileType>2</FileType>
-              <FilePath>startup_stm32f769xx.s</FilePath>
+              <FilePath>.\startup_stm32f769xx.S</FilePath>
             </File>
           </Files>
         </Group>
@@ -602,6 +602,11 @@
               <FileName>STUB.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\STUB.c</FilePath>
+            </File>
+            <File>
+              <FileName>heap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\heap.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1113,10 +1118,18 @@
               <FileType>5</FileType>
               <FilePath>..\common\inc\audio_int.h</FilePath>
             </File>
+            <File>
+              <FileName>retarget.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\retarget.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
+        </Group>
+        <Group>
+          <GroupName>::Compiler</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -1125,8 +1138,20 @@
   <RTE>
     <apis/>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="4.3.0" condition="CMSIS Core">
-        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="4.5.0"/>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.1.2" condition="ARMv6_7_8-M Device">
+        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.4.0"/>
+        <targetInfos>
+          <targetInfo name="STM32F769I_Discovery"/>
+        </targetInfos>
+      </component>
+      <component Cbundle="ARM Compiler" Cclass="Compiler" Cgroup="I/O" Csub="STDERR" Cvariant="ITM" Cvendor="Keil" Cversion="1.2.0" condition="ARMCC Cortex-M with ITM">
+        <package name="ARM_Compiler" schemaVersion="1.4.9" url="http://www.keil.com/pack/" vendor="Keil" version="1.3.1"/>
+        <targetInfos>
+          <targetInfo name="STM32F769I_Discovery"/>
+        </targetInfos>
+      </component>
+      <component Cbundle="ARM Compiler" Cclass="Compiler" Cgroup="I/O" Csub="STDOUT" Cvariant="ITM" Cvendor="Keil" Cversion="1.2.0" condition="ARMCC Cortex-M with ITM">
+        <package name="ARM_Compiler" schemaVersion="1.4.9" url="http://www.keil.com/pack/" vendor="Keil" version="1.3.1"/>
         <targetInfos>
           <targetInfo name="STM32F769I_Discovery"/>
         </targetInfos>

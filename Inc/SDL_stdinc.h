@@ -159,7 +159,7 @@ extern "C" {
 #endif
 
 #ifdef HAVE_MALLOC
-#define SDL_malloc	malloc
+#define SDL_malloc	Sys_HeapMAlloc
 #else
 extern DECLSPEC void * SDLCALL SDL_malloc(size_t size);
 #endif

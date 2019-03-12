@@ -667,7 +667,7 @@ void R_ScanEdges (void)
 	espan_t	*basespan_p;
 	surf_t	*s;
 
-    basespan_p = dram_cache_pop(basespans_cachesize);
+    basespan_p = Sys_HeapCachePop(basespans_cachesize);
     basespan_p = (espan_t *)alignup(basespan_p, CACHE_SIZE);
 
 	max_span_p = &basespan_p[MAXSPANS - r_refdef.vrect.width];
@@ -770,7 +770,7 @@ void R_ScanEdges (void)
 	else
 		D_DrawSurfaces ();
 
-    dram_cache_push(basespans_cachesize);
+    Sys_HeapCachePush(basespans_cachesize);
 }
 
 

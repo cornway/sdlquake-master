@@ -12,6 +12,7 @@
 #include "quakedef.h"
 #include "audio_main.h"
 #include "input_main.h"
+#include "main.h"
 #include "ff.h"
 
 qboolean        isDedicated;
@@ -312,10 +313,6 @@ double Sys_FloatTime (void)
 
 static volatile int oktogo;
 
-extern volatile uint8_t *__heap_buf_raw;
-extern volatile size_t __heap_buf_raw_size;
-
-
 void alarm_handler(int x)
 {
 	oktogo=1;
@@ -324,8 +321,7 @@ void alarm_handler(int x)
 byte *Sys_ZoneBase (int *size)
 {
 
-    *size = __heap_buf_raw_size;
-    return (byte *)__heap_buf_raw;
+    Sys_Error("Not supported");
 
 }
 
@@ -347,10 +343,6 @@ void moncontrol(int x)
 {
 }
 
-
-extern volatile uint8_t *__heap_buf_raw;
-extern volatile size_t __heap_buf_raw_size;
-
 int SDL_main (int argc, const char *argv[])
 {
 
@@ -362,8 +354,8 @@ int SDL_main (int argc, const char *argv[])
 
     moncontrol(0);
 
-    parms.memsize = __heap_buf_raw_size;
-    parms.membase = (void *)__heap_buf_raw;
+    parms.memsize = Sys_HeapMaxSize();
+    parms.membase = Sys_HeapHunkAlloc(&parms.memsize);
     parms.basedir = basedir;
     // Disable cache, else it looks in the cache for config.cfg.
     parms.cachedir = NULL;

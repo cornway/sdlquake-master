@@ -73,7 +73,7 @@ void CL_ClearState (void)
 
     if (!cl_entities || !cl_static_entities) {
 
-        cl_entities = (entity_t *)dram_cache_top(cl_ent_cachesize + cl_static_ent_cachesize);
+        cl_entities = (entity_t *)Sys_HeapCacheTop(cl_ent_cachesize + cl_static_ent_cachesize);
         cl_static_entities = cl_entities + MAX_EDICTS;
     }
 

@@ -651,7 +651,7 @@ void R_RenderWorld (void)
 	model_t		*clmodel;
     const int    btofpolys_cachesize = sizeof(btofpoly_t) * MAX_BTOFPOLYS;
 
-    pbtofpolys = (btofpoly_t *)dram_cache_pop(btofpolys_cachesize);
+    pbtofpolys = (btofpoly_t *)Sys_HeapCachePop(btofpolys_cachesize);
 
 	currententity = &cl_entities[0];
 	VectorCopy (r_origin, modelorg);
@@ -670,7 +670,7 @@ void R_RenderWorld (void)
 		}
 	}
 
-    dram_cache_push(btofpolys_cachesize);
+    Sys_HeapCachePush(btofpolys_cachesize);
 }
 
 

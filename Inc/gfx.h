@@ -47,14 +47,6 @@ typedef uint32_t pix_t;
 #error "!"
 #endif
 
-extern int screen_res_x;
-extern int screen_res_y;
-#define LCD_MAX_X					(screen_res_x)	// LCD width
-#define LCD_MAX_Y					(screen_res_y)// LCD height
-
-#define GFX_MAX_WIDTH				LCD_MAX_X
-#define GFX_MAX_HEIGHT				LCD_MAX_Y
-
 #define GFX_RGB565(r, g, b)			((((r & 0xF8) >> 3) << 11) | (((g & 0xFC) >> 2) << 5) | ((b & 0xF8) >> 3))
 
 #define GFX_RGB565_R(color)			((0xF800 & color) >> 11)

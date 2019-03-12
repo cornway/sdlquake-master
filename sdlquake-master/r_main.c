@@ -886,8 +886,8 @@ void R_EdgeDrawing (void)
     const int     lsurfs_cachesize =  (NUMSTACKEDGES + 1) * sizeof(surf_t);
 
 
-    ledges = (edge_t *)dram_cache_pop(ledges_cachesize);
-    lsurfs = (surf_t *)dram_cache_pop(lsurfs_cachesize);
+    ledges = (edge_t *)Sys_HeapCachePop(ledges_cachesize);
+    lsurfs = (surf_t *)Sys_HeapCachePop(lsurfs_cachesize);
 
     if (auxedges)
 	{
@@ -948,8 +948,8 @@ void R_EdgeDrawing (void)
 	if (!(r_drawpolys | r_drawculledpolys))
 		R_ScanEdges ();
 
-    dram_cache_push(lsurfs_cachesize);
-    dram_cache_push(ledges_cachesize);
+    Sys_HeapCachePush(lsurfs_cachesize);
+    Sys_HeapCachePush(ledges_cachesize);
 }
 
 
