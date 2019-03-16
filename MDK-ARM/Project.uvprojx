@@ -1128,6 +1128,11 @@
               <FileType>5</FileType>
               <FilePath>..\common\inc\sect.h</FilePath>
             </File>
+            <File>
+              <FileName>audio_mix.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\audio_mix.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

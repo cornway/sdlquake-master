@@ -116,10 +116,19 @@ void SNDDMA_Shutdown(void)
 
 #else
 
+typedef struct {
+    sfx_t sfx;
+    audio_channel_t *achannel;
+    uint8_t volume_prev;
+} ambient_t;
+
 int sound_started=0;
 
 Q_CVAR_DEF(bgmvolume, "bgmvolume", 1, true);
 Q_CVAR_DEF(volume, "volume", 0,7, true);
+Q_CVAR_DEF(ambient_level, "ambient_level", 0.3);
+Q_CVAR_DEF(ambient_fade, "ambient_fade", 100);
+
 
 int         desired_speed = 11025; //11025;
 int         desired_bits = 16;
@@ -131,7 +140,11 @@ int recording = 0;
 Q_CVAR_DEF(nosound, "nosound", 0);
 Q_CVAR_DEF(precache, "precache", 1);
 
+static qboolean snd_ambient = true;
 
+ambient_t ambient_desc[NUM_AMBIENTS];
+
+sfx_t ambient_sfx[NUM_AMBIENTS];
 channel_t   channels[MAX_CHANNELS];
 int			total_channels;
 
@@ -301,10 +314,9 @@ SND_Spatialize
 void SND_Spatialize(channel_t *ch)
 {
     vec_t dot;
-    vec_t ldist, rdist, dist;
+    vec_t dist;
     vec_t lscale, rscale, scale;
     vec3_t source_vec;
-    sfx_t *snd;
 
 // anything coming from the view entity will allways be full volume
     if (ch->entnum == cl.viewentity)
@@ -316,7 +328,6 @@ void SND_Spatialize(channel_t *ch)
 
 // calculate stereo seperation and distance attenuation
 
-    snd = ch->sfx;
     VectorSubtract(ch->origin, listener_origin, source_vec);
 
     dist = VectorNormalize(source_vec) * ch->dist_mult;
@@ -330,24 +341,24 @@ void SND_Spatialize(channel_t *ch)
     }
     else
     {
-        rscale = 1.0 + dot;
-        lscale = 1.0 - dot;
+        rscale = 1.0f + dot;
+        lscale = 1.0f - dot;
     }
 
 // add in distance effect
-    scale = (1.0 - dist) * rscale;
+    scale = (1.0f - dist) * rscale;
     ch->rightvol = (int) (ch->master_vol * scale);
     if (ch->rightvol < 0)
         ch->rightvol = 0;
 
-    scale = (1.0 - dist) * lscale;
+    scale = (1.0f - dist) * lscale;
     ch->leftvol = (int) (ch->master_vol * scale);
     if (ch->leftvol < 0)
         ch->leftvol = 0;
 }
 
 
-static void S_PushSound (channel_t *ch, int channel)
+static audio_channel_t *S_PushSound (channel_t *ch, int channel)
 {
     Mix_Chunk chunk;
     sfxcache_t	*sc;
@@ -360,18 +371,15 @@ static void S_PushSound (channel_t *ch, int channel)
     chunk.volume = (ch->leftvol + ch->rightvol) / 4;
     chunk.cache = &ch->sfx->cache.data;
     if (audio_is_playing(channel)) {
-        audio_stop_channel(channel);
-    }///*
-    ach = audio_play_channel(&chunk, channel);
-    if (ach) {
-        ach->complete = NULL;
+        return NULL;
     }
-    //*/
+    return audio_play_channel(&chunk, channel);
 }
 
 void S_StartSound(int entnum, int entchannel, sfx_t *sfx, vec3_t origin, float fvol, float attenuation)
 {
     channel_t *target_chan, *check;
+    audio_channel_t *achannel;
     sfxcache_t	*sc;
     int		vol;
     int		ch_idx, chpush;
@@ -434,7 +442,10 @@ void S_StartSound(int entnum, int entchannel, sfx_t *sfx, vec3_t origin, float f
             break;
         }
     }
-    S_PushSound(target_chan, chpush);
+    achannel = S_PushSound(target_chan, chpush);
+    if (achannel) {
+        achannel->complete = NULL;
+    }
 }
 
 void S_StopSound(int entnum, int entchannel)
@@ -455,7 +466,50 @@ void S_StopSound(int entnum, int entchannel)
 }
 
 void S_StaticSound (sfx_t *sfx, vec3_t origin, float vol, float attenuation)
-{}
+{
+    channel_t	*ss;
+    sfxcache_t		*sc;
+    audio_channel_t *achannel;
+    int channel;
+
+    if (!sfx)
+        return;
+
+    if (total_channels == NUM_AMBIENTS)
+    {
+        Con_Printf ("total_channels == MAX_CHANNELS\n");
+        return;
+    }
+
+    channel = total_channels;
+    ss = &channels[total_channels];
+    total_channels++;
+
+    sc = S_LoadSound (sfx);
+    if (!sc)
+        return;
+
+    if (sc->loopstart == -1)
+    {
+        Con_Printf ("Sound %s not looped\n", sfx->name);
+        return;
+    }
+
+    ss->sfx = sfx;
+    VectorCopy (origin, ss->origin);
+    ss->master_vol = vol;
+    ss->dist_mult = (attenuation/64) / sound_nominal_clip_dist;
+    ss->end = paintedtime + sc->length;	
+
+    SND_Spatialize (ss);
+
+    achannel = S_PushSound(ss, channel);
+    if (!achannel) {
+        Sys_Error("");
+    }
+    ambient_desc[channel].achannel = achannel;
+    ambient_desc[channel].volume_prev = vol;
+}
 
 
 void S_Init (void)
@@ -493,12 +547,82 @@ void S_Init (void)
     shm->gamealive = true;
     shm->submission_chunk = 1;
 
+    S_PrecacheSound ("ambience/water1.wav", &ambient_desc[AMBIENT_WATER].sfx);
+    S_PrecacheSound ("ambience/wind2.wav", &ambient_desc[AMBIENT_WATER].sfx);
+
     S_StopAllSounds (true);
 }
 
 void S_Shutdown(void)
 {
 }
+
+/*
+===================
+S_UpdateAmbientSounds
+===================
+*/
+void S_UpdateAmbientSounds (void)
+{
+    mleaf_t		*l;
+    float		vol;
+    int			ambient_channel;
+    channel_t	*chan;
+    ambient_t *ambient;
+
+    if (!snd_ambient)
+        return;
+
+// calc ambient sound levels
+    if (!cl.worldmodel)
+        return;
+
+    l = Mod_PointInLeaf (listener_origin, cl.worldmodel);
+    if (!l || !ambient_level.value)
+    {
+        for (ambient_channel = 0 ; ambient_channel< NUM_AMBIENTS ; ambient_channel++) {
+            if (channels[ambient_channel].sfx) {
+                /*Null the cache to stop sample playing*/
+                channels[ambient_channel].sfx->cache.data = NULL;
+            }
+            channels[ambient_channel].sfx = NULL;
+        }
+        return;
+    }
+
+    for (ambient_channel = 0 ; ambient_channel< NUM_AMBIENTS ; ambient_channel++)
+    {
+        chan = &channels[ambient_channel];
+        ambient = &ambient_desc[ambient_channel];
+        chan->sfx = &ambient->sfx;
+
+        vol = ambient_level.value * l->ambient_sound_level[ambient_channel];
+        if (vol < 8)
+            vol = 0;
+
+        // don't adjust volume too fast
+        if (chan->master_vol < vol)
+        {
+            chan->master_vol += host_frametime * ambient_fade.value;
+            if (chan->master_vol > vol)
+                chan->master_vol = vol;
+        }
+        else if (chan->master_vol > vol)
+        {
+            chan->master_vol -= host_frametime * ambient_fade.value;
+            if (chan->master_vol < vol)
+                chan->master_vol = vol;
+        }
+        
+        chan->leftvol = chan->rightvol = chan->master_vol;
+
+        if (chan->leftvol != ambient->volume_prev) {
+            ambient->volume_prev = chan->leftvol;
+            audio_change_sample_volume(ambient->achannel, chan->leftvol);
+        }
+    }
+}
+
 
 void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 {
@@ -516,7 +640,7 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
     VectorCopy(up, listener_up);
     
 // update general area ambient sound sources
-    //S_UpdateAmbientSounds ();
+    S_UpdateAmbientSounds ();
 
     combine = NULL;
 
