@@ -367,7 +367,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>STM32F769I_DISCOVERY\Exe\Project.sct</ScatterFile>
+            <ScatterFile>.\memsch1.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -1122,6 +1122,11 @@
               <FileName>retarget.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\retarget.c</FilePath>
+            </File>
+            <File>
+              <FileName>sect.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\common\inc\sect.h</FilePath>
             </File>
           </Files>
         </Group>
