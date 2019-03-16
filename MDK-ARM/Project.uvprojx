@@ -603,11 +603,6 @@
               <FileType>1</FileType>
               <FilePath>..\Src\STUB.c</FilePath>
             </File>
-            <File>
-              <FileName>heap.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\common\heap.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1074,6 +1069,11 @@
           <GroupName>common</GroupName>
           <Files>
             <File>
+              <FileName>heap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\heap.c</FilePath>
+            </File>
+            <File>
               <FileName>audio_main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\audio_main.c</FilePath>
@@ -1114,19 +1114,14 @@
               <FilePath>..\common\audio_mem.c</FilePath>
             </File>
             <File>
-              <FileName>audio_int.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\common\inc\audio_int.h</FilePath>
-            </File>
-            <File>
               <FileName>retarget.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\retarget.c</FilePath>
             </File>
             <File>
-              <FileName>sect.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\common\inc\sect.h</FilePath>
+              <FileName>audio_mix.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\audio_mix.c</FilePath>
             </File>
           </Files>
         </Group>
