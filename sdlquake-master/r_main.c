@@ -49,9 +49,11 @@ int			r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
 qboolean	r_surfsonstack;
 int			r_clipflags;
 
-byte		*r_warpbuffer;
+pixel_t		*r_warpbuffer;
 
+#if !QEMBED
 byte		*r_stack_start;
+#endif
 
 qboolean	r_fov_greater_than_90;
 
@@ -184,11 +186,11 @@ R_Init
 */
 void R_Init (void)
 {
-	int		dummy;
-	
 // get stack position so we can guess if we are going to overflow
-	r_stack_start = (byte *)&dummy;
-	
+#if !QEMBED
+    int dummy;
+    r_stack_start = (byte *)&dummy;
+#endif
 	R_InitTurb ();
 	
 	Cmd_AddCommand ("timerefresh", R_TimeRefresh_f);	
@@ -963,8 +965,8 @@ r_refdef must be set before the first call
 void R_RenderView_ (void)
 {
 	//byte	warpbuffer[WARP_WIDTH * WARP_HEIGHT];
-
-	r_warpbuffer = (void *)(byte *)vid.buffer;//warpbuffer;
+    const int warpbuffer_size = WARP_WIDTH * WARP_HEIGHT * sizeof(byte);
+	r_warpbuffer = (pixel_t *)Sys_HeapCachePop(warpbuffer_size);
 
 	if (r_timegraph.value || r_speeds.value || r_dspeeds.value)
 		r_time1 = Sys_FloatTime ();
@@ -1054,10 +1056,14 @@ SetVisibilityByPassages ();
 
 // back to high floating-point precision
 	Sys_HighFPPrecision ();
+
+    Sys_HeapCachePush(warpbuffer_size);
+    r_warpbuffer = NULL;
 }
 
 void R_RenderView (void)
 {
+#if !QEMBED
 	int		dummy;
 	int		delta;
 	
@@ -1073,7 +1079,7 @@ void R_RenderView (void)
 
 	if ( (long)(&r_warpbuffer) & 3 )
 		Sys_Error ("Globals are missaligned");
-
+#endif /*QEMBED*/
 	R_RenderView_ ();
 }
 
