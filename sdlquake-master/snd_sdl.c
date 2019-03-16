@@ -249,6 +249,7 @@ channel_t *SND_PickChannel(int entnum, int entchannel, int *chidx)
         channels[first_to_die].sfx = NULL;
 
     *chidx = first_to_die;
+    audio_stop_channel(first_to_die);
     return &channels[first_to_die];
 }       
 
@@ -367,9 +368,10 @@ static audio_channel_t *S_PushSound (channel_t *ch, int channel)
     sc = Cache_Check (&ch->sfx->cache);
 
     chunk.abuf = (snd_sample_t *)sc->data;
-    chunk.alen = sc->length * sizeof(snd_sample_t) * 2;
+    chunk.alen = sc->length * sizeof(snd_sample_t);
     chunk.volume = (ch->leftvol + ch->rightvol) / 4;
     chunk.cache = &ch->sfx->cache.data;
+    chunk.loopstart = sc->loopstart;
     if (audio_is_playing(channel)) {
         return NULL;
     }

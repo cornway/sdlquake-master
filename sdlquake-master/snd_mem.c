@@ -30,68 +30,62 @@ byte *S_Alloc (int size);
 ResampleSfx
 ================
 */
-void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
+void ResampleSfx (sfxcache_t *sc, int inrate, int inwidth, byte *data)
 {
-	int		outcount;
-	int		srcsample;
-	float	stepscale;
-	int		i;
+
+    int		outcount;
+    int		srcsample;
+    float	stepscale;
+    int		i;
     int     idest;
-	int		sample, samplefrac, fracstep;
-	sfxcache_t	*sc;
-	
-	sc = Cache_Check (&sfx->cache);
-	if (!sc)
-		return;
+    int		sample, samplefrac, fracstep;
+    int channelsfactor, inchannels;
 
-	stepscale = (float)inrate / shm->speed;	// this is usually 0.5, 1, or 2
+    channelsfactor = shm->channels / sc->stereo;
 
-	outcount = sc->length / stepscale;
-	sc->length = outcount;
-	if (sc->loopstart != -1)
-		sc->loopstart = sc->loopstart / stepscale;
+    stepscale = (float)inrate / shm->speed;	// this is usually 0.5, 1, or 2
+    stepscale = stepscale / channelsfactor;
 
-	sc->speed = shm->speed;
+    outcount = sc->length / stepscale;
+
+    sc->length = outcount;
+    if (sc->loopstart != -1)
+        sc->loopstart = sc->loopstart / stepscale;
+
+    sc->speed = shm->speed;
     sc->width = shm->samplebits / 8;
-	sc->stereo = 0;
+    sc->stereo = 0;
 
 // resample / decimate to the current source rate
 
-	if (stepscale == 1 && inwidth == 1 && sc->width == 1)
-	{
-// fast special case
-		for (i=0 ; i<outcount ; i++)
-			((signed char *)sc->data)[i]
-			= (int)( (unsigned char)(data[i]) - 128);
-	}
-	else
-	{
-// general case
-		samplefrac = 0;
-		fracstep = stepscale*256;
-		for (i=0, idest = 0; i<outcount ; i++)
-		{
-			srcsample = samplefrac >> 8;
-			samplefrac += fracstep;
-			if (inwidth == 2)
-				sample = LittleShort ( ((short *)data)[srcsample] );
-			else
-				sample = (int)( (unsigned char)(data[srcsample]) - 128) << 8;
-			if (sc->width == 2)
-				((short *)sc->data)[idest] = sample;
-			else
-				((signed char *)sc->data)[idest] = sample >> 8;
+    if (stepscale == 1 && inwidth == 1 && sc->width == 1)
+    {
+        // fast special case
+        for (i=0 ; i<outcount ; i++)
+            ((signed char *)sc->data)[i] = (int)( (unsigned char)(data[i]) - 128);
 
-            if ((shm->channels > 1) && !sc->stereo) {
-                idest++;
-                if (sc->width == 2)
-                    ((short *)sc->data)[idest] = sample;
-                else
-                    ((signed char *)sc->data)[idest] = sample >> 8;
-            }
-            idest++;
-		}
-	}
+        return;
+    }
+
+// general case
+    samplefrac = 0;
+    fracstep = stepscale*256;
+    for (i=0, idest = 0; i<outcount ; i++, idest++)
+    {
+        srcsample = samplefrac >> 8;
+        samplefrac += fracstep;
+        if (inwidth == 2) {
+            sample = LittleShort ( ((short *)data)[srcsample] );
+        } else {
+            sample = (int)( (unsigned char)(data[srcsample]) - 128) << 8;
+        }
+
+        if (sc->width == 2) {
+            ((short *)sc->data)[idest] = sample;
+        } else {
+            ((signed char *)sc->data)[idest] = sample >> 8;
+        }
+    }
 }
 
 //=============================================================================
@@ -153,7 +147,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	sc->width = info.width;
 	sc->stereo = info.channels;
 
-	ResampleSfx (s, sc->speed, sc->width, data + info.dataofs);
+	ResampleSfx (sc, sc->speed, sc->width, data + info.dataofs);
 
 	return sc;
 }

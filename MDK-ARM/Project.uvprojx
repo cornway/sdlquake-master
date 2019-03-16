@@ -603,11 +603,6 @@
               <FileType>1</FileType>
               <FilePath>..\Src\STUB.c</FilePath>
             </File>
-            <File>
-              <FileName>heap.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\common\heap.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1073,6 +1068,11 @@
         <Group>
           <GroupName>common</GroupName>
           <Files>
+            <File>
+              <FileName>heap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\heap.c</FilePath>
+            </File>
             <File>
               <FileName>audio_main.c</FileName>
               <FileType>1</FileType>
