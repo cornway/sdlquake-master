@@ -667,11 +667,11 @@ void Mod_LoadTexinfo (lump_t *l)
 		len1 = Length (out->vecs[0]);
 		len2 = Length (out->vecs[1]);
 		len1 = (len1 + len2)/2;
-		if (len1 < 0.32)
+		if (len1 < 0.32f)
 			out->mipadjust = 4;
-		else if (len1 < 0.49)
+		else if (len1 < 0.49f)
 			out->mipadjust = 3;
-		else if (len1 < 0.99)
+		else if (len1 < 0.99f)
 			out->mipadjust = 2;
 		else
 			out->mipadjust = 1;
@@ -1317,7 +1317,7 @@ void * Mod_LoadAliasGroup (aliashdr_t *pheader, int framenum, void * pin, int nu
 	for (i=0 ; i<numframes ; i++)
 	{
 		*poutintervals = LittleFloat (pin_intervals->interval);
-		if (*poutintervals <= 0.0)
+		if (*poutintervals <= 0.0f)
 			Sys_Error ("Mod_LoadAliasGroup: interval<=0");
 
 		poutintervals++;
@@ -1739,7 +1739,7 @@ void * Mod_LoadSpriteGroup (void * pin, mspriteframe_t **ppframe)
 	for (i=0 ; i<numframes ; i++)
 	{
 		*poutintervals = LittleFloat (pin_intervals->interval);
-		if (*poutintervals <= 0.0)
+		if (*poutintervals <= 0.0f)
 			Sys_Error ("Mod_LoadSpriteGroup: interval<=0");
 
 		poutintervals++;

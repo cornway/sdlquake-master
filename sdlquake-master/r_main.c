@@ -49,9 +49,11 @@ int			r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
 qboolean	r_surfsonstack;
 int			r_clipflags;
 
-byte		*r_warpbuffer;
+pixel_t		*r_warpbuffer;
 
+#if !QEMBED
 byte		*r_stack_start;
+#endif
 
 qboolean	r_fov_greater_than_90;
 
@@ -184,11 +186,11 @@ R_Init
 */
 void R_Init (void)
 {
-	int		dummy;
-	
 // get stack position so we can guess if we are going to overflow
-	r_stack_start = (byte *)&dummy;
-	
+#if !QEMBED
+    int dummy;
+    r_stack_start = (byte *)&dummy;
+#endif
 	R_InitTurb ();
 	
 	Cmd_AddCommand ("timerefresh", R_TimeRefresh_f);	
@@ -366,20 +368,20 @@ void R_ViewChanged (vrect_t *pvrect, int lineadj, float aspect)
 
 	R_SetVrect (pvrect, &r_refdef.vrect, lineadj);
 
-	r_refdef.horizontalFieldOfView = 2.0 * tan (r_refdef.fov_x/360*M_PI);
+	r_refdef.horizontalFieldOfView = 2.0f * tan (r_refdef.fov_x/360*M_PI);
 	r_refdef.fvrectx = (float)r_refdef.vrect.x;
-	r_refdef.fvrectx_adj = (float)r_refdef.vrect.x - 0.5;
+	r_refdef.fvrectx_adj = (float)r_refdef.vrect.x - 0.5f;
 	r_refdef.vrect_x_adj_shift20 = (r_refdef.vrect.x<<20) + (1<<19) - 1;
 	r_refdef.fvrecty = (float)r_refdef.vrect.y;
-	r_refdef.fvrecty_adj = (float)r_refdef.vrect.y - 0.5;
+	r_refdef.fvrecty_adj = (float)r_refdef.vrect.y - 0.5f;
 	r_refdef.vrectright = r_refdef.vrect.x + r_refdef.vrect.width;
 	r_refdef.vrectright_adj_shift20 = (r_refdef.vrectright<<20) + (1<<19) - 1;
 	r_refdef.fvrectright = (float)r_refdef.vrectright;
-	r_refdef.fvrectright_adj = (float)r_refdef.vrectright - 0.5;
-	r_refdef.vrectrightedge = (float)r_refdef.vrectright - 0.99;
+	r_refdef.fvrectright_adj = (float)r_refdef.vrectright - 0.5f;
+	r_refdef.vrectrightedge = (float)r_refdef.vrectright - 0.99f;
 	r_refdef.vrectbottom = r_refdef.vrect.y + r_refdef.vrect.height;
 	r_refdef.fvrectbottom = (float)r_refdef.vrectbottom;
-	r_refdef.fvrectbottom_adj = (float)r_refdef.vrectbottom - 0.5;
+	r_refdef.fvrectbottom_adj = (float)r_refdef.vrectbottom - 0.5f;
 
 	r_refdef.aliasvrect.x = (int)(r_refdef.vrect.x * r_aliasuvscale);
 	r_refdef.aliasvrect.y = (int)(r_refdef.vrect.y * r_aliasuvscale);
@@ -417,35 +419,35 @@ void R_ViewChanged (vrect_t *pvrect, int lineadj, float aspect)
 
 	xscale = r_refdef.vrect.width / r_refdef.horizontalFieldOfView;
 	aliasxscale = xscale * r_aliasuvscale;
-	xscaleinv = 1.0 / xscale;
+	xscaleinv = 1.0f / xscale;
 	yscale = xscale * pixelAspect;
 	aliasyscale = yscale * r_aliasuvscale;
-	yscaleinv = 1.0 / yscale;
+	yscaleinv = 1.0f / yscale;
 	xscaleshrink = (r_refdef.vrect.width-6)/r_refdef.horizontalFieldOfView;
 	yscaleshrink = xscaleshrink*pixelAspect;
 
 // left side clip
-	screenedge[0].normal[0] = -1.0 / (xOrigin*r_refdef.horizontalFieldOfView);
+	screenedge[0].normal[0] = -1.0f / (xOrigin*r_refdef.horizontalFieldOfView);
 	screenedge[0].normal[1] = 0;
 	screenedge[0].normal[2] = 1;
 	screenedge[0].type = PLANE_ANYZ;
 	
 // right side clip
 	screenedge[1].normal[0] =
-			1.0 / ((1.0-xOrigin)*r_refdef.horizontalFieldOfView);
+			1.0f / ((1.0f-xOrigin)*r_refdef.horizontalFieldOfView);
 	screenedge[1].normal[1] = 0;
 	screenedge[1].normal[2] = 1;
 	screenedge[1].type = PLANE_ANYZ;
 	
 // top side clip
 	screenedge[2].normal[0] = 0;
-	screenedge[2].normal[1] = -1.0 / (yOrigin*verticalFieldOfView);
+	screenedge[2].normal[1] = -1.0f / (yOrigin*verticalFieldOfView);
 	screenedge[2].normal[2] = 1;
 	screenedge[2].type = PLANE_ANYZ;
 	
 // bottom side clip
 	screenedge[3].normal[0] = 0;
-	screenedge[3].normal[1] = 1.0 / ((1.0-yOrigin)*verticalFieldOfView);
+	screenedge[3].normal[1] = 1.0f / ((1.0f-yOrigin)*verticalFieldOfView);
 	screenedge[3].normal[2] = 1;	
 	screenedge[3].type = PLANE_ANYZ;
 	
@@ -454,11 +456,11 @@ void R_ViewChanged (vrect_t *pvrect, int lineadj, float aspect)
 
 	res_scale = sqrt ((double)(r_refdef.vrect.width * r_refdef.vrect.height) /
 			          (320.0 * 152.0)) *
-			(2.0 / r_refdef.horizontalFieldOfView);
+			(2.0f / r_refdef.horizontalFieldOfView);
 	r_aliastransition = r_aliastransbase.value * res_scale;
 	r_resfudge = r_aliastransadj.value * res_scale;
 
-	if (scr_fov.value <= 90.0)
+	if (scr_fov.value <= 90.0f)
 		r_fov_greater_than_90 = false;
 	else
 		r_fov_greater_than_90 = true;
@@ -963,8 +965,8 @@ r_refdef must be set before the first call
 void R_RenderView_ (void)
 {
 	//byte	warpbuffer[WARP_WIDTH * WARP_HEIGHT];
-
-	r_warpbuffer = (void *)(byte *)vid.buffer;//warpbuffer;
+    const int warpbuffer_size = WARP_WIDTH * WARP_HEIGHT * sizeof(byte);
+	r_warpbuffer = (pixel_t *)Sys_HeapCachePop(warpbuffer_size);
 
 	if (r_timegraph.value || r_speeds.value || r_dspeeds.value)
 		r_time1 = Sys_FloatTime ();
@@ -1054,10 +1056,14 @@ SetVisibilityByPassages ();
 
 // back to high floating-point precision
 	Sys_HighFPPrecision ();
+
+    Sys_HeapCachePush(warpbuffer_size);
+    r_warpbuffer = NULL;
 }
 
 void R_RenderView (void)
 {
+#if !QEMBED
 	int		dummy;
 	int		delta;
 	
@@ -1073,7 +1079,7 @@ void R_RenderView (void)
 
 	if ( (long)(&r_warpbuffer) & 3 )
 		Sys_Error ("Globals are missaligned");
-
+#endif /*QEMBED*/
 	R_RenderView_ ();
 }
 
