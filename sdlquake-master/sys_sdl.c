@@ -14,6 +14,7 @@
 #include "input_main.h"
 #include "main.h"
 #include "ff.h"
+#include "debug.h"
 
 qboolean        isDedicated;
 
@@ -35,7 +36,11 @@ void Sys_DebugNumber(int y, int val)
 
 void Sys_Printf (char *fmt, ...)
 {
+    va_list         argptr;
 
+    va_start (argptr, fmt);
+    dvprint (fmt, argptr);
+    va_end (argptr);
 }
 
 void Sys_Quit (void)
@@ -79,20 +84,22 @@ void Sys_HighFPPrecision (void)
 
 void Sys_Error (char *error, ...)
 {
-    va_list ap;
-    char p[256];
-    int   r;
+    va_list         argptr;
 
-    va_start (ap, error);
-    r = r = vsnprintf(p, sizeof(p), error, ap);
-    va_end (ap);
+    va_start (argptr, error);
+    dvprint (error, argptr);
+    va_end (argptr);
 
     Sys_Quit();
 } 
 
 void Sys_Warn (char *warning, ...)
 { 
+    va_list         argptr;
 
+    va_start (argptr, warning);
+    dvprint (warning, argptr);
+    va_end (argptr);
 } 
 
 /*

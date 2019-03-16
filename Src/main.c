@@ -42,6 +42,7 @@
 #include "audio_main.h"
 #include "usbh_hid.h"
 #include "touch.h"
+#include "debug.h"
 
 #if (_USE_LFN == 3)
 #error "ff_malloc, ff_free must be redefined to Sys_HeapAlloc"
@@ -83,6 +84,17 @@ void hdd_led_off (void)
     BSP_LED_Off(LED2);
 }
 
+void serial_led_on (void)
+{
+    BSP_LED_On(LED1);
+}
+
+void serial_led_off (void)
+{
+    BSP_LED_Off(LED1);
+}
+
+
 const char *argv[] =
 {
     __FILE__,
@@ -103,6 +115,7 @@ int main(void)
     //gamepad_init();
     audio_init();
     //touch_init();
+    serial_init();
 
     if(FATFS_LinkDriver(&SD_Driver, SDPath)) {
         return -1;
