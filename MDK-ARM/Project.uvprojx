@@ -1114,9 +1114,19 @@
               <FilePath>..\common\audio_mem.c</FilePath>
             </File>
             <File>
+              <FileName>audio_int.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\common\inc\audio_int.h</FilePath>
+            </File>
+            <File>
               <FileName>retarget.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\retarget.c</FilePath>
+            </File>
+            <File>
+              <FileName>sect.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\common\inc\sect.h</FilePath>
             </File>
             <File>
               <FileName>audio_mix.c</FileName>
