@@ -1153,6 +1153,21 @@
               <FileType>1</FileType>
               <FilePath>..\common\serial.c</FilePath>
             </File>
+            <File>
+              <FileName>nvic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\nvic.c</FilePath>
+            </File>
+            <File>
+              <FileName>dev_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\common\inc\dev_conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>nvic.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\common\inc\nvic.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
