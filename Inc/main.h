@@ -40,21 +40,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f7xx_hal.h"
 
-//#include "stm32f769i_discovery.h"
-//#include "stm32f769i_discovery_lcd.h"
-//#include "stm32f769i_discovery_sdram.h"
-
-/* FatFs includes component */
-//#include "ff_gen_drv.h"
-//#include "sd_diskio.h"
-
 /* Exported variables --------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void OnError_Handler(void);
-void fatal_error (const char* message);
+void fatal_error (char *message, ...);
 
 
 #endif /* __MAIN_H */

@@ -110,7 +110,7 @@ DECLSPEC uint8_t SDLCALL SDL_GetMouseState(int *x, int *y)
 
 void SDL_Quit(void)
 {
-    fatal_error("quit/n");
+    fatal_error("-----------SDL_Quit-----------/n");
 }
 
 

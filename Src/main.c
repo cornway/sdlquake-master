@@ -56,7 +56,18 @@ int const __cache_line_size = 32;
 
 volatile uint32_t systime = 0;
 
-void fatal_error (const char* message)
+void fatal_error (char *message, ...)
+{
+    va_list argptr;
+
+    va_start (argptr, message);
+    dvprintf (message, argptr);
+    va_end (argptr);
+
+    for (;;) {}
+}
+
+static void clock_fault (void)
 {
     for (;;) {}
 }
@@ -110,12 +121,12 @@ int main(void)
     Sys_AllocInit();
     BSP_LED_Init(LED1);
     BSP_LED_Init(LED2);
+    serial_init();
 
     screen_init();
     //gamepad_init();
     audio_init();
     //touch_init();
-    serial_init();
 
     if(FATFS_LinkDriver(&SD_Driver, SDPath)) {
         return -1;
@@ -160,13 +171,13 @@ static void SystemClock_Config(void)
     ret = HAL_RCC_OscConfig(&RCC_OscInitStruct);
     if(ret != HAL_OK)
     {
-    while(1) { ; }
+        while(1) { ; }
     }
 
     /* Activate the OverDrive to reach the 200 MHz Frequency */
     ret = HAL_PWREx_EnableOverDrive();
     if(ret != HAL_OK)
-        fatal_error("");
+        clock_fault();
 
     /* Select PLLSAI output as USB clock source */
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_CLK48;
@@ -175,18 +186,18 @@ static void SystemClock_Config(void)
     PeriphClkInitStruct.PLLSAI.PLLSAIQ = 4;
     PeriphClkInitStruct.PLLSAI.PLLSAIP = RCC_PLLSAIP_DIV4;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-        fatal_error("");
+        clock_fault();
 
     /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 clocks dividers */
     RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
     ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7);
     if(ret != HAL_OK)
-        fatal_error("");
+        clock_fault();
 }
 
 static void CPU_CACHE_Enable(void)

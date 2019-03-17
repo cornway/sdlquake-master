@@ -39,7 +39,7 @@ void Sys_Printf (char *fmt, ...)
     va_list         argptr;
 
     va_start (argptr, fmt);
-    dvprint (fmt, argptr);
+    dvprintf (fmt, argptr);
     va_end (argptr);
 }
 
@@ -87,7 +87,7 @@ void Sys_Error (char *error, ...)
     va_list         argptr;
 
     va_start (argptr, error);
-    dvprint (error, argptr);
+    dvprintf (error, argptr);
     va_end (argptr);
 
     Sys_Quit();
@@ -98,7 +98,7 @@ void Sys_Warn (char *warning, ...)
     va_list         argptr;
 
     va_start (argptr, warning);
-    dvprint (warning, argptr);
+    dvprintf (warning, argptr);
     va_end (argptr);
 } 
 
@@ -329,7 +329,7 @@ byte *Sys_ZoneBase (int *size)
 {
 
     Sys_Error("Not supported");
-
+    return NULL;
 }
 
 void Sys_LineRefresh(void)
