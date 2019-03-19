@@ -167,6 +167,7 @@ void CL_EstablishConnection (char *host)
 	if (cls.demoplayback)
 		return;
 
+    Con_Debug("%s : host=\"%s\"\n", __func__, host);
 	CL_Disconnect ();
 
 	cls.netcon = NET_Connect (host);

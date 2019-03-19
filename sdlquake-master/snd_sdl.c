@@ -135,8 +135,6 @@ int         desired_bits = 16;
 
 volatile dma_t  *shm = 0;
 
-int recording = 0;
-
 Q_CVAR_DEF(nosound, "nosound", 0);
 Q_CVAR_DEF(precache, "precache", 1);
 

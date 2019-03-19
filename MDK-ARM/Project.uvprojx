@@ -1088,6 +1088,26 @@
               <FileType>1</FileType>
               <FilePath>..\sdlquake-master\snd_mem.c</FilePath>
             </File>
+            <File>
+              <FileName>net_loop.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\sdlquake-master\net_loop.c</FilePath>
+            </File>
+            <File>
+              <FileName>net_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\sdlquake-master\net_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>net_none.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\sdlquake-master\net_none.c</FilePath>
+            </File>
+            <File>
+              <FileName>net_vcr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\sdlquake-master\net_vcr.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

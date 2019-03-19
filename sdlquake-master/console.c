@@ -374,7 +374,7 @@ Handles cursor positioning, line wrapping, etc
 ================
 */
 //FIXME! : reduce buffer size.
-#define	MAXPRINTMSG	4096
+#define	MAXPRINTMSG	1024
 // FIXME: make a buffer size safe vsprintf?
 void Con_Printf (char *fmt, ...)
 {
@@ -436,6 +436,24 @@ void Con_DPrintf (char *fmt, ...)
 	va_end (argptr);
 	
 	Con_Printf ("%s", msg);
+}
+
+
+void Con_Debug(char *fmt, ...)
+{
+    char buf[MAXPRINTMSG];
+    va_list		argptr;
+
+    sprintf (buf, "[%d        ] %s", (uint32_t)Sys_FloatTime(), fmt);
+
+    va_start (argptr,fmt);
+    dvprintf (buf,argptr);
+    va_end (argptr);
+}
+
+void Con_Flush(void)
+{
+    serial_flush();
 }
 
 

@@ -56,6 +56,11 @@ void Sys_Init(void)
 #endif
 }
 
+void SDL_Quit(void)
+{
+    Sys_Error("-----------SDL_Quit-----------/n");
+}
+
 #if !id386
 
 /*
@@ -90,6 +95,7 @@ void Sys_Error (char *error, ...)
     dvprintf (error, argptr);
     va_end (argptr);
 
+    serial_flush();
     Sys_Quit();
 } 
 

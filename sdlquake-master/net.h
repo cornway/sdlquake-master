@@ -326,10 +326,17 @@ extern	qboolean	ipxAvailable;
 extern	qboolean	tcpipAvailable;
 extern	char		my_ipx_address[NET_NAMELEN];
 extern	char		my_tcpip_address[NET_NAMELEN];
+#if QEMBED
+extern void GetComPortConfig (int portNumber, int *port, int *irq, int *baud, qboolean *useModem);
+extern void SetComPortConfig (int portNumber, int port, int irq, int baud, qboolean useModem);
+extern void GetModemConfig (int portNumber, char *dialType, char *clear, char *init, char *hangup);
+extern void SetModemConfig (int portNumber, char *dialType, char *clear, char *init, char *hangup);
+#else
 extern void (*GetComPortConfig) (int portNumber, int *port, int *irq, int *baud, qboolean *useModem);
 extern void (*SetComPortConfig) (int portNumber, int port, int irq, int baud, qboolean useModem);
 extern void (*GetModemConfig) (int portNumber, char *dialType, char *clear, char *init, char *hangup);
 extern void (*SetModemConfig) (int portNumber, char *dialType, char *clear, char *init, char *hangup);
+#endif
 
 extern	qboolean	slistInProgress;
 extern	qboolean	slistSilent;

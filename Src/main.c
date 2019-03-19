@@ -124,7 +124,7 @@ int main(void)
     serial_init();
 
     screen_init();
-    //gamepad_init();
+    gamepad_init();
     audio_init();
     //touch_init();
 
