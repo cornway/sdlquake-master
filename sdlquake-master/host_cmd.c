@@ -417,6 +417,7 @@ void Host_Connect_f (void)
 		CL_Disconnect ();
 	}
 	Q_strcpy (name, Cmd_Argv(1));
+    Con_Debug("%s : name=\"%s\"\n", __func__, name);
 	CL_EstablishConnection (name);
 	Host_Reconnect_f ();
 }

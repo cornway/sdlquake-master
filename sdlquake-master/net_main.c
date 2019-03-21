@@ -36,10 +36,33 @@ int			DEFAULTnet_hostport = 26000;
 char		my_ipx_address[NET_NAMELEN];
 char		my_tcpip_address[NET_NAMELEN];
 
+#if QEMBED
+void GetComPortConfig (int portNumber, int *port, int *irq, int *baud, qboolean *useModem)
+{
+    Sys_Error("GetComPortConfig unavailable\n");
+}
+
+void SetComPortConfig (int portNumber, int port, int irq, int baud, qboolean useModem)
+{
+    Sys_Error("SetComPortConfig unavailable\n");
+}
+
+void GetModemConfig (int portNumber, char *dialType, char *clear, char *init, char *hangup)
+{
+    Sys_Error("GetModemConfig unavailable\n");
+}
+
+void SetModemConfig (int portNumber, char *dialType, char *clear, char *init, char *hangup)
+{
+    Sys_Error("SetModemConfig unavailable\n");
+}
+
+#else
 void (*GetComPortConfig) (int portNumber, int *port, int *irq, int *baud, qboolean *useModem);
 void (*SetComPortConfig) (int portNumber, int port, int irq, int baud, qboolean useModem);
 void (*GetModemConfig) (int portNumber, char *dialType, char *clear, char *init, char *hangup);
 void (*SetModemConfig) (int portNumber, char *dialType, char *clear, char *init, char *hangup);
+#endif
 
 static qboolean	listening = false;
 
@@ -63,21 +86,46 @@ int messagesReceived = 0;
 int unreliableMessagesSent = 0;
 int unreliableMessagesReceived = 0;
 
-cvar_t	net_messagetimeout = {"net_messagetimeout","300"};
-cvar_t	hostname = {"hostname", "UNNAMED"};
+
+Q_CVAR_DEF(net_messagetimeout, "net_messagetimeout", 300);
+
+#if CVAR_TINY
+Q_CVAR_DEF(hostname, "hostname", 0);
+#else
+Q_CVAR_DEF(hostname, "hostname", "UNNAMED");
+#endif
 
 qboolean	configRestored = false;
-cvar_t	config_com_port = {"_config_com_port", "0x3f8", true};
-cvar_t	config_com_irq = {"_config_com_irq", "4", true};
-cvar_t	config_com_baud = {"_config_com_baud", "57600", true};
-cvar_t	config_com_modem = {"_config_com_modem", "1", true};
+
+Q_CVAR_DEF(config_com_port, "_config_com_port", 0x3f8, true);
+Q_CVAR_DEF(config_com_irq, "_config_com_irq", 4, true);
+Q_CVAR_DEF(config_com_baud, "_config_com_baud", 57600, true);
+Q_CVAR_DEF(config_com_modem, "_config_com_modem", 1, true);
+
+#if CVAR_TINY
+Q_CVAR_DEF(config_modem_dialtype, "_config_modem_dialtype", 0);
+Q_CVAR_DEF(config_modem_clear, "_config_modem_clear", 0);
+Q_CVAR_DEF(config_modem_init, "_config_modem_init", 0);
+Q_CVAR_DEF(config_modem_hangup, "_config_modem_hangup", 0);
+
+#define CONFIG_MODEM_DIALTYPE(cvar)     "T"
+#define CONFIG_MODEM_CLEAR(cvar)        "ATZ"
+#define CONFIG_MODEM_INIT(cvar)         ""
+#define CONFIG_MODEM_HANGUP(cvar)       "AT H"
+#else
 cvar_t	config_modem_dialtype = {"_config_modem_dialtype", "T", true};
 cvar_t	config_modem_clear = {"_config_modem_clear", "ATZ", true};
 cvar_t	config_modem_init = {"_config_modem_init", "", true};
 cvar_t	config_modem_hangup = {"_config_modem_hangup", "AT H", true};
 
+#define CONFIG_MODEM_DIALTYPE(cvar)     (cvar)->string
+#define CONFIG_MODEM_CLEAR(cvar)        (cvar)->string
+#define CONFIG_MODEM_INIT(cvar)         (cvar)->string
+#define CONFIG_MODEM_HANGUP(cvar)       (cvar)->string
+#endif
+
 #ifdef IDGODS
-cvar_t	idgods = {"idgods", "0"};
+Q_CVAR_DEF(idgods, "idgods", 0);
 #endif
 
 int	vcrFile = -1;
@@ -847,9 +895,7 @@ void NET_Init (void)
 		s->disconnected = true;
 	}
 
-	// allocate space for network message buffer
-	SZ_Alloc (&net_message, NET_MAXMESSAGE);
-
+    SZ_Alloc (&net_message, NET_MAXMESSAGE);
 	Cvar_RegisterVariable (&net_messagetimeout);
 	Cvar_RegisterVariable (&hostname);
 	Cvar_RegisterVariable (&config_com_port);
@@ -938,7 +984,10 @@ void NET_Poll(void)
 			else
 				useModem = false;
 			SetComPortConfig (0, (int)config_com_port.value, (int)config_com_irq.value, (int)config_com_baud.value, useModem);
-			SetModemConfig (0, config_modem_dialtype.string, config_modem_clear.string, config_modem_init.string, config_modem_hangup.string);
+			SetModemConfig (0, CONFIG_MODEM_DIALTYPE(&config_modem_dialtype),
+                               CONFIG_MODEM_CLEAR(&config_modem_clear),
+                               CONFIG_MODEM_INIT(&config_modem_init),
+                               CONFIG_MODEM_HANGUP(&config_modem_hangup));
 		}
 		configRestored = true;
 	}

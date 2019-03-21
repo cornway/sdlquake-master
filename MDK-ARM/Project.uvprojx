@@ -618,16 +618,6 @@
               <FileType>1</FileType>
               <FilePath>../Src/stm32f7xx_it.c</FilePath>
             </File>
-            <File>
-              <FileName>i_sdlsound.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\i_sdlsound.c</FilePath>
-            </File>
-            <File>
-              <FileName>STUB.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\STUB.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1088,6 +1078,26 @@
               <FileType>1</FileType>
               <FilePath>..\sdlquake-master\snd_mem.c</FilePath>
             </File>
+            <File>
+              <FileName>net_loop.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\sdlquake-master\net_loop.c</FilePath>
+            </File>
+            <File>
+              <FileName>net_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\sdlquake-master\net_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>net_none.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\sdlquake-master\net_none.c</FilePath>
+            </File>
+            <File>
+              <FileName>net_vcr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\sdlquake-master\net_vcr.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1167,6 +1177,11 @@
               <FileName>nvic.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\common\inc\nvic.h</FilePath>
+            </File>
+            <File>
+              <FileName>input_int.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\common\inc\input_int.h</FilePath>
             </File>
           </Files>
         </Group>
