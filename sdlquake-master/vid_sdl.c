@@ -44,13 +44,13 @@ void VID_SetPalette (byte* palette)
 {
     unsigned int i;
     pal_t pal[256];
-	  byte r, g, b;
+    byte r, g, b;
 
     for (i = 0; i < 256; i++)
     {
-				r = *palette++;
-			  g = *palette++;
-				b = *palette++;
+        r = *palette++;
+        g = *palette++;
+        b = *palette++;
         pal[i] = GFX_RGB(GFX_OPAQUE, r, g, b);
     }
     screen_sync(1);
@@ -303,77 +303,42 @@ void D_EndDirectRect (int x, int y, int width, int height)
 Sys_SendKeyEvents
 ================
 */
-typedef i_event_t SDL_Event;
 
-const struct usb_gamepad_to_kbd_map gamepad_to_kbd_map[K_MAX] =
+const kbdmap_t gamepad_to_kbd_map[JOY_STD_MAX] =
 {
-    [K_UP]      = {K_UPARROW,       PAD_LOOK_CONTROL | PAD_LOOK_UP, 0, 0, 0},
-    [K_DOWN]    = {K_DOWNARROW,     PAD_LOOK_CONTROL | PAD_LOOK_DOWN, 0, 0, 0},
-    [K_LEFT]    = {K_LEFTARROW,     PAD_LOOK_CONTROL | PAD_LOOK_CENTRE, 0, 0, 0},
-    [K_RIGHT]   = {K_RIGHTARROW,    PAD_LOOK_CONTROL | PAD_LOOK_CENTRE, 0, 0, 0},
-    [K_K1]      = {K_TAB,           PAD_FREQ_LOW, 0, 0, 0},
-    [K_K4]      = {K_SHIFT,           0, 0, 0, 0},
-    [K_K3]      = {K_MOUSE1,          0, 0, 0, 0},
-    [K_K2]      = {K_SPACE,        PAD_FREQ_LOW | PAD_FUNCTION, 0, 0, 0},
-    [K_BL]      = {K_INS,      0, 0, 0, 0},
-#if GAMEPAD_USE_FLYLOOK
-    [K_BR]      = {K_DEL,    PAD_SET_FLYLOOK, 0, 0, 0},
-#else
-    [K_BR]      = {K_MWHEELUP,    PAD_FREQ_LOW, 0, 0, 0},
-#endif
-    [K_TL]      = {K_DEL,      0, 0, 0, 0},
-    [K_TR]      = {K_MWHEELDOWN,    PAD_FREQ_LOW, 0, 0, 0},
-    [K_START]   = {K_ENTER,         0, 0, 0, 0},
-    [K_SELECT]  = {K_ESCAPE,        PAD_FREQ_LOW, 0, 0, 0},
+    [JOY_UPARROW]       = {'w', 0},
+    [JOY_DOWNARROW]     = {'s', 0},
+    [JOY_LEFTARROW]     = {'x' ,0},
+    [JOY_RIGHTARROW]    = {'v', 0},
+    [JOY_K1]            = {'c', 0},
+    [JOY_K4]            = {K_END,  0},
+    [JOY_K3]            = {K_CTRL, 0},
+    [JOY_K2]            = {' ',    0},
+    [JOY_K5]            = {'a',    0},
+    [JOY_K6]            = {'d',    0},
+    [JOY_K7]            = {K_DEL,  0},
+    [JOY_K8]            = {K_PGDN, 0},
+    [JOY_K9]            = {K_ENTER, 0},
+    [JOY_K10]           = {K_ESCAPE, PAD_FREQ_LOW},
 };
 
+void input_post_key (i_event_t event)
+{
+    Key_Event(event.sym, event.state);
+}
 
 void Sys_SendKeyEvents(void)
 {
-    SDL_Event event;
-    int sym;
-		qboolean state;
-    int modstate;
-    int8_t keys[K_MAX];
-    int i, keynum;
-
-    keynum = gamepad_read(keys);
-    for (i = 0; i < keynum; i++)
-    {
-        state = (keys[i] > 0) ? true : false;
-        if (keys[i] >= 0) {
-                sym = gamepad_to_kbd_map[i].key;
-                Key_Event(sym, state);
-        }
-#if 0
-        switch (event.type) {
-            case SDL_MOUSEMOTION:
-                if ( (event.motion.x != (vid.width/2)) ||
-                     (event.motion.y != (vid.height/2)) ) {
-                    mouse_x = event.motion.xrel*10;
-                    mouse_y = event.motion.yrel*10;
-                    if ( (event.motion.x < ((vid.width/2)-(vid.width/4))) ||
-                         (event.motion.x > ((vid.width/2)+(vid.width/4))) ||
-                         (event.motion.y < ((vid.height/2)-(vid.height/4))) ||
-                         (event.motion.y > ((vid.height/2)+(vid.height/4))) ) {
-                        SDL_WarpMouse(vid.width/2, vid.height/2);
-                    }
-                }
-                break;
-
-            case SDL_QUIT:
-                CL_Disconnect ();
-                Host_ShutdownServer(false);        
-                Sys_Quit ();
-                break;
-            default:
-        }
-#endif
-    }
+    input_proc_keys();
 }
 
 void IN_Init (void)
 {
+    input_soft_init(gamepad_to_kbd_map);
+    input_bind_extra(K_EX_LOOKUP, K_HOME);
+    input_bind_extra(K_EX_LOOKUP, K_DEL);
+    input_bind_extra(K_EX_LOOKUP, K_INS);
+
     if ( COM_CheckParm ("-nomouse") )
         return;
     mouse_x = mouse_y = 0.0;

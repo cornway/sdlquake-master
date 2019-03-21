@@ -618,16 +618,6 @@
               <FileType>1</FileType>
               <FilePath>../Src/stm32f7xx_it.c</FilePath>
             </File>
-            <File>
-              <FileName>i_sdlsound.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\i_sdlsound.c</FilePath>
-            </File>
-            <File>
-              <FileName>STUB.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\STUB.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1187,6 +1177,11 @@
               <FileName>nvic.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\common\inc\nvic.h</FilePath>
+            </File>
+            <File>
+              <FileName>input_int.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\common\inc\input_int.h</FilePath>
             </File>
           </Files>
         </Group>

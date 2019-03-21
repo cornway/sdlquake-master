@@ -10,11 +10,13 @@
 #endif
 
 #include "quakedef.h"
+#include "sdl_keysym.h"
 #include "audio_main.h"
 #include "input_main.h"
 #include "main.h"
 #include "ff.h"
 #include "debug.h"
+#include "begin_code.h"
 
 qboolean        isDedicated;
 
@@ -106,7 +108,26 @@ void Sys_Warn (char *warning, ...)
     va_start (argptr, warning);
     dvprintf (warning, argptr);
     va_end (argptr);
-} 
+}
+
+DECLSPEC char * SDLCALL SDL_GetError(void)
+{
+    return "not implemented yet\n";
+}
+
+DECLSPEC void SDLCALL SDL_ClearError(void)
+{}
+
+DECLSPEC SDLMod SDLCALL SDL_GetModState(void)
+{
+    return KMOD_NONE;
+}
+
+DECLSPEC uint8_t SDLCALL SDL_GetMouseState(int *x, int *y)
+{
+    return 0;
+}
+
 
 /*
 ===============================================================================
@@ -414,7 +435,7 @@ int SDL_main (int argc, const char *argv[])
         if (sys_linerefresh.value)
             Sys_LineRefresh ();
 
-        gamepad_process();
+        input_tickle();
     }
 
 }

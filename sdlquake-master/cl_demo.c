@@ -42,7 +42,7 @@ CL_StopPlayback
 Called when a demo file runs out, or the user starts a game
 ==============
 */
-extern int          demo_message_start;
+int          demo_message_start;
 
 void CL_StopPlayback (void)
 {

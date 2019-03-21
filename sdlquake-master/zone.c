@@ -296,8 +296,10 @@ void Hunk_Check (void)
 	
 	for (h = (hunk_t *)hunk_base ; (byte *)h != hunk_base + hunk_low_used ; )
 	{
-		if (h->sentinal != HUNK_SENTINAL)
-			Sys_Error ("Hunk_Check: trahsed sentinal");
+		if (h->sentinal != HUNK_SENTINAL) {
+			Sys_Error ("Hunk_Check: trahsed sentinal, name= \"%s\", size= %d\n",
+                       h->name, h->size);
+        }
 		if (h->size < 16 || h->size + (byte *)h - hunk_base > hunk_size)
 			Sys_Error ("Hunk_Check: bad size");
 		h = (hunk_t *)((byte *)h+h->size);

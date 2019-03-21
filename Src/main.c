@@ -40,8 +40,7 @@
 #include "quakedef.h"
 #include "lcd_main.h"
 #include "audio_main.h"
-#include "usbh_hid.h"
-#include "touch.h"
+#include "input_main.h"
 #include "debug.h"
 
 #if (_USE_LFN == 3)
@@ -54,6 +53,8 @@ int const __cache_line_size = 32;
 #error "Cache line size unknown"
 #endif
 
+static void SystemDump (void);
+
 volatile uint32_t systime = 0;
 
 void fatal_error (char *message, ...)
@@ -64,6 +65,7 @@ void fatal_error (char *message, ...)
     dvprintf (message, argptr);
     va_end (argptr);
 
+    serial_flush();
     for (;;) {}
 }
 
@@ -72,7 +74,6 @@ static void clock_fault (void)
     for (;;) {}
 }
 
-extern void gamepad_init (void);
 /** The prototype for the application's main() function */
 extern int SDL_main(int argc, const char *argv[]);
 
@@ -121,12 +122,13 @@ int main(void)
     Sys_AllocInit();
     BSP_LED_Init(LED1);
     BSP_LED_Init(LED2);
-    serial_init();
 
+    serial_init();
     screen_init();
-    gamepad_init();
     audio_init();
-    //touch_init();
+    input_bsp_init();
+
+    SystemDump();
 
     if(FATFS_LinkDriver(&SD_Driver, SDPath)) {
         return -1;
@@ -170,9 +172,7 @@ static void SystemClock_Config(void)
 
     ret = HAL_RCC_OscConfig(&RCC_OscInitStruct);
     if(ret != HAL_OK)
-    {
-        while(1) { ; }
-    }
+        clock_fault();
 
     /* Activate the OverDrive to reach the 200 MHz Frequency */
     ret = HAL_PWREx_EnableOverDrive();
@@ -208,3 +208,9 @@ static void CPU_CACHE_Enable(void)
     /* Enable D-Cache */
     SCB_EnableDCache();
 }
+
+static void SystemDump (void)
+{
+    NVIC_dump();
+}
+
