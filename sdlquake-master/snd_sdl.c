@@ -156,51 +156,74 @@ int			soundtime;		// sample PAIRS
 int   		paintedtime; 	// sample PAIRS
 
 
+const char *qmus_root_path = "/id1/music";
+cd_track_t cd;
+
 void CDAudio_Pause(void)
 {
+    if (cd.desc == NULL) {
+        return;
+    }
+    music_pause(&cd);
 }
 
 void CDAudio_Play(byte track, qboolean looping)
 {
+    char path[128];
+    char *s = track < 10 ? "0" : "";
+
+    snprintf(path, sizeof(path), "%s/track%s%d.wav", qmus_root_path, s, track);
+    music_play_song_name(&cd, path);
+    music_set_vol(&cd, 0xff);
 }
 
 
 void CDAudio_Resume(void)
 {
+    music_resume(&cd);
 }
 
 int CDAudio_Init(void)
 {
-    return -1;
+    return 0;
 }
 
 void CDAudio_Shutdown(void)
 {
+
 }
 
 void CDAudio_Update(void)
 {
+
 }
 
 
 void S_PaintChannels(int endtime)
-{}
+{
+
+}
 
 
 void S_StopAllSounds(qboolean clear)
 {
+
 }
 
 void S_ClearPrecache (void)
-{}
+{
+
+}
 
 
 void S_BeginPrecaching (void)
 {
+
 }
 
 void S_EndPrecaching (void)
 {
+
 }
 
 
