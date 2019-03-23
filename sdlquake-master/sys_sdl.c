@@ -14,7 +14,7 @@
 #include "audio_main.h"
 #include "input_main.h"
 #include "main.h"
-#include "ff.h"
+#include "dev_io.h"
 #include "debug.h"
 #include "begin_code.h"
 
@@ -110,6 +110,15 @@ void Sys_Warn (char *warning, ...)
     va_end (argptr);
 }
 
+void Sys_DebugLog(char *file, char *fmt, ...)
+{
+    va_list         argptr;
+    
+    va_start (argptr, fmt);
+    dvprintf (fmt, argptr);
+    va_end (argptr);
+}
+
 DECLSPEC char * SDLCALL SDL_GetError(void)
 {
     return "not implemented yet\n";
@@ -136,148 +145,50 @@ FILE IO
 
 ===============================================================================
 */
-
-#define MAX_HANDLES		3
-
-typedef struct {
-    FIL file;
-    int is_owned;
-} fhandle_t;
-
-fhandle_t sys_handles[MAX_HANDLES];
-
-static FIL *allochandle (int *num)
-{
-    int i;
-
-    for (i=0 ; i<MAX_HANDLES ; i++) {
-        if (sys_handles[i].is_owned == 0) {
-            sys_handles[i].is_owned = 1;
-            *num = i;
-            return &sys_handles[i].file;
-        }
-    }
-    return NULL;
-}
-
-static inline FIL *gethandle (int num)
-{
-    return &sys_handles[num].file;
-}
-
-static void releasehandle (int handle)
-{
-    sys_handles[handle].is_owned = 0;
-}
-
 int Sys_FileOpenRead (char *path, int *hndl)
 {
-    FRESULT res;
-    FIL *f;
-
-    f = allochandle(hndl);
-    if (f == NULL) {
-        *hndl = -1;
-        return -1;
-    }
-    res = f_open(f, path, FA_OPEN_EXISTING | FA_READ);
-    if (res != FR_OK) {
-        releasehandle(*hndl);
-        *hndl = -1;
-        return -1;
-    }
-
-    return f_size(f);
+    return d_open(path, hndl, "r");
 }
 
 int Sys_FileOpenWrite (char *path)
 {
-    FRESULT res;
-    FIL *f;
-    int i;
-
-    Sys_Error("Not supported yet");
-
-    f = allochandle(&i);
-    if (f == NULL) {
-        return -1;
-    }
-
-    res = f_open(f, path, FA_OPEN_EXISTING | FA_WRITE);
-    if (res != FR_OK) {
-        releasehandle(i);
-        return -1;
-    }
-
-    return i;
+    int h;
+    d_open(path, &h, "+w");
+    return h;
 }
 
 void Sys_FileClose (int handle)
 {
-    if ( handle >= 0 ) {
-        f_close(gethandle(handle));
-        releasehandle(handle);
-    }
+    d_close(handle);
 }
 
 void Sys_FileSeek (int handle, int position)
 {
-    if ( handle >= 0 ) {
-        f_lseek(gethandle(handle), position);
-    }
+    d_seek(handle, position);
 }
 
 int Sys_Feof (int handle)
 {
-    if (handle < 0) {
-        return handle;
-    }
-    return f_eof(gethandle(handle));
+    return d_eof(handle);
 }
 
 int Sys_FileRead (int handle, void *dst, int count)
 {
-    char *data;
-    UINT done = 0;
-    FRESULT res = FR_NOT_READY;
-
-    if ( handle >= 0 ) {
-        data = dst;
-        res = f_read(gethandle(handle), data, count, &done);
-    }
-    if (res != FR_OK) {
-        Sys_Error("Could not read file from handle : %d\n", handle);
-    }
-    return done;
+    return d_read(handle, dst, count);
 }
 
 char *Sys_FileGetS (int handle, char *dst, int count)
 {
-    if (f_gets(dst, count, gethandle(handle)) == NULL) {
-        Sys_Error("Could not read file from handle : %d\n", handle);
-    }
-    return dst;
+    return d_gets(handle, dst, count);
 }
 
 int Sys_FileWrite (int handle, void *src, int count)
 {
-    char *data;
-    UINT done;
-    FRESULT res = FR_NOT_READY;
-
-    if ( handle >= 0 ) {
-        data = src;
-        res = f_write (gethandle(handle), data, count, &done);
-    }
-    if (res != FR_OK) {
-        Sys_Error("Could not write file from handle : %d\n", handle);
-    }
-    return done;
+    return d_write(handle, src, count);
 }
 
 int Sys_FPrintf (int handle, char *fmt, ...)
 {
-    FRESULT res = FR_NOT_READY;
     va_list ap;
     char p[256];
     int   r;
@@ -285,15 +196,10 @@ int Sys_FPrintf (int handle, char *fmt, ...)
     va_start (ap, fmt);
     r = vsnprintf(p, sizeof(p), fmt, ap);
     va_end (ap);
-
-    if (handle < 0) {
-        return handle;
+    if (Sys_FileWrite(handle, p, r) < 0) {
+        dprintf("%s Bad : %s\n", __func__, p);
     }
-    res = f_printf(gethandle(handle), fmt);
-    if (res != FR_OK) {
-        return -1;
-    }
-    return FR_OK;
+    return r;
 }
 
 
@@ -304,25 +210,12 @@ int	Sys_FileTime (char *path)
 
 void Sys_mkdir (char *path)
 {
-#ifdef __WIN32__
-    mkdir (path);
-#else
-    FRESULT res;
-    static DIR dp;
-    res = f_opendir(&dp, path);
-    if (res != FR_OK) {
-        Sys_Error("Mkdir fail for path : %s\n", path);
-    }
-#endif
-}
-
-void Sys_DebugLog(char *file, char *fmt, ...)
-{
-
+    d_mkdir(path);
 }
 
 
 extern volatile uint32_t systime;
+
 double Sys_FloatTime (void)
 {
 #ifdef __WIN32__
@@ -441,6 +334,7 @@ int SDL_main (int argc, const char *argv[])
 }
 
 
+#if	id386
 /*
 ================
 Sys_MakeCodeWriteable
@@ -448,7 +342,6 @@ Sys_MakeCodeWriteable
 */
 void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 {
-#if 0
 	int r;
 	unsigned long addr;
 	int psize = getpagesize();
@@ -461,6 +354,7 @@ void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 
 	if (r < 0)
     		Sys_Error("Protection change failed\n");
-#endif
 }
+
+#endif /*id386*/
 

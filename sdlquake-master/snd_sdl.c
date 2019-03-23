@@ -164,7 +164,7 @@ void CDAudio_Pause(void)
     if (cd.desc == NULL) {
         return;
     }
-    music_pause(&cd);
+    cd_pause(&cd);
 }
 
 void CDAudio_Play(byte track, qboolean looping)
@@ -173,14 +173,14 @@ void CDAudio_Play(byte track, qboolean looping)
     char *s = track < 10 ? "0" : "";
 
     snprintf(path, sizeof(path), "%s/track%s%d.wav", qmus_root_path, s, track);
-    music_play_song_name(&cd, path);
-    music_set_vol(&cd, 0xff);
+    cd_play_name(&cd, path);
+    cd_volume(&cd, 0xff);
 }
 
 
 void CDAudio_Resume(void)
 {
-    music_resume(&cd);
+    cd_resume(&cd);
 }
 
 int CDAudio_Init(void)
@@ -500,7 +500,7 @@ void S_StaticSound (sfx_t *sfx, vec3_t origin, float vol, float attenuation)
 
     if (total_channels == NUM_AMBIENTS)
     {
-        Con_Printf ("total_channels == MAX_CHANNELS\n");
+        //Con_Printf ("total_channels == MAX_CHANNELS\n");
         return;
     }
 
@@ -604,11 +604,8 @@ void S_UpdateAmbientSounds (void)
     if (!l || !ambient_level.value)
     {
         for (ambient_channel = 0 ; ambient_channel< NUM_AMBIENTS ; ambient_channel++) {
-            if (channels[ambient_channel].sfx) {
-                /*Null the cache to stop sample playing*/
-                channels[ambient_channel].sfx->cache.data = NULL;
-            }
-            channels[ambient_channel].sfx = NULL;
+            ambient = &ambient_desc[ambient_channel];
+            audio_stop_channel(ambient->achannel->id);
         }
         return;
     }
