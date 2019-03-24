@@ -114,6 +114,15 @@ void M_DrawCharacter (int cx, int line, int num)
 	Draw_Character ( cx + ((vid.width - 320)>>1), line, num);
 }
 
+void M_DrawCursor (int cx, int cursor, int offset)
+{
+#if QEMBED
+    M_DrawCharacter(cx, offset + 32 + cursor*8, '>');
+#else
+    M_DrawCharacter(cx, offset + 32 + cursor*8, 12+((int)(realtime*4)&1));
+#endif
+}
+
 void M_Print (int cx, int cy, char *str)
 {
 	while (*str)
@@ -513,7 +522,7 @@ void M_Load_Draw (void)
 		M_Print (16, 32 + 8*i, m_filenames[i]);
 
 // line cursor
-	M_DrawCharacter (8, 32 + load_cursor*8, 12+((int)(realtime*4)&1));
+    M_DrawCursor(8, load_cursor, 0);
 }
 
 
@@ -529,7 +538,7 @@ void M_Save_Draw (void)
 		M_Print (16, 32 + 8*i, m_filenames[i]);
 
 // line cursor
-	M_DrawCharacter (8, 32 + load_cursor*8, 12+((int)(realtime*4)&1));
+    M_DrawCursor(8, load_cursor, 0);
 }
 
 
@@ -1238,7 +1247,7 @@ void M_Options_Draw (void)
 #endif
 
 // cursor
-	M_DrawCharacter (200, 32 + options_cursor*8, 12+((int)(realtime*4)&1));
+    M_DrawCursor(200, options_cursor, 0);
 }
 
 
@@ -1445,7 +1454,8 @@ void M_Keys_Draw (void)
 	if (bind_grab)
 		M_DrawCharacter (130, 48 + keys_cursor*8, '=');
 	else
-		M_DrawCharacter (130, 48 + keys_cursor*8, 12+((int)(realtime*4)&1));
+        M_DrawCursor(130, keys_cursor, 12);
+		//M_DrawCharacter (130, 48 + keys_cursor*8, 12+((int)(realtime*4)&1));
 }
 
 

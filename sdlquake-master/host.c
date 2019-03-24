@@ -941,16 +941,16 @@ void Host_Shutdown(void)
 	
 	if (isdown)
 	{
-		printf ("recursive shutdown\n");
+		dprintf ("recursive shutdown\n");
 		return;
 	}
 	isdown = true;
 
 // keep Con_Printf from trying to update the screen
 	scr_disabled_for_loading = true;
-
-	Host_WriteConfiguration (); 
-
+#if !QEMBED
+    Host_WriteConfiguration (); 
+#endif
 	CDAudio_Shutdown ();
 	NET_Shutdown ();
 	S_Shutdown();

@@ -442,9 +442,10 @@ void Con_DPrintf (char *fmt, ...)
 void Con_Debug(char *fmt, ...)
 {
     char buf[MAXPRINTMSG];
+    int time = (uint32_t)Sys_FloatTime();
     va_list		argptr;
 
-    sprintf (buf, "[%d        ] %s", (uint32_t)Sys_FloatTime(), fmt);
+    sprintf (buf, "[%d.%d        ] %s", time / 1000, time % 1000, fmt);
 
     va_start (argptr,fmt);
     dvprintf (buf,argptr);

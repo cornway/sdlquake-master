@@ -53,7 +53,7 @@ Cvars are restricted from having the same names as commands to keep this
 interface from being ambiguous.
 */
 #if QEMBED
-#define CVAR_TINY 1
+#define CVAR_TINY 0
 #else
 #define CVAR_TINY 0
 #endif
@@ -80,7 +80,7 @@ typedef struct cvar_s
 typedef struct cvar_s
 {
 	char	*name;
-	char	*string;
+	char	string[64];
 	qboolean archive;		// set to true to cause it to be saved to vars.rc
 	qboolean server;		// notifies players when changed
 	float	value;

@@ -128,7 +128,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGTARM</Key>
-          <Name>(1010=787,381,1383,1066,0)(6017=-1,-1,-1,-1,0)(1008=-1,-1,-1,-1,0)(6016=1231,153,1571,956,0)(1012=-1,-1,-1,-1,0)</Name>
+          <Name>(1010=787,381,1383,1066,0)(6017=-1,-1,-1,-1,0)(1008=-1,-1,-1,-1,0)(6016=1002,277,1342,1080,0)(1012=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -151,7 +151,24 @@
           <Name>-U066CFF524853837267094211 -O9422 -SF4000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P2 -N00("ARM CoreSight SW-DP") -D00(5BA02477) -L00(0) -TO19 -TC200000000 -TP21 -TDS8063 -TDT0 -TDC1F -TIE1 -TIP8 -FO15 -FD20000000 -FC1000 -FN2 -FF0STM32F7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32F769NIHx$CMSIS\Flash\STM32F7x_2048.FLM) -FF1STM32F7xTCM_2048.FLM -FS1200000 -FL1200000 -FP1($$Device:STM32F769NIHx$CMSIS\Flash\STM32F7xTCM_2048.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>132</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134508658</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\common\dev_main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Project\../common/dev_main.c\132</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -207,6 +224,11 @@
           <count>10</count>
           <WinNumber>1</WinNumber>
           <ItemText>irq_saved_mask</ItemText>
+        </Ww>
+        <Ww>
+          <count>11</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>NVIC_STM32_name</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -2140,32 +2162,32 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\common\inc\dev_conf.h</PathWithFileName>
-      <FilenameWithoutPath>dev_conf.h</FilenameWithoutPath>
+      <PathWithFileName>..\common\inc\dev_io.h</PathWithFileName>
+      <FilenameWithoutPath>dev_io.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
       <FileNumber>149</FileNumber>
-      <FileType>5</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\common\inc\nvic.h</PathWithFileName>
-      <FilenameWithoutPath>nvic.h</FilenameWithoutPath>
+      <PathWithFileName>..\common\dev_io.c</PathWithFileName>
+      <FilenameWithoutPath>dev_io.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
       <FileNumber>150</FileNumber>
-      <FileType>5</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\common\inc\input_int.h</PathWithFileName>
-      <FilenameWithoutPath>input_int.h</FilenameWithoutPath>
+      <PathWithFileName>..\common\dev_main.c</PathWithFileName>
+      <FilenameWithoutPath>dev_main.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

@@ -51,7 +51,7 @@ void VID_SetPalette (byte* palette)
         r = *palette++;
         g = *palette++;
         b = *palette++;
-        pal[i] = GFX_RGB(GFX_OPAQUE, r, g, b);
+        pal[i] = GFX_RGB(r, g, b, GFX_OPAQUE);
     }
     screen_sync(1);
     screen_set_clut(pal, 256);
@@ -306,14 +306,14 @@ Sys_SendKeyEvents
 
 const kbdmap_t gamepad_to_kbd_map[JOY_STD_MAX] =
 {
-    [JOY_UPARROW]       = {'w', 0},
-    [JOY_DOWNARROW]     = {'s', 0},
-    [JOY_LEFTARROW]     = {'x' ,0},
-    [JOY_RIGHTARROW]    = {'v', 0},
-    [JOY_K1]            = {'c', 0},
+    [JOY_UPARROW]       = {K_UPARROW, 0},
+    [JOY_DOWNARROW]     = {K_DOWNARROW, 0},
+    [JOY_LEFTARROW]     = {K_LEFTARROW,0},
+    [JOY_RIGHTARROW]    = {K_RIGHTARROW, 0},
+    [JOY_K1]            = {'/', PAD_FREQ_LOW},
     [JOY_K4]            = {K_END,  0},
     [JOY_K3]            = {K_CTRL, 0},
-    [JOY_K2]            = {' ',    0},
+    [JOY_K2]            = {K_SPACE,    0},
     [JOY_K5]            = {'a',    0},
     [JOY_K6]            = {'d',    0},
     [JOY_K7]            = {K_DEL,  0},

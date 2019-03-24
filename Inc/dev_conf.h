@@ -3,6 +3,7 @@
 
 #define NVIC_IRQ_MAX 32
 
+#define DEBUG_SERIAL 1
 
 #define TX_STREAM_USE_DMA           (1)
 #define MAX_UARTS                   (1)

@@ -51,7 +51,7 @@ float	Cvar_VariableValue (char *var_name)
 	var = Cvar_FindVar (var_name);
 	if (!var)
 		return 0;
-	return Q_atof (CVAR_NAME(var));
+	return Q_atof (CVAR_STRING(var));
 }
 
 
@@ -112,14 +112,14 @@ void Cvar_Set (char *var_name, char *value)
 		return;
 	}
 
-	changed = Q_strcmp(CVAR_NAME(var), value);
+	changed = Q_strcmp(CVAR_STRING(var), value);
 #if CVAR_TINY
     Sys_Error("CVAR_TINY : Z_Malloc");
 #endif
-	Z_Free (CVAR_NAME(var));	// free the old value string
-	CVAR_NAME(var) = Z_Malloc (Q_strlen(value)+1);
-	Q_strcpy (CVAR_NAME(var), value);
-	var->value = Q_atof (CVAR_NAME(var));
+	//Z_Free (CVAR_NAME(var));	// free the old value string
+	//CVAR_NAME(var) = Z_Malloc (Q_strlen(value)+1);
+	Q_strcpy (CVAR_STRING(var), value);
+	var->value = Q_atof (CVAR_STRING(var));
 	if (CVAR_SERVER(var) && changed)
 	{
 		if (sv.active)
@@ -172,9 +172,9 @@ void Cvar_RegisterVariable (cvar_t *variable)
 	}
 		
 // copy the value off, because future sets will Z_Free it
-	oldstr = CVAR_STRING(variable);
-	CVAR_STRING(variable) = Z_Malloc (Q_strlen(CVAR_STRING(variable))+1);	
-	Q_strcpy (CVAR_STRING(variable), oldstr);
+	//oldstr = CVAR_STRING(variable);
+	//CVAR_STRING(variable) = Z_Malloc (Q_strlen(CVAR_STRING(variable))+1);	
+	//Q_strcpy (CVAR_STRING(variable), oldstr);
 	CVAR_VALUE(variable) = Q_atof (CVAR_STRING(variable));
 	
 // link the variable in
