@@ -476,7 +476,7 @@ ReconstructHostEnt(struct hostent *s, void *flattened)
    s->h_length = FARPKS(&old->h_length);
 
    if (FARPKS(&old->h_length) != sizeof(struct in_addr)) {
-      printf("Error!\n");
+      dprintf("Error!\n");
       exit(0);
    }
 
