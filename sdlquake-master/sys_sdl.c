@@ -16,6 +16,7 @@
 #include "main.h"
 #include "dev_io.h"
 #include "debug.h"
+#include <misc_utils.h>
 #include "begin_code.h"
 
 qboolean        isDedicated;
@@ -164,7 +165,7 @@ void Sys_FileClose (int handle)
 
 void Sys_FileSeek (int handle, int position)
 {
-    d_seek(handle, position);
+    d_seek(handle, position, DSEEK_SET);
 }
 
 int Sys_Feof (int handle)
@@ -180,6 +181,11 @@ int Sys_FileRead (int handle, void *dst, int count)
 char *Sys_FileGetS (int handle, char *dst, int count)
 {
     return d_gets(handle, dst, count);
+}
+
+char Sys_FileGetC (int handle)
+{
+    return d_getc(handle);
 }
 
 int Sys_FileWrite (int handle, void *src, int count)
@@ -205,7 +211,7 @@ int Sys_FPrintf (int handle, char *fmt, ...)
 
 int	Sys_FileTime (char *path)
 {
-    return 0;
+    return d_time();
 }
 
 void Sys_mkdir (char *path)
@@ -333,6 +339,47 @@ int SDL_main (int argc, const char *argv[])
 
 }
 
+static uint8_t *syscache = NULL;
+static uint8_t *syscache_top = NULL,
+            *syscache_bot = NULL;
+
+static uint32_t syscahce_size = (1024 * 700); /*~700 Kb*/
+
+void Sys_CacheInit (void)
+{
+    syscache = Sys_Malloc(syscahce_size);
+    assert(syscache);
+    syscache_top = syscache + syscahce_size;
+    syscache_bot = syscache;
+}
+
+void *Sys_HeapCacheTop (int size) /*alloc forever*/
+{
+    if (syscahce_size < size) {
+        return NULL;
+    }
+    syscahce_size = syscahce_size - size;
+    syscache_top = syscache_top - size;
+    return (void *)syscache_top;
+}
+
+void Sys_HeapCachePush (int size) /*dealloc*/
+{
+    syscache_bot = syscache_bot - size;
+    syscahce_size = syscahce_size + size;
+}
+
+extern void *Sys_HeapCachePop (int size) /*alloc*/
+{
+    void *ptr;
+    if (syscahce_size < size) {
+        return NULL;
+    }
+    ptr = syscache_bot;
+    syscache_bot = syscache_bot + size;
+    syscahce_size = syscahce_size - size;
+    return (void *)ptr;
+}
 
 #if	id386
 /*

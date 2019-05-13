@@ -567,7 +567,7 @@ void Host_Loadgame_f (void)
 	char	mapname[MAX_QPATH];
 	float	time, tfloat;
 	char	*str, *start;
-    int str_cachesize = 32768;
+    int str_cachesize = 32768 + 1;
     char    scantmp[128];
 	int		i, r;
 	edict_t	*ent;
@@ -603,7 +603,7 @@ void Host_Loadgame_f (void)
 		goto exit;
 	}
 
-    Sys_FileGetS(fhandle, scantmp, 0);
+    Sys_FileGetS(fhandle, scantmp, sizeof(scantmp));
 	sscanf(scantmp, "%i\n", &version);
 	if (version != SAVEGAME_VERSION)
 	{
@@ -611,14 +611,14 @@ void Host_Loadgame_f (void)
 		Con_Printf ("Savegame is version %i, not %i\n", version, SAVEGAME_VERSION);
 		goto exit;
 	}
-    Sys_FileGetS(fhandle, scantmp, 0);
+    Sys_FileGetS(fhandle, scantmp, sizeof(scantmp));
 	sscanf(scantmp, "%s\n", str);
 	for (i=0 ; i<NUM_SPAWN_PARMS ; i++) {
-		Sys_FileGetS(fhandle, scantmp, 0);
+		Sys_FileGetS(fhandle, scantmp, sizeof(scantmp));
 	    sscanf(scantmp, "%s\n", str);
     }
 // this silliness is so we can load 1.06 save files, which have float skill values
-    Sys_FileGetS(fhandle, scantmp, 0);
+    Sys_FileGetS(fhandle, scantmp, sizeof(scantmp));
     sscanf(scantmp, "%f\n", &tfloat);
 
 	current_skill = (int)(tfloat + 0.1);
@@ -630,10 +630,10 @@ void Host_Loadgame_f (void)
 	Cvar_SetValue ("teamplay", 0);
 #endif
 
-    Sys_FileGetS(fhandle, scantmp, 0);
+    Sys_FileGetS(fhandle, scantmp, sizeof(scantmp));
     sscanf(scantmp, "%s\n",mapname);
 
-    Sys_FileGetS(fhandle, scantmp, 0);
+    Sys_FileGetS(fhandle, scantmp, sizeof(scantmp));
     sscanf(scantmp, "%f\n",&time);
 
 	CL_Disconnect_f ();
@@ -655,7 +655,7 @@ void Host_Loadgame_f (void)
 
 	for (i=0 ; i<MAX_LIGHTSTYLES ; i++)
 	{
-	    Sys_FileGetS(fhandle, scantmp, 0);
+	    Sys_FileGetS(fhandle, scantmp, sizeof(scantmp));
         sscanf(scantmp, "%s\n", str);
 		sv.lightstyles[i] = Hunk_Alloc (strlen(str)+1);
 		Q_strcpy (sv.lightstyles[i], str);
@@ -665,17 +665,21 @@ void Host_Loadgame_f (void)
 	entnum = -1;		// -1 is the globals
 	while (!Sys_Feof(fhandle))
 	{
-	    char *p;
-		Sys_FileGetS(fhandle, scantmp, 0);
-        p = scantmp;
+		char *p;
+        
+        p = str;
 		for (i=0 ; i < str_cachesize - 1 ; i++)
 		{
+            *p = Sys_FileGetC(fhandle);
 			if (*p++ == '}')
 			{
 				i++;
 				break;
 			}
 		}
+        if (str[0] == '\n' && str[1] == '\n') {
+            break;
+        }
 		if (i == str_cachesize - 1)
 			Sys_Error ("Loadgame buffer overflow");
 		str[i] = 0;

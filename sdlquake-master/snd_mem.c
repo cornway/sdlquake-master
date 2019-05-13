@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 
 int			cache_full_cycle;
+extern volatile dma_t  *shm;
 
 byte *S_Alloc (int size);
 

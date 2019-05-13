@@ -48,7 +48,7 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>STM32F769I_DISCOVERY\Exe\</OutputDirectory>
+          <OutputDirectory>.\obj\</OutputDirectory>
           <OutputName>Project</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
@@ -80,9 +80,9 @@
             <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
+            <UserProg1Name>E:..\common\pc\win\postbuild.bat E:\Keil_v5\ARM</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1169,11 +1169,6 @@
               <FilePath>..\common\nvic.c</FilePath>
             </File>
             <File>
-              <FileName>dev_io.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\common\inc\dev_io.h</FilePath>
-            </File>
-            <File>
               <FileName>dev_io.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\dev_io.c</FilePath>
@@ -1182,6 +1177,26 @@
               <FileName>dev_main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\dev_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>asm_utils.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\common\misc\arch\Arm\m7\src\asm_utils.s</FilePath>
+            </File>
+            <File>
+              <FileName>machM7.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\common\misc\arch\Arm\m7\src\machM7.s</FilePath>
+            </File>
+            <File>
+              <FileName>mpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\mpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>hdmi_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\hdmi_mem.c</FilePath>
             </File>
           </Files>
         </Group>

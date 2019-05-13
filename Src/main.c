@@ -44,6 +44,7 @@
 extern int d_main(void);
 extern int dev_main (void);
 extern int SDL_main(int argc, const char *argv[]);
+extern void Sys_CacheInit (void);
 
 int main(void)
 {
@@ -52,7 +53,9 @@ int main(void)
 
 int mainloop (int argc, const char *argv[])
 {
+    Sys_CacheInit();
     SDL_main(argc, argv);
+    return 0;
 }
 
 

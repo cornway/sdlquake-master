@@ -54,7 +54,7 @@ __initial_sp
 ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Heap_Size       EQU     0x1000000
+Heap_Size       EQU     0xff8000
 
                 AREA    HEAP, NOINIT, READWRITE, ALIGN=3
 __heap_base
@@ -605,7 +605,12 @@ MDIOS_IRQHandler
 
                  IMPORT  __use_two_region_memory
                  EXPORT  __user_initial_stackheap
-                 
+
+                 EXPORT  Stack_Mem
+                 EXPORT  Stack_Size
+                 EXPORT  Heap_Mem
+                 EXPORT  Heap_Size
+
 __user_initial_stackheap
 
                  LDR     R0, = __heap_base

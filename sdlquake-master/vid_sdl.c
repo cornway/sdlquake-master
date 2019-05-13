@@ -1,5 +1,6 @@
 // vid_sdl.h -- sdl video driver 
 
+#include <dev_conf.h>
 #include "quakedef.h"
 #include "d_local.h"
 #include "gfx.h"
@@ -17,11 +18,8 @@ unsigned short  d_8to16table[256];
 //#define    BASEWIDTH    320
 //#define    BASEHEIGHT   200
 // Much better for high resolution displays
-#define    BASEWIDTH    (320)
-#define    BASEHEIGHT   (200)
-
-#define D_SCREEN_PIX_CNT (BASEWIDTH * BASEHEIGHT)
-#define D_SCREEN_BYTE_CNT (D_SCREEN_PIX_CNT * sizeof(pix_t))
+#define    BASEWIDTH    (DEV_MAXXDIM)
+#define    BASEHEIGHT   (DEV_MAXYDIM)
 
 #if VIDEO_IN_IRAM
 pix_t screenbuf[BASEWIDTH * BASEHEIGHT * sizeof(pix_t) + sizeof(SDL_Surface)] = {0};
@@ -53,7 +51,6 @@ void VID_SetPalette (byte* palette)
         b = *palette++;
         pal[i] = GFX_RGB(r, g, b, GFX_OPAQUE);
     }
-    screen_sync(1);
     screen_set_clut(pal, 256);
     return;
 }
@@ -162,101 +159,18 @@ void    VID_Shutdown (void)
 #error "Unsupported mode"
 #endif
 
-#if 1
-
-typedef struct {
-    pix_t a[4];
-} scanline_t;
-
-typedef union {
-#if (GFX_COLOR_MODE == GFX_COLOR_MODE_CLUT)
-    uint32_t w;
-#elif (GFX_COLOR_MODE == GFX_COLOR_MODE_RGB565)
-    uint64_t w;
-#endif
-    scanline_t sl;
-} scanline_u;
-
-#define DST_NEXT_LINE(x) (((uint32_t)(x) + BASEWIDTH * 2 * sizeof(pix_t)))
-#define W_STEP (sizeof(scanline_t) / sizeof(pix_t))
-
 void uiUpdate (vrect_t *rect, screen_t *lcd_screen)
 {
-    uint64_t *d_y0;
-    uint64_t *d_y1;
-    uint64_t pix;
-    int s_y, i;
-    scanline_t *scanline;
-    scanline_u d_yt0, d_yt1;
-    pix_t *videbuf = (pix_t *)screen->pixels;
-
-    d_y0 = (uint64_t *)lcd_screen->buf;
-    d_y1 = (uint64_t *)DST_NEXT_LINE(d_y0);
-
-    for (s_y = 0; s_y < D_SCREEN_PIX_CNT; s_y += BASEWIDTH) {
-
-        scanline = (scanline_t *)&videbuf[s_y];
-
-        for (i = 0; i < BASEWIDTH; i += W_STEP) {
-
-            d_yt0.sl = *scanline++;
-            d_yt1    = d_yt0;
-
-            d_yt0.sl.a[3] = d_yt0.sl.a[1];
-            d_yt0.sl.a[2] = d_yt0.sl.a[1];
-            d_yt0.sl.a[1] = d_yt0.sl.a[0];
-
-            d_yt1.sl.a[0] = d_yt1.sl.a[2];
-            d_yt1.sl.a[1] = d_yt1.sl.a[2];
-            d_yt1.sl.a[2] = d_yt1.sl.a[3];
-
-            pix = (uint64_t)(((uint64_t)d_yt1.w << 32) | d_yt0.w);
-            *d_y0++     = pix;
-            *d_y1++     = pix;
-        }
-        d_y0 = d_y1;
-        d_y1 = (uint64_t *)DST_NEXT_LINE(d_y0);
-    }
+    screen_update(lcd_screen);
 }
-
-#else
-
-void uiUpdate (vrect_t *rect, screen_t *lcd_screen)
-{
-    pix_t *scanline;
-    pix_t *dest, *src;
-    int pix_cnt;
-    int x0, w, line, pix;
-
-    dest = (pix_t *)lcd_screen->buf;
-    pix_cnt = screen->w * screen->h;
-    w = screen->w;
-
-    src = (pix_t *)screen->pixels;
-    line = rect->x + (rect->y * w);
-    src = src + line;
-    x0 = rect->x;
-
-    for (; line < pix_cnt; line += w) {
-
-        scanline = (pix_t *)screen->pixels;
-        scanline = &scanline[line];
-
-        for (pix = x0; pix < w; pix++) {
-            dest[pix] = scanline[pix];
-        }
-    }
-}
-
-#endif
 
 void    VID_Update (vrect_t *rects)
 {
     vrect_t *rect;
     screen_t lcd_screen;
-
-    screen_sync (0);
-    screen_get_invis_screen(&lcd_screen);
+    lcd_screen.buf = screen->pixels;
+    lcd_screen.width = BASEWIDTH;
+    lcd_screen.height = BASEHEIGHT;
 
     for (rect = rects; rect; rect = rect->pnext) {
         uiUpdate(rect, &lcd_screen);
@@ -322,14 +236,15 @@ const kbdmap_t gamepad_to_kbd_map[JOY_STD_MAX] =
     [JOY_K10]           = {K_ESCAPE, PAD_FREQ_LOW},
 };
 
-void input_post_key (i_event_t event)
+i_event_t *input_post_key (i_event_t *events, i_event_t event)
 {
     Key_Event(event.sym, event.state);
+    return NULL;
 }
 
 void Sys_SendKeyEvents(void)
 {
-    input_proc_keys();
+    input_proc_keys(NULL);
 }
 
 void IN_Init (void)

@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // the file should be in BINARY mode for stupid OSs that care
 int Sys_FileOpenRead (char *path, int *hndl);
 char *Sys_FileGetS (int handle, char *dst, int count);
+char Sys_FileGetC (int handle);
 int Sys_FileOpenWrite (char *path);
 void Sys_FileClose (int handle);
 void Sys_FileSeek (int handle, int position);

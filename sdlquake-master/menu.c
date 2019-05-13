@@ -469,10 +469,10 @@ void M_ScanSaves (void)
 		if (fhandle < 0)
 			continue;
 
-        Sys_FileGetS(fhandle, scantmp, 0);
+        Sys_FileGetS(fhandle, scantmp, sizeof(scantmp));
         sscanf(scantmp, "%i\n", &version);
 
-        Sys_FileGetS(fhandle, scantmp, 0);
+        Sys_FileGetS(fhandle, scantmp, sizeof(scantmp));
         sscanf(scantmp, "%79s\n", name);
         
 		strncpy (m_filenames[i], name, sizeof(m_filenames[i])-1);
