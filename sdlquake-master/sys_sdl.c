@@ -26,6 +26,8 @@ int noconinput = 0;
 char *basedir = ".";
 char *cachedir = "/tmp";
 
+static int con_dbglvl = 1;
+
 Q_CVAR_DEF(sys_linerefresh, "sys_linerefresh", 0);// set for entity display
 Q_CVAR_DEF(sys_nostdout, "sys_nostdout", 0);
 
@@ -42,7 +44,9 @@ void Sys_Printf (char *fmt, ...)
     va_list         argptr;
 
     va_start (argptr, fmt);
-    dvprintf (fmt, argptr);
+    if (con_dbglvl) {
+        dvprintf (fmt, argptr);
+    }
     va_end (argptr);
 }
 
@@ -57,6 +61,7 @@ void Sys_Init(void)
 #if id386
 	Sys_SetFPCW();
 #endif
+    d_dvar_int32(&con_dbglvl, "dbglvl");
 }
 
 void SDL_Quit(void)
@@ -287,7 +292,7 @@ int SDL_main (int argc, const char *argv[])
 
     moncontrol(0);
 
-    parms.memsize = Sys_AllocBytesLeft();
+    parms.memsize = Sys_AllocBytesLeft() - (1024 * 32);
     parms.membase = Sys_AllocShared(&parms.memsize);
     parms.basedir = basedir;
     // Disable cache, else it looks in the cache for config.cfg.
@@ -334,7 +339,7 @@ int SDL_main (int argc, const char *argv[])
         if (sys_linerefresh.value)
             Sys_LineRefresh ();
 
-        input_tickle();
+        dev_tickle();
     }
 
 }
