@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "r_local.h"
+#include <heap.h>
+#include <debug.h>
 
 /*
 
@@ -793,12 +795,12 @@ void Host_InitVCR (quakeparms_t *parms)
 			Sys_Error("Invalid signature in vcr file\n");
 
 		Sys_FileRead (vcrFile, &com_argc, sizeof(int));
-		com_argv = Sys_Malloc(com_argc * sizeof(char *));
+		com_argv = heap_malloc(com_argc * sizeof(char *));
 		com_argv[0] = parms->argv[0];
 		for (i = 0; i < com_argc; i++)
 		{
 			Sys_FileRead (vcrFile, &len, sizeof(int));
-			p = Sys_Malloc(len);
+			p = heap_malloc(len);
 			Sys_FileRead (vcrFile, p, len);
 			com_argv[i+1] = p;
 		}

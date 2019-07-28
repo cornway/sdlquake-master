@@ -20,7 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cvar.c -- dynamic variable tracking
 
 #include "quakedef.h"
-#include <dev_io.h>
+#include <misc_utils.h>
+#include <bsp_cmd.h>
 
 cvar_t	*cvar_vars;
 char	*cvar_null_string = "";
@@ -159,7 +160,7 @@ void Cvar_RegisterVariable (cvar_t *variable)
 	char	*oldstr;
 	
 // first check to see if it has allready been defined
-    d_dvar_float(&CVAR_VALUE(variable), CVAR_NAME(variable));
+    cmd_register_float(&CVAR_VALUE(variable), CVAR_NAME(variable));
 	if (Cvar_FindVar (CVAR_NAME(variable)))
 	{
 		Con_Printf ("Can't register variable %s, allready defined\n",CVAR_NAME(variable));

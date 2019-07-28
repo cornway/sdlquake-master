@@ -1676,6 +1676,7 @@ void M_Quit_Key (int key)
 
 	case 'Y':
 	case 'y':
+    case K_ENTER:
 		key_dest = key_console;
 		Host_Quit_f ();
 		break;

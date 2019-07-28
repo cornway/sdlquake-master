@@ -14,9 +14,11 @@
 #include "audio_main.h"
 #include "input_main.h"
 #include "main.h"
-#include "dev_io.h"
-#include "debug.h"
 #include <misc_utils.h>
+#include <dev_io.h>
+#include <debug.h>
+#include <bsp_cmd.h>
+#include <bsp_sys.h>
 #include "begin_code.h"
 
 qboolean        isDedicated;
@@ -61,12 +63,13 @@ void Sys_Init(void)
 #if id386
 	Sys_SetFPCW();
 #endif
-    d_dvar_int32(&con_dbglvl, "dbglvl");
+    cmd_register_i32(&con_dbglvl, "dbglvl");
 }
 
 void SDL_Quit(void)
 {
-    Sys_Error("-----------SDL_Quit-----------/n");
+extern void SystemSoftReset (void);
+    SystemSoftReset();
 }
 
 #if !id386
@@ -213,19 +216,23 @@ int Sys_FPrintf (int handle, char *fmt, ...)
     return r;
 }
 
-
 int	Sys_FileTime (char *path)
 {
-    return d_time();
+    int f, time;
+
+    d_open(path, &f, "r");
+    if (f < 0) {
+        return -1;
+    }
+    time = d_time();
+    d_close(f);
+    return time;
 }
 
 void Sys_mkdir (char *path)
 {
     d_mkdir(path);
 }
-
-
-extern volatile uint32_t systime;
 
 double Sys_FloatTime (void)
 {
@@ -239,9 +246,7 @@ double Sys_FloatTime (void)
 	return (clock()-starttime)*1.0/1024;
 
 #else
-
-    return systime;
-
+    return d_time();
 #endif
 }
 
@@ -269,7 +274,10 @@ void Sys_LineRefresh(void)
 
 void Sys_Sleep(void)
 {
-	HAL_Delay(1);
+    volatile static uint32_t time = 0;
+
+    time = d_time() + 1;
+    while (time > d_time()) {}
 }
 
 void floating_point_exception_handler(int whatever)
@@ -281,6 +289,8 @@ void moncontrol(int x)
 {
 }
 
+extern void bsp_tickle (void);
+
 int SDL_main (int argc, const char *argv[])
 {
 
@@ -289,11 +299,12 @@ int SDL_main (int argc, const char *argv[])
     extern int vcrFile;
     extern int recording;
     static int frame;
+    int sfxparm;
 
     moncontrol(0);
 
-    parms.memsize = Sys_AllocBytesLeft() - (1024 * 32);
-    parms.membase = Sys_AllocShared(&parms.memsize);
+    parms.memsize = heap_avail() - (1024 * 32);
+    parms.membase = heap_alloc_shared(parms.memsize);
     parms.basedir = basedir;
     // Disable cache, else it looks in the cache for config.cfg.
     parms.cachedir = NULL;
@@ -308,6 +319,18 @@ int SDL_main (int argc, const char *argv[])
 
     Cvar_RegisterVariable (&sys_nostdout);
 
+    {
+        char cfg[128];
+        const char *volume = "64";
+        sfxparm = COM_CheckParm("-vol");
+
+        if (sfxparm) {
+            volume = com_argv[sfxparm + 1];
+        }
+        snprintf(cfg, sizeof(cfg), "samplerate=11025, volume=%s", volume);
+        audio_conf(cfg);
+    }
+
     oldtime = Sys_FloatTime () - 0.1;
     while (1)
     {
@@ -319,7 +342,7 @@ int SDL_main (int argc, const char *argv[])
         {   // play vcrfiles at max speed
             if (time < sys_ticrate.value && (vcrFile == -1 || recording) )
             {
-                HAL_Delay (1);
+                Sys_Sleep();
                 continue;       // not time to run a server only tic yet
             }
             time = sys_ticrate.value;
@@ -339,7 +362,7 @@ int SDL_main (int argc, const char *argv[])
         if (sys_linerefresh.value)
             Sys_LineRefresh ();
 
-        dev_tickle();
+        bsp_tickle();
     }
 
 }
@@ -352,7 +375,7 @@ static uint32_t syscahce_size = (1024 * 700); /*~700 Kb*/
 
 void Sys_CacheInit (void)
 {
-    syscache = Sys_Malloc(syscahce_size);
+    syscache = heap_malloc(syscahce_size);
     assert(syscache);
     syscache_top = syscache + syscahce_size;
     syscache_bot = syscache;

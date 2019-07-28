@@ -1,15 +1,21 @@
 // vid_sdl.h -- sdl video driver 
 
 #include <dev_conf.h>
+
+#include <lcd_main.h>
+#include <misc_utils.h>
+#include <input_main.h>
+#include <heap.h>
+#include <gfx.h>
+
 #include "quakedef.h"
 #include "d_local.h"
-#include "gfx.h"
 #include "sdl_video.h"
-#include "lcd_main.h"
-#include "input_main.h"
 #include "sdl_keysym.h"
 
 #define VIDEO_IN_IRAM 1
+#define pal_t uint32_t
+#define pix_t uint8_t
 
 viddef_t    vid;                // global video state
 unsigned short  d_8to16table[256];
@@ -49,9 +55,9 @@ void VID_SetPalette (byte* palette)
         r = *palette++;
         g = *palette++;
         b = *palette++;
-        pal[i] = GFX_RGB(r, g, b, GFX_OPAQUE);
+        pal[i] = GFX_RGBA8888(r, g, b, 0xff);
     }
-    screen_set_clut(pal, 256);
+    vid_set_clut(pal, 256);
     return;
 }
 
@@ -68,7 +74,7 @@ void VID_PreConfig (void)
     lcd_screen.buf = NULL;
     lcd_screen.width = BASEWIDTH;
     lcd_screen.height = BASEHEIGHT;
-    screen_win_cfg(&lcd_screen);
+    vid_config(heap_malloc, NULL, &lcd_screen, GFX_COLOR_MODE_CLUT, 2);
 }
 
 void    VID_Init (unsigned char *palette)
@@ -88,8 +94,6 @@ void    VID_Init (unsigned char *palette)
     lcd_screen.buf = NULL;
     lcd_screen.width = BASEWIDTH;
     lcd_screen.height = BASEHEIGHT;
-
-    screen_win_cfg(&lcd_screen);
 
 #if VIDEO_IN_IRAM
     screen = (SDL_Surface *)&screenbuf[0];
@@ -155,13 +159,9 @@ void    VID_Shutdown (void)
     SDL_Quit();
 }
 
-#if GFX_COLOR_MODE != GFX_COLOR_MODE_CLUT
-#error "Unsupported mode"
-#endif
-
 void uiUpdate (vrect_t *rect, screen_t *lcd_screen)
 {
-    screen_update(lcd_screen);
+    vid_update(lcd_screen);
 }
 
 void    VID_Update (vrect_t *rects)
@@ -192,7 +192,7 @@ void D_BeginDirectRect (int x, int y, byte *pbitmap, int width, int height)
     offset = (uint8_t *)screen->pixels + y*screen->pitch + x;
     while ( height-- )
     {
-        memcpy(offset, pbitmap, width);
+        d_memcpy(offset, pbitmap, width);
         offset += screen->pitch;
         pbitmap += width;
     }
@@ -236,9 +236,9 @@ const kbdmap_t gamepad_to_kbd_map[JOY_STD_MAX] =
     [JOY_K10]           = {K_ESCAPE, PAD_FREQ_LOW},
 };
 
-i_event_t *input_post_key (i_event_t *events, i_event_t event)
+static i_event_t *__post_key (i_event_t *events, i_event_t *event)
 {
-    Key_Event(event.sym, event.state);
+    Key_Event(event->sym, (qboolean)event->state);
     return NULL;
 }
 
@@ -249,7 +249,7 @@ void Sys_SendKeyEvents(void)
 
 void IN_Init (void)
 {
-    input_soft_init(gamepad_to_kbd_map);
+    input_soft_init(__post_key, gamepad_to_kbd_map);
     input_bind_extra(K_EX_LOOKUP, K_HOME);
     input_bind_extra(K_EX_LOOKUP, K_DEL);
     input_bind_extra(K_EX_LOOKUP, K_INS);

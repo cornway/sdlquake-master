@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "r_local.h"
 
+#define __cache_line_size 32
+
 #if 0
 // FIXME
 the complex cases add new polys on most lines, so dont optimize for keeping them the same

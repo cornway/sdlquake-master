@@ -562,9 +562,9 @@ void S_Init (void)
     shm = (void *) Hunk_AllocName(sizeof(*shm), "shm");
     shm->splitbuffer = 0;
     shm->samplebits = 16;
-    shm->speed = AUDIO_SAMPLE_RATE;
+    shm->speed = 11025;
     shm->channels = 2;
-    shm->samples = AUDIO_OUT_BUFFER_SIZE;
+    shm->samples = 0x800;
     shm->samplepos = 0;
     shm->soundalive = true;
     shm->gamealive = true;
@@ -638,7 +638,7 @@ void S_UpdateAmbientSounds (void)
 
         if (chan->leftvol != ambient->volume_prev) {
             ambient->volume_prev = chan->leftvol;
-            audio_change_sample_volume(ambient->achannel, chan->leftvol);
+            audio_sample_vol(ambient->achannel, chan->leftvol);
         }
     }
 }
