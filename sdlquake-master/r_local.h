@@ -313,4 +313,37 @@ void R_ClipEdge (mvertex_t *pv0, mvertex_t *pv1, clipplane_t *clip);
 void R_SplitEntityOnNode2 (mnode_t *node);
 void R_MarkLights (dlight_t *light, int bit, mnode_t *node);
 
+/*
+================
+TransformVector
+================
+*/
+static inline void TransformVector (vec3_t in, vec3_t out)
+{
+extern vec3_t vright, vup, vpn;
+    out[0] = DotProduct(in,vright);
+    out[1] = DotProduct(in,vup);
+    out[2] = DotProduct(in,vpn);
+}
+
+#if	!id386
+
+/*
+================
+R_TransformPlane
+================
+*/
+static inline void R_TransformPlane (mplane_t *p, float *normal, float *dist)
+{
+extern vec3_t	r_origin;
+	float	d;
+	
+	d = DotProduct (r_origin, p->normal);
+	*dist = p->dist - d;
+// TODO: when we have rotating entities, this will need to use the view matrix
+	TransformVector (p->normal, normal);
+}
+
+#endif
+
 #endif

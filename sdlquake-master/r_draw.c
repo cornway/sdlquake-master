@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "r_local.h"
 #include "d_local.h"	// FIXME: shouldn't need to include this
+#include <bsp_sys.h>
 
 #define MAXLEFTCLIPEDGES		100
 
@@ -132,11 +133,12 @@ void R_EmitEdge (mvertex_t *pv0, mvertex_t *pv1)
 	VectorSubtract (world, modelorg, local);
 	TransformVector (local, transformed);
 
-	if (transformed[2] < NEAR_CLIP)
+	if (transformed[2] < NEAR_CLIP) {
 		transformed[2] = NEAR_CLIP;
-
-	r_lzi1 = 1.0f / transformed[2];
-
+        r_lzi1 = 1.0f / NEAR_CLIP;
+    } else {
+    	r_lzi1 = 1.0f / transformed[2];
+    }
 	scale = xscale * r_lzi1;
 	r_u1 = (xcenter + scale*transformed[0]);
 	if (r_u1 < r_refdef.fvrectx_adj)

@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // chase.c -- chase camera code
 
 #include "quakedef.h"
+#include "mathlib.h"
 
 Q_CVAR_DEF(chase_back, "chase_back", 100);
 Q_CVAR_DEF(chase_up, "chase_up", 16);
