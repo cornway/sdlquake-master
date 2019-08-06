@@ -242,7 +242,6 @@ void R_StoreEfrags (efrag_t **ppefrag)
 	model_t		*clmodel;
 	efrag_t		*pefrag;
 
-
 	while ((pefrag = *ppefrag) != NULL)
 	{
 		pent = pefrag->entity;

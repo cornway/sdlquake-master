@@ -655,7 +655,9 @@ void R_DrawParticles (void)
 	float			time1;
 	float			dvel;
 	float			frametime;
-	
+
+    profiler_enter();
+
 #ifdef GLQUAKE
 	vec3_t			up, right;
 	float			scale;
@@ -796,5 +798,6 @@ void R_DrawParticles (void)
 #else
 	D_EndParticles ();
 #endif
+    profiler_exit();
 }
 

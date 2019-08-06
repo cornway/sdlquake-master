@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "r_local.h"
+#include "d_local.h"
 #include <bsp_sys.h>
 
 #define __cache_line_size 32
@@ -458,8 +459,8 @@ void R_ViewChanged (vrect_t *pvrect, int lineadj, float aspect)
 		VectorNormalize (screenedge[i].normal);
 
 	res_scale = sqrt ((double)(r_refdef.vrect.width * r_refdef.vrect.height) /
-			          (320.0 * 152.0)) *
-			(2.0f / r_refdef.horizontalFieldOfView);
+			          (BASEWIDTH * 152.0f) *
+			(2.0f / r_refdef.horizontalFieldOfView));
 	r_aliastransition = r_aliastransbase.value * res_scale;
 	r_resfudge = r_aliastransadj.value * res_scale;
 
@@ -544,6 +545,8 @@ void R_DrawEntitiesOnList (void)
 	if (!r_drawentities.value)
 		return;
 
+    profiler_enter();
+
 	for (i=0 ; i<cl_numvisedicts ; i++)
 	{
 		currententity = cl_visedicts[i];
@@ -606,6 +609,7 @@ void R_DrawEntitiesOnList (void)
 			break;
 		}
 	}
+    profiler_exit();
 }
 
 /*
@@ -635,6 +639,8 @@ void R_DrawViewModel (void)
 	currententity = &cl.viewent;
 	if (!currententity->model)
 		return;
+
+    profiler_enter();
 
 	VectorCopy (currententity->origin, r_entorigin);
 	VectorSubtract (r_origin, r_entorigin, modelorg);
@@ -679,6 +685,8 @@ void R_DrawViewModel (void)
 #endif
 
 	R_AliasDrawModel (&r_viewlighting);
+
+    profiler_exit();
 }
 
 
@@ -890,6 +898,7 @@ void R_EdgeDrawing (void)
     surf_t        *lsurfs = NULL;
     const int     lsurfs_cachesize =  (NUMSTACKEDGES + 1) * sizeof(surf_t);
 
+    profiler_enter();
 
     ledges = (edge_t *)Sys_HeapCachePop(ledges_cachesize);
     lsurfs = (surf_t *)Sys_HeapCachePop(lsurfs_cachesize);
@@ -955,6 +964,8 @@ void R_EdgeDrawing (void)
 
     Sys_HeapCachePush(lsurfs_cachesize);
     Sys_HeapCachePush(ledges_cachesize);
+
+    profiler_exit();
 }
 
 

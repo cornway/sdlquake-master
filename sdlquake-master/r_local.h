@@ -259,6 +259,7 @@ extern int		r_numallocatededges;
 extern edge_t	*r_edges, *edge_p, *edge_max;
 
 extern	edge_t	*newedges[MAXHEIGHT];
+extern uint32_t newedgescnt;
 extern	edge_t	*removeedges[MAXHEIGHT];
 
 extern	int	screenwidth;

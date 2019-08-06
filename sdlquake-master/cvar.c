@@ -160,7 +160,7 @@ void Cvar_RegisterVariable (cvar_t *variable)
 	char	*oldstr;
 	
 // first check to see if it has allready been defined
-    cmd_register_float(&CVAR_VALUE(variable), CVAR_NAME(variable));
+    //cmd_register_float(&CVAR_VALUE(variable), CVAR_NAME(variable));
 	if (Cvar_FindVar (CVAR_NAME(variable)))
 	{
 		Con_Printf ("Can't register variable %s, allready defined\n",CVAR_NAME(variable));

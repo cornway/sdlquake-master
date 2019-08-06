@@ -25,6 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // TODO: fine-tune this; it's based on providing some overage even if there
 // is a 2k-wide scan, with subdivision every 8, for 256 spans of 12 bytes each
 //
+#define    BASEWIDTH    (DEV_MAXXDIM)
+#define    BASEHEIGHT   (DEV_MAXYDIM)
+
 #define SCANBUFFERPAD		0x1000
 
 #define R_SKY_SMASK	0x007F0000

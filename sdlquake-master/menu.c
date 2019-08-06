@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include "quakedef.h"
+#include "d_local.h"
 
 #ifdef _WIN32
 #include "winquake.h"
@@ -111,7 +112,7 @@ Draws one solid graphics character
 */
 void M_DrawCharacter (int cx, int line, int num)
 {
-	Draw_Character ( cx + ((vid.width - 320)>>1), line, num);
+	Draw_Character ( cx + ((vid.width - BASEWIDTH)>>1), line, num);
 }
 
 void M_DrawCursor (int cx, int cursor, int offset)
@@ -145,12 +146,12 @@ void M_PrintWhite (int cx, int cy, char *str)
 
 void M_DrawTransPic (int x, int y, qpic_t *pic)
 {
-	Draw_TransPic (x + ((vid.width - 320)>>1), y, pic);
+	Draw_TransPic (x + ((vid.width - BASEWIDTH)>>1), y, pic);
 }
 
 void M_DrawPic (int x, int y, qpic_t *pic)
 {
-	Draw_Pic (x + ((vid.width - 320)>>1), y, pic);
+	Draw_Pic (x + ((vid.width - BASEWIDTH)>>1), y, pic);
 }
 
 byte identityTable[256];
@@ -183,7 +184,7 @@ void M_BuildTranslationTable(int top, int bottom)
 
 void M_DrawTransPicTranslate (int x, int y, qpic_t *pic)
 {
-	Draw_TransPicTranslate (x + ((vid.width - 320)>>1), y, pic, translationTable);
+	Draw_TransPicTranslate (x + ((vid.width - BASEWIDTH)>>1), y, pic, translationTable);
 }
 
 
@@ -304,7 +305,7 @@ void M_Main_Draw (void)
 
 	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
 	p = Draw_CachePic ("gfx/ttl_main.lmp");
-	M_DrawPic ( (320-p->width)/2, 4, p);
+	M_DrawPic ( (BASEWIDTH-p->width)/2, 4, p);
 	M_DrawTransPic (72, 32, Draw_CachePic ("gfx/mainmenu.lmp") );
 
 	f = (int)(host_time * 10)%6;
@@ -387,7 +388,7 @@ void M_SinglePlayer_Draw (void)
 
 	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
 	p = Draw_CachePic ("gfx/ttl_sgl.lmp");
-	M_DrawPic ( (320-p->width)/2, 4, p);
+	M_DrawPic ( (BASEWIDTH-p->width)/2, 4, p);
 	M_DrawTransPic (72, 32, Draw_CachePic ("gfx/sp_menu.lmp") );
 
 	f = (int)(host_time * 10)%6;
@@ -516,7 +517,7 @@ void M_Load_Draw (void)
 	qpic_t	*p;
 
 	p = Draw_CachePic ("gfx/p_load.lmp");
-	M_DrawPic ( (320-p->width)/2, 4, p);
+	M_DrawPic ( (BASEWIDTH-p->width)/2, 4, p);
 
 	for (i=0 ; i< MAX_SAVEGAMES; i++)
 		M_Print (16, 32 + 8*i, m_filenames[i]);
@@ -532,7 +533,7 @@ void M_Save_Draw (void)
 	qpic_t	*p;
 
 	p = Draw_CachePic ("gfx/p_save.lmp");
-	M_DrawPic ( (320-p->width)/2, 4, p);
+	M_DrawPic ( (BASEWIDTH-p->width)/2, 4, p);
 
 	for (i=0 ; i<MAX_SAVEGAMES ; i++)
 		M_Print (16, 32 + 8*i, m_filenames[i]);
@@ -3051,9 +3052,9 @@ void M_Draw (void)
 			S_ExtraUpdate ();
 			VID_LockBuffer ();
 		}
-		else
+		else {
 			Draw_FadeScreen ();
-
+        }
 		scr_fullupdate = 0;
 	}
 	else

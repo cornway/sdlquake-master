@@ -7,6 +7,7 @@
 #include <input_main.h>
 #include <heap.h>
 #include <gfx.h>
+#include <bsp_sys.h>
 
 #include "quakedef.h"
 #include "d_local.h"
@@ -24,8 +25,6 @@ unsigned short  d_8to16table[256];
 //#define    BASEWIDTH    320
 //#define    BASEHEIGHT   200
 // Much better for high resolution displays
-#define    BASEWIDTH    (DEV_MAXXDIM)
-#define    BASEHEIGHT   (DEV_MAXYDIM)
 
 #if VIDEO_IN_IRAM
 pix_t screenbuf[BASEWIDTH * BASEHEIGHT * sizeof(pix_t) + sizeof(SDL_Surface)] = {0};
@@ -69,12 +68,24 @@ void    VID_ShiftPalette (unsigned char *palette)
 
 void VID_PreConfig (void)
 {
-    screen_t lcd_screen;
+    screen_conf_t conf;
+    int hwaccel = 0, p;
 
-    lcd_screen.buf = NULL;
-    lcd_screen.width = BASEWIDTH;
-    lcd_screen.height = BASEHEIGHT;
-    vid_config(heap_malloc, NULL, &lcd_screen, GFX_COLOR_MODE_CLUT, 2);
+    p = bsp_argv_check("-gfxmod");
+    if (p >= 0) {
+        const char *str = bsp_argv_get(p);
+        hwaccel = atoi(str);
+    }
+
+    conf.res_x = BASEWIDTH;
+    conf.res_y = BASEHEIGHT;
+    conf.alloc.malloc = heap_alloc_shared;
+    conf.alloc.free = heap_free;
+    conf.colormode = GFX_COLOR_MODE_CLUT;
+    conf.laynum = 2;
+    conf.hwaccel = hwaccel;
+    conf.clockpresc = 1;
+    vid_config(&conf);
 }
 
 void    VID_Init (unsigned char *palette)
@@ -167,8 +178,8 @@ void uiUpdate (vrect_t *rect, screen_t *lcd_screen)
 void    VID_Update (vrect_t *rects)
 {
     vrect_t *rect;
-    screen_t lcd_screen;
-    lcd_screen.buf = screen->pixels;
+    screen_t lcd_screen = {0};
+    lcd_screen.buf = VGA_pagebase;
     lcd_screen.width = BASEWIDTH;
     lcd_screen.height = BASEHEIGHT;
 

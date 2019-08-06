@@ -238,14 +238,17 @@ void R_EmitEdge (mvertex_t *pv0, mvertex_t *pv1)
 	{
 		edge->next = newedges[v];
 		newedges[v] = edge;
+        newedgescnt++;
 	}
 	else
 	{
 		pcheck = newedges[v];
-		while (pcheck->next && pcheck->next->u < u_check)
+		while (pcheck->next && pcheck->next->u < u_check) {
 			pcheck = pcheck->next;
+        }
 		edge->next = pcheck->next;
 		pcheck->next = edge;
+        newedgescnt++;
 	}
 
 	edge->nextremove = removeedges[v2];
@@ -353,7 +356,6 @@ void R_ClipEdge (mvertex_t *pv0, mvertex_t *pv1, clipplane_t *clip)
 // add the edge
 	R_EmitEdge (pv0, pv1);
 }
-
 #endif	// !id386
 
 
@@ -410,6 +412,8 @@ void R_RenderFace (msurface_t *fa, int clipflags)
 	}
 
 	c_faceclip++;
+
+    profiler_enter();
 
 // set up clip planes
 	pclip = NULL;
@@ -575,6 +579,8 @@ void R_RenderFace (msurface_t *fa, int clipflags)
 
 //JDC	VectorCopy (r_worldmodelorg, surface_p->modelorg);
 	surface_p++;
+
+    profiler_exit();
 }
 
 
@@ -714,6 +720,8 @@ void R_RenderPoly (msurface_t *fa, int clipflags)
 
 // FIXME: clean this up and make it faster
 // FIXME: guard against running out of vertices
+
+    profiler_enter();
 
 	s_axis = t_axis = 0;	// keep compiler happy
 
@@ -873,6 +881,8 @@ void R_RenderPoly (msurface_t *fa, int clipflags)
 
 // draw the polygon
 	D_DrawPoly ();
+
+    profiler_exit();
 }
 
 

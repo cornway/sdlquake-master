@@ -66,7 +66,6 @@ void Chase_Update (void)
 	vec3_t	forward, up, right;
 	vec3_t	dest, stop;
 
-
 	// if can't see player, reset
 	AngleVectors (cl.viewangles, forward, right, up);
 

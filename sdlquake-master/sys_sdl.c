@@ -272,11 +272,11 @@ void Sys_LineRefresh(void)
 {
 }
 
-void Sys_Sleep(void)
+void Sys_Sleep(uint32_t ms)
 {
     volatile static uint32_t time = 0;
 
-    time = d_time() + 1;
+    time = d_time() + ms;
     while (time > d_time()) {}
 }
 
@@ -290,6 +290,7 @@ void moncontrol(int x)
 }
 
 extern void bsp_tickle (void);
+extern int g_profile_per;
 
 int SDL_main (int argc, const char *argv[])
 {
@@ -342,7 +343,7 @@ int SDL_main (int argc, const char *argv[])
         {   // play vcrfiles at max speed
             if (time < sys_ticrate.value && (vcrFile == -1 || recording) )
             {
-                Sys_Sleep();
+                Sys_Sleep(1);
                 continue;       // not time to run a server only tic yet
             }
             time = sys_ticrate.value;
@@ -362,6 +363,10 @@ int SDL_main (int argc, const char *argv[])
         if (sys_linerefresh.value)
             Sys_LineRefresh ();
 
+        if (g_profile_per > 0) {
+            cmd_execute("profile", sizeof("profile") - 1);
+            g_profile_per--;
+        }
         bsp_tickle();
     }
 

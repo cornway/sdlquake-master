@@ -40,11 +40,15 @@
 #include "audio_main.h"
 #include "input_main.h"
 #include "debug.h"
+#include <bsp_sys.h>
+#include <bsp_cmd.h>
 
 extern int d_main(void);
 extern int dev_main (void);
 extern int SDL_main(int argc, const char *argv[]);
 extern void Sys_CacheInit (void);
+
+int g_profile_per = 10;
 
 int main(void)
 {
@@ -54,6 +58,7 @@ int main(void)
 int mainloop (int argc, const char *argv[])
 {
     Sys_CacheInit();
+    cmd_register_i32(&g_profile_per, "profper");
     SDL_main(argc, argv);
     return 0;
 }

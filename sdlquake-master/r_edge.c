@@ -46,6 +46,7 @@ surf_t	*surfaces, *surface_p, *surf_max;
 // surfaces[1] is the background, and is used as the active surface stack
 
 edge_t	*newedges[MAXHEIGHT];
+uint32_t newedgescnt = 0;
 edge_t	*removeedges[MAXHEIGHT];
 
 espan_t	*span_p, *max_span_p;
@@ -76,7 +77,6 @@ void R_TrailingEdge (surf_t *surf, edge_t *edge);
 
 
 //=============================================================================
-
 
 /*
 ==============
@@ -157,6 +157,7 @@ void R_BeginEdgeFrame (void)
 	{
 		newedges[v] = removeedges[v] = NULL;
 	}
+    newedgescnt = 0;
 }
 
 

@@ -331,6 +331,7 @@ void R_SetUpFrustumIndexes (void)
 R_SetupFrame
 ===============
 */
+
 void R_SetupFrame (void)
 {
 	int				edgecount;

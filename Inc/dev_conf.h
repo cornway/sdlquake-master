@@ -17,6 +17,6 @@
 
 
 #define DEV_MAXXDIM                 (320)
-#define DEV_MAXYDIM                 (240)
+#define DEV_MAXYDIM                 (200)
 
 #endif /*__DEV_CONF_H__*/

@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // vid buffer
 
 #include "quakedef.h"
+#include "d_local.h"
 
 typedef struct {
 	vrect_t	rect;
@@ -277,7 +278,7 @@ void Draw_DebugChar (char num)
 		dest[6] = source[6];
 		dest[7] = source[7];
 		source += 128;
-		dest += 320;
+		dest += BASEWIDTH;
 	}
 }
 
@@ -525,7 +526,7 @@ void Draw_CharToConback (int num, byte *dest)
 			if (source[x])
 				dest[x] = 0x60 + source[x];
 		source += 128;
-		dest += 320;
+		dest += BASEWIDTH;
 	}
 
 }
@@ -550,15 +551,15 @@ void Draw_ConsoleBackground (int lines)
 // hack the version number directly into the pic
 #ifdef _WIN32
 	sprintf (ver, "(WinQuake) %4.2f", (float)VERSION);
-	dest = conback->data + 320*186 + 320 - 11 - 8*strlen(ver);
+	dest = conback->data + BASEWIDTH*186 + BASEWIDTH - 11 - 8*strlen(ver);
 #elif defined(X11)
 	sprintf (ver, "(X11 Quake %2.2f) %4.2f", (float)X11_VERSION, (float)VERSION);
-	dest = conback->data + 320*186 + 320 - 11 - 8*strlen(ver);
+	dest = conback->data + BASEWIDTH*186 + BASEWIDTH - 11 - 8*strlen(ver);
 #elif defined(__linux__)
 	sprintf (ver, "(Linux Quake %2.2f) %4.2f", (float)LINUX_VERSION, (float)VERSION);
-	dest = conback->data + 320*186 + 320 - 11 - 8*strlen(ver);
+	dest = conback->data + BASEWIDTH*186 + BASEWIDTH - 11 - 8*strlen(ver);
 #else
-	dest = conback->data + 320 - 43 + 320*186;
+	dest = conback->data + BASEWIDTH - 43 + BASEWIDTH*186;
 	sprintf (ver, "%4.2f", VERSION);
 #endif
 
@@ -573,13 +574,13 @@ void Draw_ConsoleBackground (int lines)
 		for (y=0 ; y<lines ; y++, dest += vid.conrowbytes)
 		{
 			v = (vid.conheight - lines + y)*200/vid.conheight;
-			src = conback->data + v*320;
-			if (vid.conwidth == 320)
+			src = conback->data + v*BASEWIDTH;
+			if (vid.conwidth == BASEWIDTH)
 				Q_memcpy (dest, src, vid.conwidth);
 			else
 			{
 				f = 0;
-				fstep = 320*0x10000/vid.conwidth;
+				fstep = BASEWIDTH*0x10000/vid.conwidth;
 				for (x=0 ; x<vid.conwidth ; x+=4)
 				{
 					dest[x] = src[f>>16];
@@ -603,9 +604,9 @@ void Draw_ConsoleBackground (int lines)
 		// FIXME: pre-expand to native format?
 		// FIXME: does the endian switching go away in production?
 			v = (vid.conheight - lines + y)*200/vid.conheight;
-			src = conback->data + v*320;
+			src = conback->data + v*BASEWIDTH;
 			f = 0;
-			fstep = 320*0x10000/vid.conwidth;
+			fstep = BASEWIDTH*0x10000/vid.conwidth;
 			for (x=0 ; x<vid.conwidth ; x+=4)
 			{
 				pusdest[x] = d_8to16table[src[f>>16]];

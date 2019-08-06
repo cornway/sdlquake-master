@@ -861,7 +861,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 			while (time < sys_ticrate.value )
 			{
-				Sys_Sleep();
+				Sys_Sleep(1);
 				newtime = Sys_FloatTime ();
 				time = newtime - oldtime;
 			}
