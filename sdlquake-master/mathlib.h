@@ -397,11 +397,11 @@ quotient must fit in 32 bits.
 ====================
 */
 
-static inline void FloorDivMod (double numer, double denom, int *quotient,
+static inline void FloorDivMod (float numer, float denom, int *quotient,
 		int *rem)
 {
 	int		q, r;
-	double	x;
+	float	x;
 
 #ifndef PARANOID
 	if (denom <= 0.0)

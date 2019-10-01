@@ -458,7 +458,7 @@ void R_ViewChanged (vrect_t *pvrect, int lineadj, float aspect)
 	for (i=0 ; i<4 ; i++)
 		VectorNormalize (screenedge[i].normal);
 
-	res_scale = sqrt ((double)(r_refdef.vrect.width * r_refdef.vrect.height) /
+	res_scale = sqrt ((float)(r_refdef.vrect.width * r_refdef.vrect.height) /
 			          (BASEWIDTH * 152.0f) *
 			(2.0f / r_refdef.horizontalFieldOfView));
 	r_aliastransition = r_aliastransbase.value * res_scale;
@@ -699,7 +699,7 @@ int R_BmodelCheckBBox (model_t *clmodel, float *minmaxs)
 {
 	int			i, *pindex, clipflags;
 	vec3_t		acceptpt, rejectpt;
-	double		d;
+	float		d;
 
 	clipflags = 0;
 
