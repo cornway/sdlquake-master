@@ -43,8 +43,7 @@
 #include <bsp_sys.h>
 #include <bsp_cmd.h>
 
-extern int d_main(void);
-extern int dev_main (void);
+extern int app_main (void);
 extern int SDL_main(int argc, const char *argv[]);
 extern void Sys_CacheInit (void);
 
@@ -52,7 +51,7 @@ int g_profile_per = 10;
 
 int main(void)
 {
-    dev_main();
+    app_main();
 }
 
 int mainloop (int argc, const char *argv[])
