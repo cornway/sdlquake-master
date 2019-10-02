@@ -104,8 +104,8 @@ extern const int __cache_line_size;
 #define	ROLL	2
 
 
-#define	MAX_QPATH		32			// max length of a quake game pathname
-#define	MAX_OSPATH		32			// max length of a filesystem pathname
+#define	MAX_QPATH		128			// max length of a quake game pathname
+#define	MAX_OSPATH		128			// max length of a filesystem pathname
 
 #define	ON_EPSILON		0.1			// point on plane side epsilon
 
