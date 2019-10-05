@@ -47,7 +47,7 @@ extern int app_main (void);
 extern int SDL_main(int argc, const char *argv[]);
 extern void Sys_CacheInit (void);
 
-int g_profile_per = 10;
+int g_profile_per = 0;
 
 int main(void)
 {
