@@ -21,8 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __MATHLIB_H__
 #define __MATHLIB_H__
 
-#include <dmath.h>
-
 #define DEG2RAD( a ) ( a * M_PI ) / 180.0F
 
 typedef float vec_t;
@@ -149,7 +147,7 @@ static inline vec_t Length(vec3_t v)
 	length = 0;
 	for (i=0 ; i< 3 ; i++)
 		length += v[i]*v[i];
-	length = dvsqrt(length);
+	length = sqrt(length);
 
 	return length;
 }
@@ -159,7 +157,7 @@ static inline float VectorNormalize (vec3_t v)
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = dvsqrt(length);
+	length = sqrt(length);
 
 	if (length)
 	{

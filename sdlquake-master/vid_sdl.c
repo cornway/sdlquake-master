@@ -1,6 +1,6 @@
 // vid_sdl.h -- sdl video driver 
 
-#include <dev_conf.h>
+#include <config.h>
 
 #include <lcd_main.h>
 #include <misc_utils.h>

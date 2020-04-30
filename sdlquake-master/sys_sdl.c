@@ -68,8 +68,8 @@ void Sys_Init(void)
 
 void SDL_Quit(void)
 {
-extern void SystemSoftReset (void);
-    SystemSoftReset();
+    cmd_execute("reset", 0);
+    assert(0);
 }
 
 #if !id386
